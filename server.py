@@ -106,8 +106,8 @@ def delete_pets(id):
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 # load sample data
-def data_load(payload):
-    Pet().deserialize(payload).save()
+def data_load(data):
+    Pet().deserialize(data).save()
 
 # empty the database
 def data_reset():
