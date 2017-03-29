@@ -68,8 +68,15 @@ def get_pets(id):
 ######################################################################
 @app.route('/pets', methods=['POST'])
 def create_pets():
+    # Check for form submission data
+    print 'Headers: {}'.format(request.headers.get('Content-Type'))
+    data = {}
+    if request.headers.get('Content-Type') == 'application/x-www-form-urlencoded':
+        data = {'name': request.form['name'], 'category': request.form['category']}
+    else:
+        data = request.get_json()
     pet = Pet()
-    pet.deserialize(request.get_json())
+    pet.deserialize(data)
     pet.save()
     message = pet.serialize()
     return make_response(jsonify(message), status.HTTP_201_CREATED, {'Location': pet.self_url() })

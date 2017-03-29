@@ -25,6 +25,20 @@ class TestPetServerWeb(unittest.TestCase):
         )
         print self.driver.current_url
 
+    def test_create_a_pet(self):
+        self.driver.get(self.baseURL)
+        nameElement = self.driver.find_element_by_name("name")
+        nameElement.clear()
+        nameElement.send_keys("Missy")
+        categoryElement = self.driver.find_element_by_name("category")
+        categoryElement.clear()
+        categoryElement.send_keys("Cat")
+        self.driver.find_element_by_id("submit").click()
+        self.assertIn(
+            "http://localhost:5000/pets", self.driver.current_url
+        )
+        print self.driver.current_url
+
         #
         # self.driver.find_element_by_id(
         #     'search_form_input_homepage').send_keys("realpython")
