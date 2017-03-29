@@ -25,15 +25,17 @@ def step_impl(context, url):
     context.resp = context.app.get(url)
     assert context.resp.status_code == 200
 
-@when(u'I delete "{url}"')
-def step_impl(context, url):
-    context.resp = context.app.delete(url)
+@when(u'I delete "{url}" with id "{id}"')
+def step_impl(context, url, id):
+    target_url = url + '/' + id
+    context.resp = context.app.delete(target_url)
     assert context.resp.status_code == 204
     assert context.resp.data is ""
 
-@when(u'I retrieve "{url}"')
-def step_impl(context, url):
-    context.resp = context.app.get(url)
+@when(u'I retrieve "{url}" with id "{id}"')
+def step_impl(context, url, id):
+    target_url = url + '/' + id
+    context.resp = context.app.get(target_url)
     assert context.resp.status_code == 200
 
 @when(u'I change "{key}" to "{value}"')
@@ -42,9 +44,10 @@ def step_impl(context, key, value):
     data[key] = value
     context.resp.data = json.dumps(data)
 
-@when(u'I update "{url}"')
-def step_impl(context, url):
-    context.resp = context.app.put(url, data=context.resp.data, content_type='application/json')
+@when(u'I update "{url}" with id "{id}"')
+def step_impl(context, url, id):
+    target_url = url + '/' + id
+    context.resp = context.app.put(target_url, data=context.resp.data, content_type='application/json')
     assert context.resp.status_code == 200
 
 # @then(u'I should see a list of pets')
