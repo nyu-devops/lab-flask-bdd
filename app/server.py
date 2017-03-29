@@ -22,19 +22,12 @@ from flask import Flask, Response, jsonify, request, json, url_for, make_respons
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
 from pet import Pet
-
-# Create Flask application
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret-for-dev'
-app.config['LOGGING_LEVEL'] = logging.INFO
+from . import app
 
 # Error handlers reuire app to be initialized so we must import
 # then only after we have initialized the Flask app instance
 import error_handlers
 
-# Pull options from environment
-debug = (os.getenv('DEBUG', 'False') == 'True')
-port = os.getenv('PORT', '5000')
 redis = None
 
 ######################################################################
@@ -166,12 +159,3 @@ def inititalize_redis():
         app.logger.error('*** FATAL ERROR: Could not connect to the Redis Service')
     # Have the Pet model use Redis
     Pet.use_db(redis)
-
-
-######################################################################
-#   M A I N
-######################################################################
-if __name__ == "__main__":
-    print "Pet Service Starting..."
-    inititalize_redis()
-    app.run(host='0.0.0.0', port=int(port), debug=debug)

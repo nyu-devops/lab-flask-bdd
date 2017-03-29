@@ -1,6 +1,6 @@
 from behave import *
 import json
-import server
+from app import server
 
 @when(u'I visit the "home page"')
 def step_impl(context):

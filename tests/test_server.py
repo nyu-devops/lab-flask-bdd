@@ -5,7 +5,7 @@
 import unittest
 import logging
 import json
-import server
+from app import server
 
 # Status Codes
 HTTP_200_OK = 200
