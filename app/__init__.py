@@ -7,5 +7,5 @@ app = Flask(__name__)
 app.config.from_object('config')
 
 import server
-import pet
+import models
 import custom_exceptions

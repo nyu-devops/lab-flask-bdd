@@ -6,7 +6,7 @@ import unittest
 import json
 from redis import Redis
 from werkzeug.exceptions import NotFound
-from app.pet import Pet
+from app.models import Pet
 from app.custom_exceptions import DataValidationError
 
 ######################################################################

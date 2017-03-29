@@ -21,7 +21,7 @@ from redis.exceptions import ConnectionError
 from flask import Flask, Response, jsonify, request, json, url_for, make_response
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
-from pet import Pet
+from models import Pet
 from . import app
 
 # Error handlers reuire app to be initialized so we must import
