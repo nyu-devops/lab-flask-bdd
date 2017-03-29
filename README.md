@@ -33,9 +33,9 @@ You can now run `behave` and `nosetests` to run the BDD and TDD tests respective
 
 ## Manually running the Tests
 
-Run the tests using `unittest`
+Run the tests using `behave`
 
-    $ python -m unittest discover
+    $ behave
 
 Run the tests using `nose`
 
@@ -43,25 +43,12 @@ Run the tests using `nose`
 
 Nose is configured to automatically include the flags `--with-spec --spec-color` so that red-green-refactor is meaningful. If you are in a command shell that supports colors, passing tests will be green while failing tests will be red.
 
-Run Code Coverage to see how well your test cases exercise your code:
-
-    $ coverage run test_server.py
-    $ coverage report -m --include= server.py
-
-This is particularly useful because it reports the line numbers for the code that is not covered so that you can write more test cases.
-
-You can even run `nosetests` with `coverage`
-
-    $ nosetests --with-coverage --cover-package=server
-
-Try and get as close to 100% coverage as you can.
-
 ## What's featured in the project?
 
-    * server.py -- the main Service using Python Flask
-    * test_server.py -- unit test cases for the server
-    * test_pets.py -- unit test cases for the model
+    * ./app/server.py -- the main Service using Python Flask
+    * ./tests/test_server.py -- unit test cases for the server
+    * ./tests/test_pets.py -- unit test cases for the model
     * ./features/pets.feature -- Behave feature file
     * ./features/steps/steps.py -- Behave step definitions
 
-John Rofrano, Adjunct Professor, NYU Curant
+John Rofrano, Adjunct Professor, NYU
