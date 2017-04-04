@@ -16,22 +16,22 @@ Scenario: The server is running
     Then I should not see "404 Not Found"
 
 Scenario: List all pets
-    When I visit "/pets"
+    When I visit "pets"
     Then I should see "fido"
     And I should see "kitty"
     And I should see "leo"
 
 Scenario: Update a pet
-    When I retrieve "/pets" with id "1"
+    When I retrieve "pets" with id "1"
     And I change "category" to "big dog"
-    And I update "/pets" with id "1"
+    And I update "pets" with id "1"
     Then I should see "big dog"
 
 Scenario: Delete a pet
-    When I visit "/pets"
+    When I visit "pets"
     Then I should see "fido"
     And I should see "kitty"
-    When I delete "/pets" with id "2"
-    And I visit "/pets"
+    When I delete "pets" with id "2"
+    And I visit "pets"
     Then I should see "fido"
     And I should not see "kitty"

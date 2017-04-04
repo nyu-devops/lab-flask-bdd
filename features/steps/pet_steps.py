@@ -27,14 +27,14 @@ def step_impl(context, url):
 
 @when(u'I delete "{url}" with id "{id}"')
 def step_impl(context, url, id):
-    target_url = url + '/' + id
+    target_url = '/{}/{}'.format(url, id)
     context.resp = context.app.delete(target_url)
     assert context.resp.status_code == 204
     assert context.resp.data is ""
 
 @when(u'I retrieve "{url}" with id "{id}"')
 def step_impl(context, url, id):
-    target_url = url + '/' + id
+    target_url = '/{}/{}'.format(url, id)
     context.resp = context.app.get(target_url)
     assert context.resp.status_code == 200
 
@@ -46,7 +46,7 @@ def step_impl(context, key, value):
 
 @when(u'I update "{url}" with id "{id}"')
 def step_impl(context, url, id):
-    target_url = url + '/' + id
+    target_url = '/{}/{}'.format(url, id)
     context.resp = context.app.put(target_url, data=context.resp.data, content_type='application/json')
     assert context.resp.status_code == 200
 
