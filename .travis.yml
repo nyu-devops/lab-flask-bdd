@@ -11,13 +11,15 @@ before_script:
   # - "export DISPLAY=:99.0"
   # - "sh -e /etc/init.d/xvfb start"
   # - sleep 3 # give xvfb some time to start
-  - python run.py &  # start a Web server
-  - sleep 3 # give Web server some time to bind to sockets, etc
+  # - python run.py &  # start a Web server
+  # - sleep 3 # give Web server some time to bind to sockets, etc
 
 script:
-  - nosetests tests/test_selenium.py
-#   - coverage run test_server.py
-#
+  - behave
+  # - nosetests
+  # - nosetests tests/test_selenium.py
+  # - coverage run test_server.py
+
 # after_success:
 #   - codecov
 
