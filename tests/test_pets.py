@@ -103,6 +103,10 @@ class TestPets(unittest.TestCase):
         pet = Pet(0)
         self.assertRaises(DataValidationError, pet.deserialize, "string data")
 
+    def test_save_a_pet_with_no_name(self):
+        pet = Pet(0, None, "cat")
+        self.assertRaises(AttributeError, pet.save)
+
     def test_find_pet(self):
         Pet(0, "fido", "dog").save()
         Pet(0, "kitty", "cat").save()

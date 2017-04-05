@@ -68,9 +68,8 @@ def get_pets(id):
 ######################################################################
 @app.route('/pets', methods=['POST'])
 def create_pets():
-    # Check for form submission data
-    print 'Headers: {}'.format(request.headers.get('Content-Type'))
     data = {}
+    # Check for form submission data
     if request.headers.get('Content-Type') == 'application/x-www-form-urlencoded':
         data = {'name': request.form['name'], 'category': request.form['category']}
     else:
