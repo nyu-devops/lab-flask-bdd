@@ -11,7 +11,6 @@ node('node') {
                    checkout scm                      // checks out the git repo that contains this Jenkinsfile
            }
        stage 'Test'
-            print "Executing build script for" $JOB_NAME
             sh '''
             if [ ! -d "venv" ]; then
                 virtualenv venv
