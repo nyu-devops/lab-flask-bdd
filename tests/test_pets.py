@@ -8,6 +8,7 @@ from redis import Redis
 from werkzeug.exceptions import NotFound
 from app.models import Pet
 from app.custom_exceptions import DataValidationError
+from app import server  # to get Redis
 
 ######################################################################
 #  T E S T   C A S E S
@@ -15,7 +16,9 @@ from app.custom_exceptions import DataValidationError
 class TestPets(unittest.TestCase):
 
     def setUp(self):
-        Pet.use_db(Redis(host='127.0.0.1', port=6379))
+        server.inititalize_redis()
+        Pet.use_db(server.redis)
+        # Pet.use_db(Redis(host='127.0.0.1', port=6379))
         Pet.remove_all()
         # Pet(0, 'fido', 'dog').save()
         # Pet(0, 'kitty', 'cat').save()
