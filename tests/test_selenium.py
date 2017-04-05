@@ -1,12 +1,15 @@
-
+import os
 import unittest
 from selenium import webdriver
+
+# Pull server url from environment
+BASE_URL = os.getenv('BASE_URL', 'http://localhost:5000/')
 
 class TestPetServerWeb(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.PhantomJS()
         self.driver.set_window_size(1120, 550)
-        self.baseURL = "http://localhost:5000/"
+        self.baseURL = BASE_URL
 
     def tearDown(self):
         self.driver.quit()
@@ -20,9 +23,9 @@ class TestPetServerWeb(unittest.TestCase):
     def test_get_pets(self):
         self.driver.get(self.baseURL)
         self.driver.find_element_by_id("get_pets").click()
-        self.assertIn(
-            "http://localhost:5000/pets", self.driver.current_url
-        )
+        # make sure we landed on the correct page
+        new_url = '{}pets'.format(self.baseURL)
+        self.assertIn(new_url, self.driver.current_url)
         print self.driver.current_url
 
     def test_create_a_pet(self):
@@ -34,9 +37,9 @@ class TestPetServerWeb(unittest.TestCase):
         categoryElement.clear()
         categoryElement.send_keys("Cat")
         self.driver.find_element_by_id("submit").click()
-        self.assertIn(
-            "http://localhost:5000/pets", self.driver.current_url
-        )
+        # make sure we landed on the correct page
+        new_url = '{}pets'.format(self.baseURL)
+        self.assertIn(new_url, self.driver.current_url)
         print self.driver.current_url
 
         #
