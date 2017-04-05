@@ -10,7 +10,6 @@ node {
     }
     stage ('Test') {
         sh '''
-        docker run -d --name redis -p 6379:6379 redis:alpine
         if [ ! -d "venv" ]; then
             virtualenv venv
         fi
