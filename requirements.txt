@@ -1,9 +1,13 @@
 Flask==0.12
 Flask-API==0.6.9
 redis>=2.10
+# TDD
 nose==1.3.7
 pinocchio==0.4.2
 rednose==1.2.1
+# Code coverage
 coverage==3.7.1
+codecov==2.0.5
+# BDD
 behave==1.2.5
 selenium==3.3.1

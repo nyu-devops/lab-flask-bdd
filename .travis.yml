@@ -15,13 +15,13 @@ before_script:
   # - sleep 3 # give Web server some time to bind to sockets, etc
 
 script:
+  - nosetests
   - behave
-  # - nosetests
   # - nosetests tests/test_selenium.py
-  # - coverage run test_server.py
+  # - coverage run tests/test_server.py
 
-# after_success:
-#   - codecov
+after_success:
+  - codecov
 
 services:
   - redis-server
