@@ -1,6 +1,6 @@
 # Lab: Python Flask Behavior Driven Development
 
-[![Build Status](https://travis-ci.org/nyu-devops/lab-flask-bdd.svg?branch=master)](https://travis-ci.org/nyu-devops/lab-flask-bdd)
+[![Build Status](https://travis-ci.org/vignesh3193/lab-flask-bdd.svg?branch=master)](https://travis-ci.org/vignesh3193/lab-flask-bdd)
 [![Codecov](https://img.shields.io/codecov/c/github/nyu-devops/lab-flask-bdd.svg)]()
 <a href="https://zenhub.com"><img src="https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png"></a>
 
