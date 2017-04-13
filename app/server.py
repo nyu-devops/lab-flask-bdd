@@ -100,6 +100,16 @@ def delete_pets(id):
         pet.delete()
     return make_response('', status.HTTP_204_NO_CONTENT)
 
+######################################################################
+# PURCHASE A PET
+######################################################################
+@app.route('/pets/<int:id>/purchase', methods=['PUT'])
+def purchase_pets(id):
+    pet = Pet.find_or_404(id)
+    pet.available = False
+    pet.save()
+    return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
+
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
@@ -112,17 +122,17 @@ def data_load(data):
 def data_reset():
     redis.flushall()
 
-@app.before_first_request
-def setup_logging():
-    if not app.debug:
-        # In production mode, add log handler to sys.stderr.
-        handler = logging.StreamHandler()
-        handler.setLevel(app.config['LOGGING_LEVEL'])
-        # formatter = logging.Formatter(app.config['LOGGING_FORMAT'])
-        #'%Y-%m-%d %H:%M:%S'
-        formatter = logging.Formatter('[%(asctime)s] - %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
-        handler.setFormatter(formatter)
-        app.logger.addHandler(handler)
+# @app.before_first_request
+# def setup_logging():
+#     if not app.debug:
+#         # In production mode, add log handler to sys.stderr.
+#         handler = logging.StreamHandler()
+#         handler.setLevel(app.config['LOGGING_LEVEL'])
+#         # formatter = logging.Formatter(app.config['LOGGING_FORMAT'])
+#         #'%Y-%m-%d %H:%M:%S'
+#         formatter = logging.Formatter('[%(asctime)s] - %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
+#         handler.setFormatter(formatter)
+#         app.logger.addHandler(handler)
 
 ######################################################################
 # Connect to Redis and catch connection exceptions

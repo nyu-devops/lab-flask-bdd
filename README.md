@@ -23,7 +23,7 @@ It also introduces Behavior Driven Development using `Behave` as a way to define
 
 ## Setup
 
-For easy setup, you need to have Vagrant and VirtualBox installed. Then all you have to do is clone this repo and invoke vagrant:
+For easy setup, you need to have [Vagrant](https://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/) installed. Then all you have to do is clone this repo and invoke vagrant:
 
     git clone https://github.com/nyu-devops/lab-flask-bdd.git
     cd lab-flask-bdd

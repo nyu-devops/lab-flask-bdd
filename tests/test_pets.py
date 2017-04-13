@@ -25,17 +25,18 @@ class TestPets(unittest.TestCase):
 
     def test_create_a_pet(self):
         # Create a pet and assert that it exists
-        pet = Pet(0, "fido", "dog")
+        pet = Pet(0, "fido", "dog", False)
         self.assertNotEqual( pet, None )
         self.assertEqual( pet.id, 0 )
         self.assertEqual( pet.name, "fido" )
         self.assertEqual( pet.category, "dog" )
+        self.assertEqual( pet.available, False )
 
     def test_add_a_pet(self):
         # Create a pet and add it to the database
         pets = Pet.all()
         self.assertEqual( pets, [])
-        pet = Pet(0, "fido", "dog")
+        pet = Pet(0, "fido", "dog", True)
         self.assertTrue( pet != None )
         self.assertEqual( pet.id, 0 )
         pet.save()
@@ -46,9 +47,10 @@ class TestPets(unittest.TestCase):
         self.assertEqual( pets[0].id, 1 )
         self.assertEqual( pets[0].name, "fido" )
         self.assertEqual( pets[0].category, "dog" )
+        self.assertEqual( pets[0].available, True )
 
     def test_update_a_pet(self):
-        pet = Pet(0, "fido", "dog")
+        pet = Pet(0, "fido", "dog", True)
         pet.save()
         self.assertEqual( pet.id, 1 )
         # Change it an save it
@@ -82,7 +84,7 @@ class TestPets(unittest.TestCase):
         self.assertEqual( data['category'], "dog" )
 
     def test_deserialize_a_pet(self):
-        data = {"id":1, "name": "kitty", "category": "cat"}
+        data = {"id":1, "name": "kitty", "category": "cat", "available": True}
         pet = Pet(data['id'])
         pet.deserialize(data)
         self.assertNotEqual( pet, None )
@@ -133,6 +135,13 @@ class TestPets(unittest.TestCase):
         pets = Pet.find_by_category("cat")
         self.assertNotEqual( len(pets), 0 )
         self.assertEqual( pets[0].category, "cat" )
+        self.assertEqual( pets[0].name, "kitty" )
+
+    def test_find_by_availability(self):
+        Pet(0, "fido", "dog", False).save()
+        Pet(0, "kitty", "cat", True).save()
+        pets = Pet.find_by_availability(True)
+        self.assertEqual( len(pets), 1 )
         self.assertEqual( pets[0].name, "kitty" )
 
 

@@ -29,8 +29,8 @@ class TestPetServer(unittest.TestCase):
         self.app = server.app.test_client()
         server.inititalize_redis()
         server.data_reset()
-        server.data_load({"name": "fido", "category": "dog"})
-        server.data_load({"name": "kitty", "category": "cat"})
+        server.data_load({"name": "fido", "category": "dog", "available": True})
+        server.data_load({"name": "kitty", "category": "cat", "available": True})
 
     def test_index(self):
         resp = self.app.get('/')
@@ -57,7 +57,7 @@ class TestPetServer(unittest.TestCase):
         # save the current number of pets for later comparrison
         pet_count = self.get_pet_count()
         # add a new pet
-        new_pet = {'name': 'sammy', 'category': 'snake'}
+        new_pet = {'name': 'sammy', 'category': 'snake', 'available': True}
         data = json.dumps(new_pet)
         resp = self.app.post('/pets', data=data, content_type='application/json')
         self.assertEqual( resp.status_code, HTTP_201_CREATED )
@@ -76,7 +76,7 @@ class TestPetServer(unittest.TestCase):
         self.assertIn( new_json, data )
 
     def test_update_pet(self):
-        new_kitty = {'name': 'kitty', 'category': 'tabby'}
+        new_kitty = {'name': 'kitty', 'category': 'tabby', 'available': True}
         data = json.dumps(new_kitty)
         resp = self.app.put('/pets/2', data=data, content_type='application/json')
         self.assertEqual( resp.status_code, HTTP_200_OK )
@@ -138,6 +138,14 @@ class TestPetServer(unittest.TestCase):
         data = json.loads(resp.data)
         query_item = data[0]
         self.assertEqual(query_item['category'], 'dog')
+
+    def test_purchase_a_pet(self):
+        resp = self.app.put('/pets/2/purchase', content_type='application/json')
+        self.assertEqual( resp.status_code, HTTP_200_OK )
+        resp = self.app.get('/pets/2', content_type='application/json')
+        self.assertEqual( resp.status_code, HTTP_200_OK )
+        pet_data = json.loads(resp.data)
+        self.assertEqual (pet_data['available'], False)
 
 
 ######################################################################
