@@ -18,7 +18,7 @@ def step_impl(context, message):
 def step_impl(context):
     server.data_reset()
     for row in context.table:
-        server.data_load({"name": row['name'], "category": row['category']})
+        server.data_load({"name": row['name'], "category": row['category'], "available": row['available']})
 
 @when(u'I visit "{url}"')
 def step_impl(context, url):
