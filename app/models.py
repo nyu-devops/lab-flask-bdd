@@ -14,6 +14,7 @@
 # limitations under the License.
 ######################################################################
 
+import pickle
 from flask import url_for
 from werkzeug.exceptions import NotFound
 from custom_exceptions import DataValidationError
@@ -26,20 +27,21 @@ from custom_exceptions import DataValidationError
 class Pet(object):
     __redis = None
 
-    def __init__(self, id=0, name=None, category=None):
+    def __init__(self, id=0, name=None, category=None, available=True):
         self.id = int(id)
         self.name = name
         self.category = category
+        self.available = available
 
     def self_url(self):
         return url_for('get_pets', id=self.id, _external=True)
 
     def save(self):
-        if self.name == None:
+        if self.name == None:   # name is the only required field
             raise AttributeError('name attribute is not set')
         if self.id == 0:
             self.id = self.__next_index()
-        Pet.__redis.hmset(self.id, self.serialize())
+        Pet.__redis.set(self.id, pickle.dumps(self.serialize()))
 
     def delete(self):
         Pet.__redis.delete(self.id)
@@ -48,12 +50,13 @@ class Pet(object):
         return Pet.__redis.incr('index')
 
     def serialize(self):
-        return { "id": self.id, "name": self.name, "category": self.category }
+        return { "id": self.id, "name": self.name, "category": self.category, "available": self.available }
 
     def deserialize(self, data):
         try:
             self.name = data['name']
             self.category = data['category']
+            self.available = data['available']
         except KeyError as e:
             raise DataValidationError('Invalid pet: missing ' + e.args[0])
         except TypeError as e:
@@ -78,7 +81,7 @@ class Pet(object):
         results = []
         for key in Pet.__redis.keys():
             if key != 'index':  # filer out our id index
-                data = Pet.__redis.hgetall(key)
+                data = pickle.loads(Pet.__redis.get(key))
                 pet = Pet(data['id']).deserialize(data)
                 results.append(pet)
         return results
@@ -86,7 +89,7 @@ class Pet(object):
     @staticmethod
     def find(id):
         if Pet.__redis.exists(id):
-            data = Pet.__redis.hgetall(id)
+            data = pickle.loads(Pet.__redis.get(id))
             pet = Pet(data['id']).deserialize(data)
             return pet
         else:
@@ -105,7 +108,18 @@ class Pet(object):
         results = []
         for key in Pet.__redis.keys():
             if key != 'index':  # filer out our id index
-                data = Pet.__redis.hgetall(key)
+                data = pickle.loads(Pet.__redis.get(key))
                 if data['category'] == category:
+                    results.append(Pet(data['id']).deserialize(data))
+        return results
+
+    @staticmethod
+    def find_by_availability(available=True):
+        # return [pet for pet in Pet.__data if pet.available == available]
+        results = []
+        for key in Pet.__redis.keys():
+            if key != 'index':  # filer out our id index
+                data = pickle.loads(Pet.__redis.get(key))
+                if data['available'] == available:
                     results.append(Pet(data['id']).deserialize(data))
         return results

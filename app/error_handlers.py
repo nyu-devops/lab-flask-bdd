@@ -9,7 +9,7 @@ from custom_exceptions import DataValidationError
 
 @app.errorhandler(DataValidationError)
 def request_validation_error(e):
-    return make_response(jsonify(status=400, error='Bad Request', message=e.message), status.HTTP_400_BAD_REQUEST)
+    return bad_request(e)
 
 @app.errorhandler(404)
 def not_found(e):
