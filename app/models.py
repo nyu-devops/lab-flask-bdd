@@ -15,6 +15,7 @@
 ######################################################################
 
 import pickle
+from cerberus import Validator
 from flask import url_for
 from werkzeug.exceptions import NotFound
 from custom_exceptions import DataValidationError
@@ -25,6 +26,13 @@ from custom_exceptions import DataValidationError
 #   where redis is a value connection to a Redis database
 ######################################################################
 class Pet(object):
+    schema = {
+                'id': {'type': 'integer'},
+                'name': {'type': 'string', 'required': True},
+                'category': {'type': 'string', 'required': True},
+                'available': {'type': 'boolean', 'required': True}
+             }
+    __validator = Validator(schema)
     __redis = None
 
     def __init__(self, id=0, name=None, category=None, available=True):
@@ -53,14 +61,12 @@ class Pet(object):
         return { "id": self.id, "name": self.name, "category": self.category, "available": self.available }
 
     def deserialize(self, data):
-        try:
+        if isinstance(data, dict) and Pet.__validator.validate(data):
             self.name = data['name']
             self.category = data['category']
             self.available = data['available']
-        except KeyError as e:
-            raise DataValidationError('Invalid pet: missing ' + e.args[0])
-        except TypeError as e:
-            raise DataValidationError('Invalid pet: body of request contained bad or no data')
+        else:
+            raise DataValidationError('Invalid pet data: ' + str(Pet.__validator.errors))
         return self
 
 ######################################################################

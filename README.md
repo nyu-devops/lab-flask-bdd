@@ -52,4 +52,37 @@ Nose is configured to automatically include the flags `--with-spec --spec-color`
     * ./features/pets.feature -- Behave feature file
     * ./features/steps/steps.py -- Behave step definitions
 
+## Running these tests using Docker containers
+
+If you want to deploy this example in a Docker container, you can run the tests from the container.
+
+This service requires Redis so first start a Redis container
+
+    docker run -d --name redis-service -p 6379:6379 redis:alpine
+
+Next build this repo as a container
+
+    docker build -t flask-bdd .
+
+To run `nosetests` just run it in a container while linking it to the `redis-service` container that we have running.
+
+    docker run --rm --link redis-service flask-bdd nosetests
+
+To run `behave` tests we need an instance of our service running so it takes two `docker` commands, one to run our service and another to run the `behave` tests
+
+    docker run -d --name flask-service --link redis-service -p 5000:5000 flask-bdd
+    docker run --rm --link flask-service -e BASE_URL="http://flask-service:5000/" flask-bdd behave
+
+Notice how we injected the URL of the running service into our container running the behave tests using an environment variable in keeping with 12-factor configuration recommendations.
+
+To bring down these services use:
+
+    docker stop flask-bdd
+    docker stop redis-service
+
+...and to remove them with:
+
+    docker rm flask-bdd
+    docker rm redis-service
+
 John Rofrano, Adjunct Professor, NYU

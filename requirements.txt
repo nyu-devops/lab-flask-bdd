@@ -1,6 +1,7 @@
 Flask==0.12
 Flask-API==0.6.9
 redis>=2.10
+Cerberus==1.1
 # TDD
 nose==1.3.7
 pinocchio==0.4.2
@@ -11,3 +12,4 @@ codecov==2.0.5
 # BDD
 behave==1.2.5
 selenium==3.3.1
+requests==2.13.0
