@@ -31,6 +31,13 @@ import error_handlers
 redis = None
 
 ######################################################################
+# GET HEALTH CHECK
+######################################################################
+@app.route('/healthcheck')
+def healthcheck():
+    return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
+
+######################################################################
 # GET INDEX
 ######################################################################
 @app.route('/')
@@ -110,6 +117,12 @@ def purchase_pets(id):
     pet.save()
     return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
 
+######################################################################
+# DELETE ALL PET DATA (for testing only)
+######################################################################
+# @app.route('/pets/reset', methods=['DELETE'])
+# def pets_reset():
+#     redis.flushall()
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

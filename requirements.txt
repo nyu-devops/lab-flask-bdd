@@ -13,3 +13,6 @@ codecov==2.0.5
 behave==1.2.5
 selenium==3.3.1
 requests==2.13.0
+# Runtime
+honcho
+httpie
