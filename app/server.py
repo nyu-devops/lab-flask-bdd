@@ -78,7 +78,7 @@ def create_pets():
     data = {}
     # Check for form submission data
     if request.headers.get('Content-Type') == 'application/x-www-form-urlencoded':
-        data = {'name': request.form['name'], 'category': request.form['category']}
+        data = {'name': request.form['name'], 'category': request.form['category'], 'available': True}
     else:
         data = request.get_json()
     pet = Pet()
