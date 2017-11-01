@@ -8,13 +8,13 @@
 Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "ubuntu/xenial64"
   config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
   config.vm.network "private_network", ip: "192.168.33.10"
 
   # Windows users need to change the permissions explicitly so that Windows doesn't
   # set the execute bit on all of your files which messes with GitHub users on Mac and Linux
-  config.vm.synced_folder "./", "/vagrant", owner: "vagrant", mount_options: ["dmode=755,fmode=644"]
+  config.vm.synced_folder "./", "/vagrant", owner: "ubuntu", mount_options: ["dmode=755,fmode=644"]
 
   # Example for VirtualBox:
   config.vm.provider "virtualbox" do |vb|
@@ -30,17 +30,37 @@ Vagrant.configure(2) do |config|
     config.vm.provision "file", source: "~/.gitconfig", destination: "~/.gitconfig"
   end
 
+  # Copy your private ssh keys to use with github
+  if File.exists?(File.expand_path("~/.ssh/id_rsa"))
+    config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
+  end
+
   ######################################################################
   # Setup a Python development environment
   ######################################################################
   config.vm.provision "shell", inline: <<-SHELL
-    wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
-    echo "deb http://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
-    sudo apt-get update
-    sudo apt-get install -y git zip tree python-pip python-dev build-essential cf-cli
+    #apt-get update && apt-get upgrade -y && apt-get dist-upgrade -y
+    apt-get update
+    apt-get install -y wget git zip tree python-pip python-dev
+    apt-get -y autoremove
+    pip install --upgrade pip
+    # Make vi look nice
+    sudo -H -u ubuntu echo "colorscheme desert" > ~/.vimrc
+    echo "\n****************************"
+    echo " Installing the Bluemix CLI"
+    echo "****************************\n"
+    wget https://clis.ng.bluemix.net/download/bluemix-cli/latest/linux64
+    tar -zxvf linux64
+    cd Bluemix_CLI/
+    ./install_bluemix_cli
+    cd ..
+    rm -fr Bluemix_CLI/
+    rm linux64
     # Install PhantomJS for Selenium browser support
+    echo "\n***********************************"
+    echo " Installing PhantomJS for Selenium"
+    echo "***********************************\n"
     sudo apt-get install -y chrpath libssl-dev libxft-dev
-    sudo apt-get -y autoremove
     # PhantomJS https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2
     cd ~
     export PHANTOM_JS="phantomjs-2.1.1-linux-x86_64"
@@ -50,6 +70,9 @@ Vagrant.configure(2) do |config|
     sudo ln -sf /usr/local/share/$PHANTOM_JS/bin/phantomjs /usr/local/bin
     rm -f $PHANTOM_JS.tar.bz2
     # Install app dependencies
+    echo "\n******************************"
+    echo " Installing app dependencies"
+    echo "******************************\n"
     cd /vagrant
     sudo pip install -r requirements.txt
   SHELL
@@ -60,7 +83,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: <<-SHELL
     # Prepare Redis data share
     sudo mkdir -p /var/lib/redis/data
-    sudo chown vagrant:vagrant /var/lib/redis/data
+    sudo chown ubuntu:ubuntu /var/lib/redis/data
   SHELL
 
   # Add Redis docker container
