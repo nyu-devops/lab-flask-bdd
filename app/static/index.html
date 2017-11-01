@@ -6,6 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="static/stylesheets/style.css">
+    <script type="text/javascript" src = "static/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="static/rest_api.js"></script>
   </head>
   <body>
       <table>
@@ -20,35 +22,64 @@
 				<br><br>
                 GET <a href="/pets?category=dog">/pets?category=dog</a> to see all of the pets in the 'dog' category.
 				<br><br>
-				GET /pets/{id} retrieves a pet from the DB using an ID.
-				<br><br>
-				PUT /pets/{id} updates a pet using an ID.
-				<br><br>
-				DELETE /pets/{id} removes a pet from the DB using an ID.
-				<br><br>
-				POST /pets creates an new pet.
-                <p>Example Data:</p>
-                <pre>
-    {
-        "name": "bowser",
-        "category": "dog"
-    }
-                </pre>
                 Try it now:
-                <form id="create_pets" action="/pets" method="post" enctype="application/json">
-                    <input type="hidden" name="available" value="true">
-                    <div>
-                      <label for="name">What is the name of the pet?</label>
-                      <input name="name" id="name" value="Bowser">
+                <hr />
+                <div class = "create">
+                    <h4>Create a Pet</h4>
+                    <input type="hidden" id="create_available" value="true">
+                    <label>Name:</label>
+                    <input type="text" id="create_name"><br>
+                    <label>Category:</label>
+                    <input type="text" id="create_category"><br>
+                    <button id = "create-btn">Create</button>
+                    <br>
+                    <div class = "create-display">
+                        <div id="create_result_id"></div>
+                        <div id="create_result_name"></div>
+                        <div id="create_result_category"></div>
+                        <div id="create_result_available"></div>
                     </div>
-                    <div>
-                      <label for="category">What category is the pet?</label>
-                      <input name="category" id="category" value="Dog">
+                </div>
+                <br><hr />
+                <div class = "retrieve">
+                    <h4>Retrieve a Pet</h4>
+                    <label>Enter ID:</label>
+                    <input type="text" id="retrieve_id">
+                    <button id = "retrieve-btn">Retrieve</button>
+                    <br><div class = "retrieve-display">
+                        <div id="retrieve_result_id"></div>
+                        <div id="retrieve_result_name"></div>
+                        <div id="retrieve_result_category"></div>
+                        <div id="retrieve_result_available"></div>
                     </div>
-                    <div>
-                      <button id="submit">Create Pet</button>
+                </div>
+                <br><hr />
+                <div class = "update">
+                    <h4>Update a Pet</h3>
+                    <label>Enter Pet ID:</label>
+                    <input type="text" id="update_id">
+                    <label>Name:</label>
+                    <input type="text" id="update_name">
+                    <label>Category:</label>
+                    <input type="text" id="update_category">
+                    <button id = "update-btn">Update</button>
+                    <br><div class = "update-display">
+                        <div id="update_result_id"></div>
+                        <div id="update_result_name"></div>
+                        <div id="update_result_category"></div>
                     </div>
-                </form>
+                </div>
+                <br><hr />
+                <div class = "delete">
+                    <h4>Delete a Pet</h3>
+                    <label>Enter Pet ID:</label>
+                    <input type="text" id="delete_id">
+                    <button id = "delete-btn">Delete</button>
+                    <br><div class = "delete-display">
+                        <div id="delete_result"></div>
+                    </div>
+                </div>
+
 			</td>
 		</tr>
 	</table>

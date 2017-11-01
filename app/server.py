@@ -104,13 +104,16 @@ def create_pets():
     data = {}
     # Check for form submission data
     if request.headers.get('Content-Type') == 'application/x-www-form-urlencoded':
+        app.logger.info('Getting data from form submit')
         data = {
             'name': request.form['name'],
             'category': request.form['category'],
             'available': True
         }
     else:
+        app.logger.info('Getting data from API call')
         data = request.get_json()
+    app.logger.info(data)
     pet = Pet()
     pet.deserialize(data)
     pet.save()
@@ -134,7 +137,9 @@ def update_pets(pet_id):
     pet = Pet.find(pet_id)
     if not pet:
         raise NotFound("Pet with id '{}' was not found.".format(pet_id))
-    pet.deserialize(request.get_json())
+    data = request.get_json()
+    app.logger.info(data)
+    pet.deserialize(data)
     pet.id = pet_id
     pet.save()
     return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
