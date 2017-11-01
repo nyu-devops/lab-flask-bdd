@@ -8,21 +8,24 @@
 Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "ubuntu/xenial64"
-  config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
-  config.vm.network "private_network", ip: "192.168.33.10"
+  config.vm.define "bdd" do |bdd|
+      bdd.vm.box = "ubuntu/xenial64"
+      # set up network ip and port forwarding
+      bdd.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
+      bdd.vm.network "private_network", ip: "192.168.33.10"
 
-  # Windows users need to change the permissions explicitly so that Windows doesn't
-  # set the execute bit on all of your files which messes with GitHub users on Mac and Linux
-  config.vm.synced_folder "./", "/vagrant", owner: "ubuntu", mount_options: ["dmode=755,fmode=644"]
+      # Windows users need to change the permissions explicitly so that Windows doesn't
+      # set the execute bit on all of your files which messes with GitHub users on Mac and Linux
+      bdd.vm.synced_folder "./", "/vagrant", owner: "ubuntu", mount_options: ["dmode=755,fmode=644"]
 
-  # Example for VirtualBox:
-  config.vm.provider "virtualbox" do |vb|
-    # Display the VirtualBox GUI when booting the machine
-    #vb.gui = true
-    # Customize the amount of memory on the VM:
-    vb.memory = "512"
-    vb.cpus = 1
+      bdd.vm.provider "virtualbox" do |vb|
+        # Customize the amount of memory on the VM:
+        vb.memory = "512"
+        vb.cpus = 1
+        # Fixes some DNS issues on some networks
+        vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+        vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+      end
   end
 
   # Copy your .gitconfig file so that your git credentials are correct
