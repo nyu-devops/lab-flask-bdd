@@ -14,6 +14,9 @@
 		<tr>
             <td style= "width:30%;">
               <img class = "newappIcon" src="static/images/newapp-icon.png">
+              <div class = "flash">
+                  <div id = "flash_message"></div>
+              </div>
             </td>
 			<td>
 				<h1 id = "message">Pet Demo REST API Service</h1>
@@ -34,10 +37,10 @@
                     <button id = "create-btn">Create</button>
                     <br>
                     <div class = "create-display">
-                        <div id="create_result_id"></div>
-                        <div id="create_result_name"></div>
-                        <div id="create_result_category"></div>
-                        <div id="create_result_available"></div>
+                        <span id="create_result_id"></span>
+                        <span id="create_result_name"></span>
+                        <span id="create_result_category"></span>
+                        <span id="create_result_available"></span>
                     </div>
                 </div>
                 <br><hr />
@@ -47,10 +50,10 @@
                     <input type="text" id="retrieve_id">
                     <button id = "retrieve-btn">Retrieve</button>
                     <br><div class = "retrieve-display">
-                        <div id="retrieve_result_id"></div>
-                        <div id="retrieve_result_name"></div>
-                        <div id="retrieve_result_category"></div>
-                        <div id="retrieve_result_available"></div>
+                        <span id="retrieve_result_id"></span>
+                        <span id="retrieve_result_name"></span>
+                        <span id="retrieve_result_category"></span>
+                        <span id="retrieve_result_available"></span>
                     </div>
                 </div>
                 <br><hr />
@@ -64,9 +67,9 @@
                     <input type="text" id="update_category">
                     <button id = "update-btn">Update</button>
                     <br><div class = "update-display">
-                        <div id="update_result_id"></div>
-                        <div id="update_result_name"></div>
-                        <div id="update_result_category"></div>
+                        <span id="update_result_id"></span>
+                        <span id="update_result_name"></span>
+                        <span id="update_result_category"></span>
                     </div>
                 </div>
                 <br><hr />
@@ -76,7 +79,7 @@
                     <input type="text" id="delete_id">
                     <button id = "delete-btn">Delete</button>
                     <br><div class = "delete-display">
-                        <div id="delete_result"></div>
+                        <span id="delete_result"></span>
                     </div>
                 </div>
 

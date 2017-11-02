@@ -12,26 +12,33 @@ Background:
 
 Scenario: The server is running
     When I visit the "home page"
-    Then I should see "Pet Demo REST API Service"
-    Then I should not see "404 Not Found"
+    Then I should see "Pet Demo RESTful Service" in the title
+#     Then I should not see "404 Not Found"
 
-Scenario: List all pets
-    When I visit "pets"
-    Then I should see "fido"
-    And I should see "kitty"
-    And I should see "leo"
+Scenario: Create a Pet
+    When I visit the "home page"
+    And I set the "create_name" to "Happy"
+    And I set the "create_category" to "Hippo"
+    And I press the "create-btn" button
+    Then I should see the message "Success"
 
-Scenario: Update a pet
-    When I retrieve "pets" with id "1"
-    And I change "category" to "big dog"
-    And I update "pets" with id "1"
-    Then I should see "big dog"
-
-Scenario: Delete a pet
-    When I visit "pets"
-    Then I should see "fido"
-    And I should see "kitty"
-    When I delete "pets" with id "2"
-    And I visit "pets"
-    Then I should see "fido"
-    And I should not see "kitty"
+# Scenario: List all pets
+#     When I visit "pets"
+#     Then I should see "fido"
+#     And I should see "kitty"
+#     And I should see "leo"
+#
+# Scenario: Update a pet
+#     When I retrieve "pets" with id "1"
+#     And I change "category" to "big dog"
+#     And I update "pets" with id "1"
+#     Then I should see "big dog"
+#
+# Scenario: Delete a pet
+#     When I visit "pets"
+#     Then I should see "fido"
+#     And I should see "kitty"
+#     When I delete "pets" with id "2"
+#     And I visit "pets"
+#     Then I should see "fido"
+#     And I should not see "kitty"

@@ -38,6 +38,9 @@ $(function () {
             $("#create_result_category").append(result_category);
             $("#create_result_available").append(result_available);
 
+            $("#flash_message").empty();
+            $("#flash_message").append("Success");
+
         });
         ajax.fail(function(res){
 
@@ -45,7 +48,9 @@ $(function () {
             $("#create_result_name").empty();
             $("#create_result_category").empty();
             $("#create_result_available").empty();
-            $("#create_result_id").append("server error!");
+
+            $("#flash_message").empty();
+            $("#flash_message").append("Server error!");
         });
 
     });
@@ -91,6 +96,9 @@ $(function () {
             $("#update_result_category").append(result_category);
             $("#update_result_available").append(result_available);
 
+            $("#flash_message").empty();
+            $("#flash_message").append("Success");
+
         });
         ajax.fail(function(res){
 
@@ -98,7 +106,10 @@ $(function () {
             $("#update_result_name").empty();
             $("#update_result_category").empty();
             $("#update_result_available").empty();
-            $("#update_result_id").append("user id does not exist");
+
+            $("#flash_message").empty();
+            $("#flash_message").append("Pet does not exist");
+
         });
     });
 
@@ -132,6 +143,8 @@ $(function () {
             $("#retrieve_result_category").append(result_category);
             $("#retrieve_result_available").append(result_available);
 
+            $("#flash_message").empty();
+            $("#flash_message").append("Success");
         });
         ajax.fail(function(res){
 
@@ -140,7 +153,9 @@ $(function () {
             $("#retrieve_result_category").empty();
             $("#retrieve_result_available").empty();
 
-            $("#retrieve_result_id").append("user id does not exist!");
+            $("#flash_message").empty();
+            $("#flash_message").append("Pet does not exist");
+
         });
     });
 
@@ -164,11 +179,14 @@ $(function () {
             $("#delete_result").empty();
             $("#delete_result").append("Deleted!");
 
+            $("#flash_message").empty();
+            $("#flash_message").append("Success");
         });
         ajax.fail(function(res){
 
             $("#delete_result").empty();
             $("#delete_result").append("server error!");
+
         });
     });
 
