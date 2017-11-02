@@ -5,86 +5,93 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="static/stylesheets/style.css">
-    <script type="text/javascript" src = "static/jquery-3.1.1.min.js"></script>
-    <script type="text/javascript" src="static/rest_api.js"></script>
+    <link rel="stylesheet" href="static/css/blue_bootstrap.min.css">
+    <script type="text/javascript" src = "static/js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="static/js/rest_api.js"></script>
   </head>
   <body>
-      <table>
-		<tr>
-            <td style= "width:30%;">
-              <img class = "newappIcon" src="static/images/newapp-icon.png">
-              <div class = "flash">
-                  <div id = "flash_message"></div>
-              </div>
-            </td>
-			<td>
-				<h1 id = "message">Pet Demo REST API Service</h1>
-				<p class='description'>
-				GET <a href="/pets" id = "get_pets">/pets</a> to see all the pets.
-				<br><br>
-                GET <a href="/pets?category=dog">/pets?category=dog</a> to see all of the pets in the 'dog' category.
-				<br><br>
-                Try it now:
-                <hr />
-                <div class = "create">
-                    <h4>Create a Pet</h4>
-                    <input type="hidden" id="create_available" value="true">
-                    <label>Name:</label>
-                    <input type="text" id="create_name"><br>
-                    <label>Category:</label>
-                    <input type="text" id="create_category"><br>
-                    <button id = "create-btn">Create</button>
-                    <br>
-                    <div class = "create-display">
-                        <span id="create_result_id"></span>
-                        <span id="create_result_name"></span>
-                        <span id="create_result_category"></span>
-                        <span id="create_result_available"></span>
-                    </div>
-                </div>
-                <br><hr />
-                <div class = "retrieve">
-                    <h4>Retrieve a Pet</h4>
-                    <label>Enter ID:</label>
-                    <input type="text" id="retrieve_id">
-                    <button id = "retrieve-btn">Retrieve</button>
-                    <br><div class = "retrieve-display">
-                        <span id="retrieve_result_id"></span>
-                        <span id="retrieve_result_name"></span>
-                        <span id="retrieve_result_category"></span>
-                        <span id="retrieve_result_available"></span>
-                    </div>
-                </div>
-                <br><hr />
-                <div class = "update">
-                    <h4>Update a Pet</h3>
-                    <label>Enter Pet ID:</label>
-                    <input type="text" id="update_id">
-                    <label>Name:</label>
-                    <input type="text" id="update_name">
-                    <label>Category:</label>
-                    <input type="text" id="update_category">
-                    <button id = "update-btn">Update</button>
-                    <br><div class = "update-display">
-                        <span id="update_result_id"></span>
-                        <span id="update_result_name"></span>
-                        <span id="update_result_category"></span>
-                    </div>
-                </div>
-                <br><hr />
-                <div class = "delete">
-                    <h4>Delete a Pet</h3>
-                    <label>Enter Pet ID:</label>
-                    <input type="text" id="delete_id">
-                    <button id = "delete-btn">Delete</button>
-                    <br><div class = "delete-display">
-                        <span id="delete_result"></span>
-                    </div>
-                </div>
+    <div class="container">
+        <div class="page-header">
+            <h1>Pet Demo REST API Service</h1>
+        </div>
 
-			</td>
-		</tr>
-	</table>
+        <!-- Flash Message -->
+        <div class="table-responsive">
+          <table class="table">
+            <tr><td>Status:</td><td><span id="flash_message"></span></td></tr>
+          </table>
+        </div>
+
+        <div class="col-md-12" id="form_data">
+          Create, Retrieve, Update, and Delete a Pet:
+          <div class="well">
+            <div class="form-horizontal">
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="pet_id">Pet ID:</label>
+                <div class="col-sm-6">
+                  <input type="text" class="form-control" id="pet_id" placeholder="Enter ID of Pet">
+                </div>
+                <div class="col-sm-4">
+                  <button type="submit" class="btn btn-primary" id="retrieve-btn">Retrieve</button>
+                  <button type="submit" class="btn btn-danger" id="delete-btn">Delete</button>
+                </div>
+              </div>
+            </div> <!-- form div -->
+
+            <div class="form-horizontal">
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="pet_name">Name:</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="pet_name" placeholder="Enter name for Pet">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="pet_category">Category:</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" id="pet_category" placeholder="Enter category for Pet">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="control-label col-sm-2" for="pet_available">Available:</label>
+                <div class="col-sm-10">
+                  <select class="form-control" id="pet_available">
+                      <option value="true" selected>True</option>
+                      <option value="false">False</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                  <button type="submit" class="btn btn-primary" id="search-btn">Search</button>
+                  <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
+                  <button type="submit" class="btn btn-success" id="create-btn">Create</button>
+                  <button type="submit" class="btn btn-warning" id="update-btn">Update</button>
+                </div>
+              </div>
+          </div> <!-- form div -->
+        </div>
+
+        <!-- Search Results -->
+        <div class="table-responsive col-md-12" id="search_results">
+          <table class="table-striped">
+            <thead>
+            <tr>
+                <th class="col-md-1">ID</th>
+                <th class="col-md-4">Name</th>
+                <th class="col-md-4">Category</th>
+                <th class="col-md-3">Available</th>
+            </tr>
+            </thead>
+          </table>
+        </div>
+
+        <footer>
+          <br><br>
+          <p>&copy; NYU DevOps Company 2017</p>
+        </footer>
+        </div><!--/span-->
+     </div><!--/row-->
+
+  </div><!-- container -->
   </body>
 </html>
