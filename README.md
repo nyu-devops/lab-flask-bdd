@@ -34,11 +34,27 @@ You can now run `behave` and `nosetests` to run the BDD and TDD tests respective
 
 ## Manually running the Tests
 
+These tests require the service to be running becasue unlike the the TDD unit tests that test the code locally, these BDD intagration tests are using Selenium to manipulate a web page on a running server.
+
 Run the tests using `behave`
 
+```shell
+    $ python run.py &
     $ behave
+```
 
-Run the tests using `nose`
+Note that the `&` runs the server in the background. To stop the server, you must bring it to the foreground and then press `Ctrl+C`
+
+Stop the server with
+
+```shell
+    $ fg
+    $ <ctrl+c>
+```
+
+Alternately you can run the server in another `shell` by opening another terminal window and using `vagrant ssh` to establish a second connection to the VM.
+
+This repo also has unit tests that you can run `nose`
 
     $ nosetests
 
