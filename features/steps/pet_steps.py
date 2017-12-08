@@ -67,17 +67,20 @@ def step_impl(context, button):
 
 @then(u'I should see "{name}" in the results')
 def step_impl(context, name):
+    sleep(3)
     element = context.driver.find_element_by_id('search_results')
     expect(element.text).to_contain(name)
 
 @then(u'I should not see "{name}" in the results')
 def step_impl(context, name):
+    sleep(3)
     element = context.driver.find_element_by_id('search_results')
     error_msg = "I should not see '%s' in '%s'" % (name, element.text)
     ensure(name in element.text, False, error_msg)
 
 @then(u'I should see the message "{message}"')
 def step_impl(context, message):
+    sleep(3)
     element = context.driver.find_element_by_id('flash_message')
     expect(element.text).to_contain(message)
 
