@@ -7,6 +7,7 @@ Steps file for Pet.feature
 from os import getenv
 import json
 import requests
+from time import sleep
 from behave import *
 from compare import expect, ensure
 from app import server
