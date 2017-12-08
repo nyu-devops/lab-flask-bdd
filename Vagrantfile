@@ -66,7 +66,8 @@ Vagrant.configure(2) do |config|
     sudo apt-get install -y chrpath libssl-dev libxft-dev
     # PhantomJS https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2
     cd ~
-    export PHANTOM_JS="phantomjs-2.1.1-linux-x86_64"
+    export PHANTOM_JS="phantomjs-1.9.7-linux-x86_64"
+    #export PHANTOM_JS="phantomjs-2.1.1-linux-x86_64"
     wget https://bitbucket.org/ariya/phantomjs/downloads/$PHANTOM_JS.tar.bz2
     sudo tar xvjf $PHANTOM_JS.tar.bz2
     sudo mv $PHANTOM_JS /usr/local/share

@@ -18,7 +18,6 @@ def step_impl(context):
     """ Delete all Pets and load new ones """
     headers = {'Content-Type': 'application/json'}
     context.resp = requests.delete(context.base_url + '/pets/reset', headers=headers)
-    #assert context.resp.status_code == 204
     expect(context.resp.status_code).to_equal(204)
     create_url = context.base_url + '/pets'
     for row in context.table:
@@ -29,7 +28,6 @@ def step_impl(context):
             }
         payload = json.dumps(data)
         context.resp = requests.post(create_url, data=payload, headers=headers)
-        #assert context.resp.status_code == 201
         expect(context.resp.status_code).to_equal(201)
 
 @when(u'I visit the "home page"')
@@ -44,7 +42,8 @@ def step_impl(context, message):
 
 @then(u'I should not see "{message}"')
 def step_impl(context, message):
-    ensure(message not in context.resp.text, True)
+    error_msg = "I should not see '%s' in '%s'" % (message, context.resp.text)
+    ensure(message in context.resp.text, False, error_msg)
 
 @when(u'I set the "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
@@ -74,7 +73,8 @@ def step_impl(context, name):
 @then(u'I should not see "{name}" in the results')
 def step_impl(context, name):
     element = context.driver.find_element_by_id('search_results')
-    ensure(name not in element.text, True)
+    error_msg = "I should not see '%s' in '%s'" % (name, element.text)
+    ensure(name in element.text, False, error_msg)
 
 @then(u'I should see the message "{message}"')
 def step_impl(context, message):
