@@ -3,17 +3,12 @@ Pet Steps
 
 Steps file for Pet.feature
 """
-# Sample expect syntax
-# expect(resp.status_code).to(equal(200))
-# expect('Pet Demo REST API Service' in resp.data).to(be_true)
-# expect(len(resp.data)).to(be_above(0))
-# expect(data).to(have_key('name', match('kitty')))
 
 from os import getenv
 import json
 import requests
 from behave import *
-from expects import *
+from compare import expect, ensure
 from app import server
 
 BASE_URL = getenv('BASE_URL', 'http://localhost:5000/')
@@ -23,7 +18,8 @@ def step_impl(context):
     """ Delete all Pets and load new ones """
     headers = {'Content-Type': 'application/json'}
     context.resp = requests.delete(context.base_url + '/pets/reset', headers=headers)
-    assert context.resp.status_code == 204
+    #assert context.resp.status_code == 204
+    expect(context.resp.status_code).to_equal(204)
     create_url = context.base_url + '/pets'
     for row in context.table:
         data = {
@@ -33,7 +29,8 @@ def step_impl(context):
             }
         payload = json.dumps(data)
         context.resp = requests.post(create_url, data=payload, headers=headers)
-        assert context.resp.status_code == 201
+        #assert context.resp.status_code == 201
+        expect(context.resp.status_code).to_equal(201)
 
 @when(u'I visit the "home page"')
 def step_impl(context):
@@ -43,11 +40,11 @@ def step_impl(context):
 @then(u'I should see "{message}" in the title')
 def step_impl(context, message):
     """ Check the document title for a message """
-    expect(message in context.driver.title).to(be_true)
+    expect(context.driver.title).to_contain(message)
 
 @then(u'I should not see "{message}"')
 def step_impl(context, message):
-    expect(message in context.resp.text).to(be_false)
+    ensure(message not in context.resp.text, True)
 
 @when(u'I set the "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
@@ -72,17 +69,17 @@ def step_impl(context, button):
 @then(u'I should see "{name}" in the results')
 def step_impl(context, name):
     element = context.driver.find_element_by_id('search_results')
-    expect(name in element.text).to(be_true)
+    expect(element.text).to_contain(name)
 
 @then(u'I should not see "{name}" in the results')
 def step_impl(context, name):
     element = context.driver.find_element_by_id('search_results')
-    expect(name in element.text).to(be_false)
+    ensure(name not in element.text, True)
 
 @then(u'I should see the message "{message}"')
 def step_impl(context, message):
     element = context.driver.find_element_by_id('flash_message')
-    expect(message in element.text).to(be_true)
+    expect(element.text).to_contain(message)
 
 ##################################################################
 # This code works because of the following naming convention:
@@ -95,7 +92,7 @@ def step_impl(context, message):
 def step_impl(context, text_string, element_name):
     element_id = 'pet_' + element_name.lower()
     element = context.driver.find_element_by_id(element_id)
-    expect(text_string in element.get_attribute('value')).to(be_true)
+    expect(element.get_attribute('value')).to_equal(text_string)
 
 @when(u'I change "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
