@@ -123,7 +123,10 @@ def step_impl(context, text_string, element_name):
 @when(u'I change "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
     element_id = 'pet_' + element_name.lower()
-    element = context.driver.find_element_by_id(element_id)
+    #element = context.driver.find_element_by_id(element_id)
+    element = WebDriverWait(context.driver, 10).until(
+        expected_conditions.presence_of_element_located((By.ID, element_id))
+    )
     element.clear()
     element.send_keys(text_string)
 

@@ -1,11 +1,11 @@
 applications:
 - path: .
   memory: 64M
-  instances: 1
+  instances: 2
   domain: mybluemix.net
   name: nyu-lab-bdd-jr
-  host: nyu-lab-bdd-jr
-  disk_quota: 1024M
+  #host: nyu-lab-bdd-jr
+  disk_quota: 512M
   buildpack: python_buildpack
   services:
   - RedisCloud
