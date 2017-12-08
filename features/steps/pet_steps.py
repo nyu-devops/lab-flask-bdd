@@ -3,11 +3,17 @@ Pet Steps
 
 Steps file for Pet.feature
 """
+# Sample expect syntax
+# expect(resp.status_code).to(equal(200))
+# expect('Pet Demo REST API Service' in resp.data).to(be_true)
+# expect(len(resp.data)).to(be_above(0))
+# expect(data).to(have_key('name', match('kitty')))
 
 from os import getenv
 import json
 import requests
 from behave import *
+from expects import *
 from app import server
 
 BASE_URL = getenv('BASE_URL', 'http://localhost:5000/')
@@ -37,11 +43,11 @@ def step_impl(context):
 @then(u'I should see "{message}" in the title')
 def step_impl(context, message):
     """ Check the document title for a message """
-    assert message in context.driver.title
+    expect(message in context.driver.title).to(be_true)
 
 @then(u'I should not see "{message}"')
 def step_impl(context, message):
-    assert message not in context.resp.text
+    expect(message in context.resp.text).to(be_false)
 
 @when(u'I set the "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
@@ -66,18 +72,17 @@ def step_impl(context, button):
 @then(u'I should see "{name}" in the results')
 def step_impl(context, name):
     element = context.driver.find_element_by_id('search_results')
-    assert name in element.text
+    expect(name in element.text).to(be_true)
 
 @then(u'I should not see "{name}" in the results')
 def step_impl(context, name):
     element = context.driver.find_element_by_id('search_results')
-    assert name not in element.text
+    expect(name in element.text).to(be_false)
 
 @then(u'I should see the message "{message}"')
 def step_impl(context, message):
     element = context.driver.find_element_by_id('flash_message')
-    raise Exception('{} in {}'.format(message, element.text))
-    assert message in element.text
+    expect(message in element.text).to(be_true)
 
 ##################################################################
 # This code works because of the following naming convention:
@@ -90,7 +95,7 @@ def step_impl(context, message):
 def step_impl(context, text_string, element_name):
     element_id = 'pet_' + element_name.lower()
     element = context.driver.find_element_by_id(element_id)
-    assert text_string in element.get_attribute('value')
+    expect(text_string in element.get_attribute('value')).to(be_true)
 
 @when(u'I change "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
@@ -99,13 +104,12 @@ def step_impl(context, element_name, text_string):
     element.clear()
     element.send_keys(text_string)
 
+# @when(u'I change "{key}" to "{value}"')
+# def step_impl(context, key, value):
+#     context.data[key] = value
 
 # @then(u'I should see "{message}" in "{field}"')
 # def step_impl(context, message, field):
 #     """ Check a field for text """
 #     element = context.driver.find_element_by_id(field)
 #     assert message in element.text
-
-# @when(u'I change "{key}" to "{value}"')
-# def step_impl(context, key, value):
-#     context.data[key] = value
