@@ -32,11 +32,11 @@ from app import server  # to get Redis
 VCAP_SERVICES = os.getenv('VCAP_SERVICES', None)
 if not VCAP_SERVICES:
     VCAP_SERVICES = {
-        u'rediscloud': [
-            {u'credentials': {
-                u'password': u'',
-                u'hostname': u'127.0.0.1',
-                u'port': u'6379'
+        'rediscloud': [
+            {'credentials': {
+                'password': '',
+                'hostname': '127.0.0.1',
+                'port': '6379'
                 }
             }
         ]
@@ -205,7 +205,7 @@ class TestPets(unittest.TestCase):
         self.assertNotEqual(len(pets), 0)
         self.assertEqual(pets[0].category, "CAT")
 
-    @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_SERVICES)})
+    @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_SERVICES).encode('utf8')})
     def test_vcap_services(self):
         """ Test if VCAP_SERVICES works """
         Pet.init_db()
