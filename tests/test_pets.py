@@ -20,22 +20,27 @@ nosetests -v --with-spec --spec-color
 """
 
 import unittest
+import os
 import json
+from mock import patch
+from redis import Redis, ConnectionError
 from werkzeug.exceptions import NotFound
 from app.models import Pet
 from app.custom_exceptions import DataValidationError
 from app import server  # to get Redis
 
-VCAP_SERVICES = {
-    'rediscloud': [
-        {'credentials': {
-            'password': '',
-            'hostname': '127.0.0.1',
-            'port': '6379'
+VCAP_SERVICES = os.getenv('VCAP_SERVICES', None)
+if not VCAP_SERVICES:
+    VCAP_SERVICES = {
+        'rediscloud': [
+            {'credentials': {
+                'password': '',
+                'hostname': '127.0.0.1',
+                'port': '6379'
+                }
             }
-        }
-    ]
-}
+        ]
+    }
 
 ######################################################################
 #  T E S T   C A S E S
@@ -198,6 +203,19 @@ class TestPets(unittest.TestCase):
         pets = Pet.find_by_category("cat")
         self.assertNotEqual(len(pets), 0)
         self.assertEqual(pets[0].category, "CAT")
+
+    @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_SERVICES)})
+    def test_vcap_services(self):
+        """ Test if VCAP_SERVICES works """
+        Pet.init_db()
+        self.assertIsNotNone(Pet.redis)
+
+    @patch('redis.Redis.ping')
+    def test_redis_connection_error(self, ping_error_mock):
+        """ Test a Bad Redis connection """
+        ping_error_mock.side_effect = ConnectionError()
+        self.assertRaises(ConnectionError, Pet.init_db)
+        self.assertIsNone(Pet.redis)
 
 
 ######################################################################
