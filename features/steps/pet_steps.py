@@ -3,19 +3,17 @@ Pet Steps
 
 Steps file for Pet.feature
 """
-
 from os import getenv
 import json
 import requests
 from behave import *
 from compare import expect, ensure
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
-
 from app import server
 
+WAIT_SECONDS = 30
 BASE_URL = getenv('BASE_URL', 'http://localhost:5000/')
 
 @given(u'the following pets')
@@ -74,7 +72,7 @@ def step_impl(context, button):
 def step_impl(context, name):
     #element = context.driver.find_element_by_id('search_results')
     #expect(element.text).to_contain(name)
-    found = WebDriverWait(context.driver, 10).until(
+    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element(
             (By.ID, 'search_results'),
             name
@@ -92,7 +90,7 @@ def step_impl(context, name):
 def step_impl(context, message):
     #element = context.driver.find_element_by_id('flash_message')
     #expect(element.text).to_contain(message)
-    found = WebDriverWait(context.driver, 10).until(
+    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element(
             (By.ID, 'flash_message'),
             message
@@ -111,7 +109,7 @@ def step_impl(context, message):
 def step_impl(context, text_string, element_name):
     element_id = 'pet_' + element_name.lower()
     #element = context.driver.find_element_by_id(element_id)
-    found = WebDriverWait(context.driver, 10).until(
+    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element_value(
             (By.ID, element_id),
             text_string
@@ -124,7 +122,7 @@ def step_impl(context, text_string, element_name):
 def step_impl(context, element_name, text_string):
     element_id = 'pet_' + element_name.lower()
     #element = context.driver.find_element_by_id(element_id)
-    element = WebDriverWait(context.driver, 10).until(
+    element = WebDriverWait(context.driver, WAIT_SECONDS).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
     element.clear()
