@@ -32,15 +32,16 @@ from app import server  # to get Redis
 VCAP_SERVICES = os.getenv('VCAP_SERVICES', None)
 if not VCAP_SERVICES:
     VCAP_SERVICES = {
-        'rediscloud': [
-            {'credentials': {
-                'password': '',
-                'hostname': '127.0.0.1',
-                'port': '6379'
+        "rediscloud": [
+            {"credentials": {
+                "password": None,
+                "hostname": "127.0.0.1",
+                "port": "6379"
                 }
             }
         ]
     }
+
 
 ######################################################################
 #  T E S T   C A S E S
