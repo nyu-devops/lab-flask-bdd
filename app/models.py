@@ -217,7 +217,9 @@ class Pet(object):
         if 'VCAP_SERVICES' in os.environ:
             Pet.logger.info("Using VCAP_SERVICES...")
             vcap_services = os.environ['VCAP_SERVICES']
+            Pet.logger.info('VCAP_SERVICES (%s)=%s', type(vcap_services), vcap_services)
             services = json.loads(vcap_services)
+            Pet.logger.info('VCAP_SERVICES (%s)=%s', type(services), services)
             creds = services['rediscloud'][0]['credentials']
             Pet.logger.info("Conecting to Redis on host %s port %s",
                             creds['hostname'], creds['port'])
