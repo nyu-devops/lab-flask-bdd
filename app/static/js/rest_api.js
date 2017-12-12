@@ -6,21 +6,21 @@ $(function () {
 
     // Updates the form with data from the response
     function update_form_data(res) {
-        $("#pet_id").val(res.id);
-        $("#pet_name").val(res.name);
-        $("#pet_category").val(res.category);
-        if (res.available == true) {
-            $("#pet_available").val("true");
+        $("#order_id").val(res.id);
+        $("#order_name").val(res.name);
+        $("#order_time").val(res.time);
+        if (res.status == true) {
+            $("#order_status").val("true");
         } else {
-            $("#pet_available").val("false");
+            $("#order_status").val("false");
         }
     }
 
     /// Clears all form fields
     function clear_form_data() {
-        $("#pet_name").val("");
-        $("#pet_category").val("");
-        $("#pet_available").val("");
+        $("#order_name").val("");
+        $("#order_time").val("");
+        $("#order_status").val("");
     }
 
     // Updates the flash message area
@@ -30,24 +30,24 @@ $(function () {
     }
 
     // ****************************************
-    // Create a Pet
+    // Create a Order
     // ****************************************
 
     $("#create-btn").click(function () {
 
-        var name = $("#pet_name").val();
-        var category = $("#pet_category").val();
-        var available = $("#pet_available").val() == "true";
+        var name = $("#order_name").val();
+        var time = $("#order_time").val();
+        var status = $("#order_status").val() == "true";
 
         var data = {
             "name": name,
-            "category": category,
-            "available": available
+            "time": time,
+            "status": status
         };
 
         var ajax = $.ajax({
             type: "POST",
-            url: "/pets",
+            url: "/orders",
             contentType:"application/json",
             data: JSON.stringify(data),
         });
@@ -64,25 +64,25 @@ $(function () {
 
 
     // ****************************************
-    // Update a Pet
+    // Update a Order
     // ****************************************
 
     $("#update-btn").click(function () {
 
-        var pet_id = $("#pet_id").val();
-        var name = $("#pet_name").val();
-        var category = $("#pet_category").val();
-        var available = $("#pet_available").val() == "true";
+        var order_id = $("#order_id").val();
+        var name = $("#order_name").val();
+        var time = $("#order_time").val();
+        var status = $("#order_status").val() == "true";
 
         var data = {
             "name": name,
-            "category": category,
-            "available": available
+            "time": time,
+            "status": status
         };
 
         var ajax = $.ajax({
                 type: "PUT",
-                url: "/pets/" + pet_id,
+                url: "/orders/" + order_id,
                 contentType:"application/json",
                 data: JSON.stringify(data)
             })
@@ -99,16 +99,16 @@ $(function () {
     });
 
     // ****************************************
-    // Retrieve a Pet
+    // Retrieve a Order
     // ****************************************
 
     $("#retrieve-btn").click(function () {
 
-        var pet_id = $("#pet_id").val();
+        var order_id = $("#order_id").val();
 
         var ajax = $.ajax({
             type: "GET",
-            url: "/pets/" + pet_id,
+            url: "/orders/" + order_id,
             contentType:"application/json",
             data: ''
         })
@@ -127,23 +127,23 @@ $(function () {
     });
 
     // ****************************************
-    // Delete a Pet
+    // Delete a Order
     // ****************************************
 
     $("#delete-btn").click(function () {
 
-        var pet_id = $("#pet_id").val();
+        var order_id = $("#order_id").val();
 
         var ajax = $.ajax({
             type: "DELETE",
-            url: "/pets/" + pet_id,
+            url: "/orders/" + order_id,
             contentType:"application/json",
             data: '',
         })
 
         ajax.done(function(res){
             clear_form_data()
-            flash_message("Pet with ID [" + res.id + "] has been Deleted!")
+            flash_message("Order with ID [" + res.id + "] has been Deleted!")
         });
 
         ajax.fail(function(res){
@@ -156,43 +156,43 @@ $(function () {
     // ****************************************
 
     $("#clear-btn").click(function () {
-        $("#pet_id").val("");
+        $("#order_id").val("");
         clear_form_data()
     });
 
     // ****************************************
-    // Search for a Pet
+    // Search for a Order
     // ****************************************
 
     $("#search-btn").click(function () {
 
-        var name = $("#pet_name").val();
-        var category = $("#pet_category").val();
-        var available = $("#pet_available").val() == "true";
+        var name = $("#order_name").val();
+        var time = $("#order_time").val();
+        var status = $("#order_status").val() == "true";
 
         var queryString = ""
 
         if (name) {
             queryString += 'name=' + name
         }
-        if (category) {
+        if (time) {
             if (queryString.length > 0) {
-                queryString += '&category=' + category
+                queryString += '&time=' + time
             } else {
-                queryString += 'category=' + category
+                queryString += 'time=' + time
             }
         }
-        if (available) {
+        if (status) {
             if (queryString.length > 0) {
-                queryString += '&available=' + available
+                queryString += '&status=' + status
             } else {
-                queryString += 'available=' + available
+                queryString += 'status=' + status
             }
         }
 
         var ajax = $.ajax({
             type: "GET",
-            url: "/pets?" + queryString,
+            url: "/orders?" + queryString,
             contentType:"application/json",
             data: ''
         })
@@ -204,12 +204,12 @@ $(function () {
             var header = '<tr>'
             header += '<th style="width:10%">ID</th>'
             header += '<th style="width:40%">Name</th>'
-            header += '<th style="width:40%">Category</th>'
+            header += '<th style="width:40%">Time</th>'
             header += '<th style="width:10%">Available</th></tr>'
             $("#search_results").append(header);
             for(var i = 0; i < res.length; i++) {
-                pet = res[i];
-                var row = "<tr><td>"+pet.id+"</td><td>"+pet.name+"</td><td>"+pet.category+"</td><td>"+pet.available+"</td></tr>";
+                order = res[i];
+                var row = "<tr><td>"+order.id+"</td><td>"+order.name+"</td><td>"+order.time+"</td><td>"+order.status+"</td></tr>";
                 $("#search_results").append(row);
             }
 

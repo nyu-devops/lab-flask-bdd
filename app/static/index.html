@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Pet Demo RESTful Service</title>
+    <title>Order Demo RESTful Service</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,7 +12,7 @@
   <body>
     <div class="container">
         <div class="page-header">
-            <h1>Pet Demo REST API Service</h1>
+            <h1>Order Demo REST API Service</h1>
         </div>
 
         <!-- Flash Message -->
@@ -23,13 +23,13 @@
         </div>
 
         <div class="col-md-12" id="form_data">
-          Create, Retrieve, Update, and Delete a Pet:
+          Create, Retrieve, Update, and Delete a Order:
           <div class="well">
             <div class="form-horizontal">
               <div class="form-group">
-                <label class="control-label col-sm-2" for="pet_id">Pet ID:</label>
+                <label class="control-label col-sm-2" for="order_id">Order ID:</label>
                 <div class="col-sm-6">
-                  <input type="text" class="form-control" id="pet_id" placeholder="Enter ID of Pet">
+                  <input type="text" class="form-control" id="order_id" placeholder="Enter ID of Order">
                 </div>
                 <div class="col-sm-4">
                   <button type="submit" class="btn btn-primary" id="retrieve-btn">Retrieve</button>
@@ -40,21 +40,21 @@
 
             <div class="form-horizontal">
               <div class="form-group">
-                <label class="control-label col-sm-2" for="pet_name">Name:</label>
+                <label class="control-label col-sm-2" for="order_name">Name:</label>
                 <div class="col-sm-10">
-                  <input type="text" class="form-control" id="pet_name" placeholder="Enter name for Pet">
+                  <input type="text" class="form-control" id="order_name" placeholder="Enter name for Order">
                 </div>
               </div>
               <div class="form-group">
-                <label class="control-label col-sm-2" for="pet_category">Category:</label>
+                <label class="control-label col-sm-2" for="order_time">Time:</label>
                 <div class="col-sm-10">
-                  <input type="text" class="form-control" id="pet_category" placeholder="Enter category for Pet">
+                  <input type="text" class="form-control" id="order_time" placeholder="Enter time for Order">
                 </div>
               </div>
               <div class="form-group">
-                <label class="control-label col-sm-2" for="pet_available">Available:</label>
+                <label class="control-label col-sm-2" for="order_status">Available:</label>
                 <div class="col-sm-10">
-                  <select class="form-control" id="pet_available">
+                  <select class="form-control" id="order_status">
                       <option value="true" selected>True</option>
                       <option value="false">False</option>
                   </select>
@@ -78,7 +78,7 @@
             <tr>
                 <th class="col-md-1">ID</th>
                 <th class="col-md-4">Name</th>
-                <th class="col-md-4">Category</th>
+                <th class="col-md-4">Time</th>
                 <th class="col-md-3">Available</th>
             </tr>
             </thead>
