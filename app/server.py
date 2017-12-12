@@ -15,16 +15,16 @@
 ######################################################################
 
 """
-Pet Store Service with UI
+Order Store Service with UI
 
 Paths:
 ------
 GET / - Displays a UI for Selenium testing
-GET /pets - Returns a list all of the Pets
-GET /pets/{id} - Returns the Pet with a given id number
-POST /pets - creates a new Pet record in the database
-PUT /pets/{id} - updates a Pet record in the database
-DELETE /pets/{id} - deletes a Pet record in the database
+GET /orders - Returns a list all of the Orders
+GET /orders/{id} - Returns the Order with a given id number
+POST /orders - creates a new Order record in the database
+PUT /orders/{id} - updates a Order record in the database
+DELETE /orders/{id} - deletes a Order record in the database
 """
 
 import sys
@@ -32,7 +32,7 @@ import logging
 from flask import jsonify, request, json, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
-from app.models import Pet
+from app.models import Order
 from . import app
 
 # Error handlers reuire app to be initialized so we must import
@@ -52,73 +52,73 @@ def healthcheck():
 ######################################################################
 @app.route('/')
 def index():
-    # data = '{name: <string>, category: <string>}'
-    # url = request.base_url + 'pets' # url_for('list_pets')
-    # return jsonify(name='Pet Demo REST API Service', version='1.0', url=url, data=data), status.HTTP_200_OK
+    # data = '{customer_name: <string>, order_time: <string>}'
+    # url = request.base_url + 'orders' # url_for('list_orders')
+    # return jsonify(customer_name='Order Demo REST API Service', version='1.0', url=url, data=data), status.HTTP_200_OK
     return app.send_static_file('index.html')
 
 ######################################################################
 # LIST ALL PETS
 ######################################################################
-@app.route('/pets', methods=['GET'])
-def list_pets():
-    """ Returns all of the Pets """
-    pets = []
-    category = request.args.get('category')
-    name = request.args.get('name')
-    if category:
-        pets = Pet.find_by_category(category)
-    elif name:
-        pets = Pet.find_by_name(name)
+@app.route('/orders', methods=['GET'])
+def list_orders():
+    """ Returns all of the Orders """
+    orders = []
+    order_time = request.args.get('order_time')
+    customer_name = request.args.get('customer_name')
+    if order_time:
+        orders = Order.find_by_order_time(order_time)
+    elif customer_name:
+        orders = Order.find_by_customer_name(customer_name)
     else:
-        pets = Pet.all()
+        orders = Order.all()
 
-    results = [pet.serialize() for pet in pets]
+    results = [order.serialize() for order in orders]
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 
 ######################################################################
 # RETRIEVE A PET
 ######################################################################
-@app.route('/pets/<int:pet_id>', methods=['GET'])
-def get_pets(pet_id):
+@app.route('/orders/<int:order_id>', methods=['GET'])
+def get_orders(order_id):
     """
-    Retrieve a single Pet
+    Retrieve a single Order
 
-    This endpoint will return a Pet based on it's id
+    This endpoint will return a Order based on it's id
     """
-    pet = Pet.find(pet_id)
-    if not pet:
-        raise NotFound("Pet with id '{}' was not found.".format(pet_id))
-    return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
+    order = Order.find(order_id)
+    if not order:
+        raise NotFound("Order with id '{}' was not found.".format(order_id))
+    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 # ADD A NEW PET
 ######################################################################
-@app.route('/pets', methods=['POST'])
-def create_pets():
+@app.route('/orders', methods=['POST'])
+def create_orders():
     """
-    Creates a Pet
-    This endpoint will create a Pet based the data in the body that is posted
+    Creates a Order
+    This endpoint will create a Order based the data in the body that is posted
     """
     data = {}
     # Check for form submission data
     if request.headers.get('Content-Type') == 'application/x-www-form-urlencoded':
         app.logger.info('Getting data from form submit')
         data = {
-            'name': request.form['name'],
-            'category': request.form['category'],
-            'available': True
+            'customer_name': request.form['customer_name'],
+            'order_time': request.form['order_time'],
+            'status': True
         }
     else:
         app.logger.info('Getting data from API call')
         data = request.get_json()
     app.logger.info(data)
-    pet = Pet()
-    pet.deserialize(data)
-    pet.save()
-    message = pet.serialize()
-    location_url = url_for('get_pets', pet_id=pet.id, _external=True)
+    order = Order()
+    order.deserialize(data)
+    order.save()
+    message = order.serialize()
+    location_url = url_for('get_orders', order_id=order.id, _external=True)
     return make_response(jsonify(message), status.HTTP_201_CREATED,
                          {'Location': location_url})
 
@@ -126,61 +126,61 @@ def create_pets():
 ######################################################################
 # UPDATE AN EXISTING PET
 ######################################################################
-@app.route('/pets/<int:pet_id>', methods=['PUT'])
-def update_pets(pet_id):
+@app.route('/orders/<int:order_id>', methods=['PUT'])
+def update_orders(order_id):
     """
-    Update a Pet
+    Update a Order
 
-    This endpoint will update a Pet based the body that is posted
+    This endpoint will update a Order based the body that is posted
     """
     check_content_type('application/json')
-    pet = Pet.find(pet_id)
-    if not pet:
-        raise NotFound("Pet with id '{}' was not found.".format(pet_id))
+    order = Order.find(order_id)
+    if not order:
+        raise NotFound("Order with id '{}' was not found.".format(order_id))
     data = request.get_json()
     app.logger.info(data)
-    pet.deserialize(data)
-    pet.id = pet_id
-    pet.save()
-    return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
+    order.deserialize(data)
+    order.id = order_id
+    order.save()
+    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 # DELETE A PET
 ######################################################################
-@app.route('/pets/<int:pet_id>', methods=['DELETE'])
-def delete_pets(pet_id):
+@app.route('/orders/<int:order_id>', methods=['DELETE'])
+def delete_orders(order_id):
     """
-    Delete a Pet
+    Delete a Order
 
-    This endpoint will delete a Pet based the id specified in the path
+    This endpoint will delete a Order based the id specified in the path
     """
-    pet = Pet.find(pet_id)
-    if pet:
-        pet.delete()
+    order = Order.find(order_id)
+    if order:
+        order.delete()
     return make_response('', status.HTTP_204_NO_CONTENT)
 
 ######################################################################
 # PURCHASE A PET
 ######################################################################
-@app.route('/pets/<int:pet_id>/purchase', methods=['PUT'])
-def purchase_pets(pet_id):
-    """ Purchasing a Pet makes it unavailable """
-    pet = Pet.find(pet_id)
-    if not pet:
-        abort(status.HTTP_404_NOT_FOUND, "Pet with id '{}' was not found.".format(pet_id))
-    if not pet.available:
-        abort(status.HTTP_400_BAD_REQUEST, "Pet with id '{}' is not available.".format(pet_id))
-    pet.available = False
-    pet.save()
-    return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
+@app.route('/orders/<int:order_id>/purchase', methods=['PUT'])
+def purchase_orders(order_id):
+    """ Purchasing a Order makes it unstatus """
+    order = Order.find(order_id)
+    if not order:
+        abort(status.HTTP_404_NOT_FOUND, "Order with id '{}' was not found.".format(order_id))
+    if not order.status:
+        abort(status.HTTP_400_BAD_REQUEST, "Order with id '{}' is not status.".format(order_id))
+    order.status = False
+    order.save()
+    return make_response(jsonify(order.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 # DELETE ALL PET DATA (for testing only)
 ######################################################################
-@app.route('/pets/reset', methods=['DELETE'])
-def pets_reset():
-    """ Removes all pets from the database """
-    Pet.remove_all()
+@app.route('/orders/reset', methods=['DELETE'])
+def orders_reset():
+    """ Removes all orders from the database """
+    Order.remove_all()
     return make_response('', status.HTTP_204_NO_CONTENT)
 
 ######################################################################
@@ -190,17 +190,17 @@ def pets_reset():
 @app.before_first_request
 def init_db(redis=None):
     """ Initlaize the model """
-    Pet.init_db(redis)
+    Order.init_db(redis)
 
 # load sample data
 def data_load(payload):
-    """ Loads a Pet into the database """
-    pet = Pet(0, payload['name'], payload['category'])
-    pet.save()
+    """ Loads a Order into the database """
+    order = Order(0, payload['customer_name'], payload['order_time'])
+    order.save()
 
 def data_reset():
-    """ Removes all Pets from the database """
-    Pet.remove_all()
+    """ Removes all Orders from the database """
+    Order.remove_all()
 
 def check_content_type(content_type):
     """ Checks that the media type is correct """
@@ -216,7 +216,7 @@ def initialize_logging(log_level=logging.INFO):
         print 'Setting up logging...'
         # Set up default logging for submodules to use STDOUT
         # datefmt='%m/%d/%Y %I:%M:%S %p'
-        fmt = '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
+        fmt = '[%(asctime)s] %(levelcustomer_name)s in %(module)s: %(message)s'
         logging.basicConfig(stream=sys.stdout, level=log_level, format=fmt)
         # Make a new log handler that uses STDOUT
         handler = logging.StreamHandler(sys.stdout)
