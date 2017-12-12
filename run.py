@@ -1,7 +1,7 @@
 """
-Pet Service Runner
+Order Service Runner
 
-Start the Pet Service and initializes logging
+Start the Order Service and initializes logging
 """
 
 import os
@@ -16,7 +16,7 @@ PORT = os.getenv('PORT', '5000')
 ######################################################################
 if __name__ == "__main__":
     print "****************************************"
-    print " P E T   S E R V I C E   R U N N I N G"
+    print " ORDER   S E R V I C E   R U N N I N G"
     print "****************************************"
     server.initialize_logging()
     app.run(host='0.0.0.0', port=int(PORT), debug=DEBUG)
