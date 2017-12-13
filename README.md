@@ -96,7 +96,7 @@ To bring down these services use:
     docker stop flask-bdd
     docker stop redis-service
 
-...and to remove them with:
+..and to remove them with:
 
     docker rm flask-bdd
     docker rm redis-service
