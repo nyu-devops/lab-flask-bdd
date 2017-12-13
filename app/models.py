@@ -15,7 +15,7 @@
 ######################################################################
 
 """
-Pet Model that uses Redis
+Order Model that uses Redis
 
 You must initlaize this class before use by calling inititlize().
 This class looks for an environment variable called VCAP_SERVICES
@@ -34,59 +34,59 @@ from redis.exceptions import ConnectionError
 from app.custom_exceptions import DataValidationError
 
 ######################################################################
-# Pet Model for database
+# Order Model for database
 #   This class must be initialized with use_db(redis) before using
 #   where redis is a value connection to a Redis database
 ######################################################################
-class Pet(object):
-    """ Pet interface to database """
+class Order(object):
+    """ Order interface to database """
 
     logger = logging.getLogger(__name__)
     redis = None
     schema = {
         'id': {'type': 'integer'},
         'name': {'type': 'string', 'required': True},
-        'category': {'type': 'string', 'required': True},
-        'available': {'type': 'boolean', 'required': True}
+        'time': {'type': 'string', 'required': True},
+        'status': {'type': 'boolean', 'required': True}
         }
     __validator = Validator(schema)
 
-    def __init__(self, id=0, name=None, category=None, available=True):
+    def __init__(self, id=0, name=None, time=None, status=True):
         """ Constructor """
         self.id = int(id)
         self.name = name
-        self.category = category
-        self.available = available
+        self.time = time
+        self.status = status
 
     def save(self):
-        """ Saves a Pet in the database """
+        """ Saves a Order in the database """
         if self.name is None:   # name is the only required field
             raise DataValidationError('name attribute is not set')
         if self.id == 0:
-            self.id = Pet.__next_index()
-        Pet.redis.set(self.id, pickle.dumps(self.serialize()))
+            self.id = Order.__next_index()
+        Order.redis.set(self.id, pickle.dumps(self.serialize()))
 
     def delete(self):
-        """ Deletes a Pet from the database """
-        Pet.redis.delete(self.id)
+        """ Deletes a Order from the database """
+        Order.redis.delete(self.id)
 
     def serialize(self):
-        """ serializes a Pet into a dictionary """
+        """ serializes a Order into a dictionary """
         return {
             "id": self.id,
             "name": self.name,
-            "category": self.category,
-            "available": self.available
+            "time": self.time,
+            "status": self.status
         }
 
     def deserialize(self, data):
-        """ deserializes a Pet my marshalling the data """
-        if isinstance(data, dict) and Pet.__validator.validate(data):
+        """ deserializes a Order my marshalling the data """
+        if isinstance(data, dict) and Order.__validator.validate(data):
             self.name = data['name']
-            self.category = data['category']
-            self.available = data['available']
+            self.time = data['time']
+            self.status = data['status']
         else:
-            raise DataValidationError('Invalid pet data: ' + str(Pet.__validator.errors))
+            raise DataValidationError('Invalid order data: ' + str(Order.__validator.errors))
         return self
 
 
@@ -97,27 +97,27 @@ class Pet(object):
     @staticmethod
     def __next_index():
         """ Increments the index and returns it """
-        return Pet.redis.incr('index')
+        return Order.redis.incr('index')
 
     # @staticmethod
     # def use_db(redis):
-    #     Pet.__redis = redis
+    #     Order.__redis = redis
 
     @staticmethod
     def remove_all():
-        """ Removes all Pets from the database """
-        Pet.redis.flushall()
+        """ Removes all Orders from the database """
+        Order.redis.flushall()
 
     @staticmethod
     def all():
-        """ Query that returns all Pets """
-        # results = [Pet.from_dict(redis.hgetall(key)) for key in redis.keys() if key != 'index']
+        """ Query that returns all Orders """
+        # results = [Order.from_dict(redis.hgetall(key)) for key in redis.keys() if key != 'index']
         results = []
-        for key in Pet.redis.keys():
+        for key in Order.redis.keys():
             if key != 'index':  # filer out our id index
-                data = pickle.loads(Pet.redis.get(key))
-                pet = Pet(data['id']).deserialize(data)
-                results.append(pet)
+                data = pickle.loads(Order.redis.get(key))
+                order = Order(data['id']).deserialize(data)
+                results.append(order)
         return results
 
 ######################################################################
@@ -125,50 +125,50 @@ class Pet(object):
 ######################################################################
 
     @staticmethod
-    def find(pet_id):
-        """ Query that finds Pets by their id """
-        if Pet.redis.exists(pet_id):
-            data = pickle.loads(Pet.redis.get(pet_id))
-            pet = Pet(data['id']).deserialize(data)
-            return pet
+    def find(order_id):
+        """ Query that finds Orders by their id """
+        if Order.redis.exists(order_id):
+            data = pickle.loads(Order.redis.get(order_id))
+            order = Order(data['id']).deserialize(data)
+            return order
         return None
 
     @staticmethod
     def __find_by(attribute, value):
         """ Generic Query that finds a key with a specific value """
-        # return [pet for pet in Pet.__data if pet.category == category]
-        Pet.logger.info('Processing %s query for %s', attribute, value)
+        # return [order for order in Order.__data if order.time == time]
+        Order.logger.info('Processing %s query for %s', attribute, value)
         if isinstance(value, str):
             search_criteria = value.lower() # make case insensitive
         else:
             search_criteria = value
         results = []
-        for key in Pet.redis.keys():
+        for key in Order.redis.keys():
             if key != 'index':  # filer out our id index
-                data = pickle.loads(Pet.redis.get(key))
+                data = pickle.loads(Order.redis.get(key))
                 # perform case insensitive search on strings
                 if isinstance(data[attribute], str):
                     test_value = data[attribute].lower()
                 else:
                     test_value = data[attribute]
                 if test_value == search_criteria:
-                    results.append(Pet(data['id']).deserialize(data))
+                    results.append(Order(data['id']).deserialize(data))
         return results
 
     @staticmethod
     def find_by_name(name):
-        """ Query that finds Pets by their name """
-        return Pet.__find_by('name', name)
+        """ Query that finds Orders by their name """
+        return Order.__find_by('name', name)
 
     @staticmethod
-    def find_by_category(category):
-        """ Query that finds Pets by their category """
-        return Pet.__find_by('category', category)
+    def find_by_time(time):
+        """ Query that finds Orders by their time """
+        return Order.__find_by('time', time)
 
     @staticmethod
-    def find_by_availability(available=True):
-        """ Query that finds Pets by their availability """
-        return Pet.__find_by('available', available)
+    def find_by_availability(status=True):
+        """ Query that finds Orders by their availability """
+        return Order.__find_by('status', status)
 
 ######################################################################
 #  R E D I S   D A T A B A S E   C O N N E C T I O N   M E T H O D S
@@ -177,15 +177,15 @@ class Pet(object):
     @staticmethod
     def connect_to_redis(hostname, port, password):
         """ Connects to Redis and tests the connection """
-        Pet.logger.info("Testing Connection to: %s:%s", hostname, port)
-        Pet.redis = Redis(host=hostname, port=port, password=password)
+        Order.logger.info("Testing Connection to: %s:%s", hostname, port)
+        Order.redis = Redis(host=hostname, port=port, password=password)
         try:
-            Pet.redis.ping()
-            Pet.logger.info("Connection established")
+            Order.redis.ping()
+            Order.logger.info("Connection established")
         except ConnectionError:
-            Pet.logger.info("Connection Error from: %s:%s", hostname, port)
-            Pet.redis = None
-        return Pet.redis
+            Order.logger.info("Connection Error from: %s:%s", hostname, port)
+            Order.redis = None
+        return Order.redis
 
     @staticmethod
     def init_db(redis=None):
@@ -203,32 +203,32 @@ class Pet(object):
           redis.ConnectionError - if ping() test fails
         """
         if redis:
-            Pet.logger.info("Using client connection...")
-            Pet.redis = redis
+            Order.logger.info("Using client connection...")
+            Order.redis = redis
             try:
-                Pet.redis.ping()
-                Pet.logger.info("Connection established")
+                Order.redis.ping()
+                Order.logger.info("Connection established")
             except ConnectionError:
-                Pet.logger.error("Client Connection Error!")
-                Pet.redis = None
+                Order.logger.error("Client Connection Error!")
+                Order.redis = None
                 raise ConnectionError('Could not connect to the Redis Service')
             return
         # Get the credentials from the Bluemix environment
         if 'VCAP_SERVICES' in os.environ:
-            Pet.logger.info("Using VCAP_SERVICES...")
+            Order.logger.info("Using VCAP_SERVICES...")
             vcap_services = os.environ['VCAP_SERVICES']
             services = json.loads(vcap_services)
             creds = services['rediscloud'][0]['credentials']
-            Pet.logger.info("Conecting to Redis on host %s port %s",
+            Order.logger.info("Conecting to Redis on host %s port %s",
                             creds['hostname'], creds['port'])
-            Pet.connect_to_redis(creds['hostname'], creds['port'], creds['password'])
+            Order.connect_to_redis(creds['hostname'], creds['port'], creds['password'])
         else:
-            Pet.logger.info("VCAP_SERVICES not found, checking localhost for Redis")
-            Pet.connect_to_redis('127.0.0.1', 6379, None)
-            if not Pet.redis:
-                Pet.logger.info("No Redis on localhost, looking for redis host")
-                Pet.connect_to_redis('redis', 6379, None)
-        if not Pet.redis:
+            Order.logger.info("VCAP_SERVICES not found, checking localhost for Redis")
+            Order.connect_to_redis('127.0.0.1', 6379, None)
+            if not Order.redis:
+                Order.logger.info("No Redis on localhost, looking for redis host")
+                Order.connect_to_redis('redis', 6379, None)
+        if not Order.redis:
             # if you end up here, redis instance is down.
-            Pet.logger.fatal('*** FATAL ERROR: Could not connect to the Redis Service')
+            Order.logger.fatal('*** FATAL ERROR: Could not connect to the Redis Service')
             raise ConnectionError('Could not connect to the Redis Service')

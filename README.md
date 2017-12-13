@@ -64,8 +64,8 @@ Nose is configured to automatically include the flags `--with-spec --spec-color`
 
     * ./app/server.py -- the main Service using Python Flask
     * ./tests/test_server.py -- unit test cases for the server
-    * ./tests/test_pets.py -- unit test cases for the model
-    * ./features/pets.feature -- Behave feature file
+    * ./tests/test_orders.py -- unit test cases for the model
+    * ./features/orders.feature -- Behave feature file
     * ./features/steps/steps.py -- Behave step definitions
 
 ## Running these tests using Docker containers
@@ -96,7 +96,7 @@ To bring down these services use:
     docker stop flask-bdd
     docker stop redis-service
 
-...and to remove them with:
+..and to remove them with:
 
     docker rm flask-bdd
     docker rm redis-service

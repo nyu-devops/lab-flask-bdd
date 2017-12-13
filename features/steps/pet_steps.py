@@ -1,7 +1,7 @@
 """
-Pet Steps
+Order Steps
 
-Steps file for Pet.feature
+Steps file for Order.feature
 """
 from os import getenv
 import json
@@ -16,18 +16,18 @@ from app import server
 WAIT_SECONDS = 30
 BASE_URL = getenv('BASE_URL', 'http://localhost:5000/')
 
-@given(u'the following pets')
+@given(u'the following orders')
 def step_impl(context):
-    """ Delete all Pets and load new ones """
+    """ Delete all Orders and load new ones """
     headers = {'Content-Type': 'application/json'}
-    context.resp = requests.delete(context.base_url + '/pets/reset', headers=headers)
+    context.resp = requests.delete(context.base_url + '/orders/reset', headers=headers)
     expect(context.resp.status_code).to_equal(204)
-    create_url = context.base_url + '/pets'
+    create_url = context.base_url + '/orders'
     for row in context.table:
         data = {
             "name": row['name'],
-            "category": row['category'],
-            "available": row['available'] in ['True', 'true', '1']
+            "time": row['time'],
+            "status": row['status'] in ['True', 'true', '1']
             }
         payload = json.dumps(data)
         context.resp = requests.post(create_url, data=payload, headers=headers)
@@ -50,7 +50,7 @@ def step_impl(context, message):
 
 @when(u'I set the "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
-    element_id = 'pet_' + element_name.lower()
+    element_id = 'order_' + element_name.lower()
     element = context.driver.find_element_by_id(element_id)
     element.clear()
     element.send_keys(text_string)
@@ -101,13 +101,13 @@ def step_impl(context, message):
 ##################################################################
 # This code works because of the following naming convention:
 # The id field for text input in the html is the element name
-# prefixed by 'pet_' so the Name field has an id='pet_name'
-# We can then lowercase the name and prefix with pet_ to get the id
+# prefixed by 'order_' so the Name field has an id='order_name'
+# We can then lowercase the name and prefix with order_ to get the id
 ##################################################################
 
 @then(u'I should see "{text_string}" in the "{element_name}" field')
 def step_impl(context, text_string, element_name):
-    element_id = 'pet_' + element_name.lower()
+    element_id = 'order_' + element_name.lower()
     #element = context.driver.find_element_by_id(element_id)
     found = WebDriverWait(context.driver, WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element_value(
@@ -120,7 +120,7 @@ def step_impl(context, text_string, element_name):
 
 @when(u'I change "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
-    element_id = 'pet_' + element_name.lower()
+    element_id = 'order_' + element_name.lower()
     #element = context.driver.find_element_by_id(element_id)
     element = WebDriverWait(context.driver, WAIT_SECONDS).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
