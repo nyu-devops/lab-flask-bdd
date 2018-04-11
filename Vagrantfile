@@ -8,24 +8,22 @@
 Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.define "bdd" do |bdd|
-      bdd.vm.box = "ubuntu/xenial64"
-      # set up network ip and port forwarding
-      bdd.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
-      bdd.vm.network "private_network", ip: "192.168.33.10"
+  config.vm.box = "ubuntu/xenial64"
+  # set up network ip and port forwarding
+  config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
+  config.vm.network "private_network", ip: "192.168.33.10"
 
-      # Windows users need to change the permissions explicitly so that Windows doesn't
-      # set the execute bit on all of your files which messes with GitHub users on Mac and Linux
-      bdd.vm.synced_folder "./", "/vagrant", owner: "ubuntu", mount_options: ["dmode=755,fmode=644"]
+  # Windows users need to change the permissions explicitly so that Windows doesn't
+  # set the execute bit on all of your files which messes with GitHub users on Mac and Linux
+  config.vm.synced_folder "./", "/vagrant", owner: "ubuntu", mount_options: ["dmode=775,fmode=664"]
 
-      bdd.vm.provider "virtualbox" do |vb|
-        # Customize the amount of memory on the VM:
-        vb.memory = "512"
-        vb.cpus = 1
-        # Fixes some DNS issues on some networks
-        vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-        vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
-      end
+  config.vm.provider "virtualbox" do |vb|
+    # Customize the amount of memory on the VM:
+    vb.memory = "512"
+    vb.cpus = 1
+    # Fixes some DNS issues on some networks
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
   end
 
   # Copy your .gitconfig file so that your git credentials are correct
@@ -47,18 +45,21 @@ Vagrant.configure(2) do |config|
     apt-get install -y wget git zip tree python-pip python-dev
     apt-get -y autoremove
     pip install --upgrade pip
+
     # Make vi look nice
-    sudo -H -u ubuntu echo "colorscheme desert" > ~/.vimrc
-    echo "\n****************************"
-    echo " Installing the Bluemix CLI"
-    echo "****************************\n"
-    wget https://clis.ng.bluemix.net/download/bluemix-cli/latest/linux64
-    tar -zxvf linux64
+    sudo -H -u vagrant echo "colorscheme desert" > ~/.vimrc
+
+    # Install Bluemix CLI
+    echo "\n******************************"
+    echo " Installing Bluemix CLI"
+    echo "******************************\n"
+    wget -q -O - https://clis.ng.bluemix.net/download/bluemix-cli/latest/linux64 | tar xzv
     cd Bluemix_CLI/
     ./install_bluemix_cli
     cd ..
     rm -fr Bluemix_CLI/
-    rm linux64
+    bluemix config --usage-stats-collect false
+
     # Install PhantomJS for Selenium browser support
     echo "\n***********************************"
     echo " Installing PhantomJS for Selenium"
@@ -73,6 +74,7 @@ Vagrant.configure(2) do |config|
     sudo mv $PHANTOM_JS /usr/local/share
     sudo ln -sf /usr/local/share/$PHANTOM_JS/bin/phantomjs /usr/local/bin
     rm -f $PHANTOM_JS.tar.bz2
+
     # Install app dependencies
     echo "\n******************************"
     echo " Installing app dependencies"
@@ -87,7 +89,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: <<-SHELL
     # Prepare Redis data share
     sudo mkdir -p /var/lib/redis/data
-    sudo chown ubuntu:ubuntu /var/lib/redis/data
+    sudo chown vagrant:vagrant /var/lib/redis/data
   SHELL
 
   # Add Redis docker container
