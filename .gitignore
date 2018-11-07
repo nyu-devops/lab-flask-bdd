@@ -5,6 +5,8 @@ Thumbs.db
 # Vagrant
 .vagrant
 
+unittests.xml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

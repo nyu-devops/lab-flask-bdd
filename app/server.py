@@ -210,7 +210,7 @@ def check_content_type(content_type):
     abort(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, 'Content-Type must be {}'.format(content_type))
 
 #@app.before_first_request
-def initialize_logging(log_level=logging.INFO):
+def initialize_logging(log_level=app.config['LOGGING_LEVEL']):
     """ Initialized the default logging to STDOUT """
     if not app.debug:
         print 'Setting up logging...'
