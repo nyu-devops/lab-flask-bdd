@@ -17,19 +17,10 @@ Vagrant.configure(2) do |config|
   # set the execute bit on all of your files which messes with GitHub users on Mac and Linux
   config.vm.synced_folder "./", "/vagrant", owner: "ubuntu", mount_options: ["dmode=775,fmode=664"]
 
-  config.vm.provider "virtualbox" do |vb|
-    # Customize the amount of memory on the VM:
-    vb.memory = "512"
-    vb.cpus = 1
-    # Fixes some DNS issues on some networks
-    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
-    vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
-  end
-
   # Provider-specific configuration
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM:
-    vb.memory = "1024"
+    vb.memory = "512"
     vb.cpus = 1
     # Fixes some DNS issues on some networks
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
@@ -75,8 +66,8 @@ Vagrant.configure(2) do |config|
     sudo apt-get install -y chrpath libssl-dev libxft-dev
     # PhantomJS https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2
     cd ~
-    export PHANTOM_JS="phantomjs-1.9.7-linux-x86_64"
-    #export PHANTOM_JS="phantomjs-2.1.1-linux-x86_64"
+    #export PHANTOM_JS="phantomjs-1.9.7-linux-x86_64"
+    export PHANTOM_JS="phantomjs-2.1.1-linux-x86_64"
     wget https://bitbucket.org/ariya/phantomjs/downloads/$PHANTOM_JS.tar.bz2
     sudo tar xvjf $PHANTOM_JS.tar.bz2
     sudo mv $PHANTOM_JS /usr/local/share
@@ -106,17 +97,10 @@ Vagrant.configure(2) do |config|
   ######################################################################
   # Add Redis docker container
   ######################################################################
-  config.vm.provision "shell", inline: <<-SHELL
-    # Prepare Redis data share
-    sudo mkdir -p /var/lib/redis/data
-    sudo chown vagrant:vagrant /var/lib/redis/data
-  SHELL
-
-  # Add Redis docker container
   config.vm.provision "docker" do |d|
     d.pull_images "redis:alpine"
     d.run "redis:alpine",
-      args: "--restart=always -d --name redis -h redis -p 6379:6379 -v /var/lib/redis/data:/data"
+      args: "--restart=always -d --name redis -h redis -p 6379:6379 -v redis_data:/data"
   end
 
 end
