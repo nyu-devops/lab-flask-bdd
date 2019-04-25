@@ -143,7 +143,7 @@ $(function () {
 
         ajax.done(function(res){
             clear_form_data()
-            flash_message("Pet with ID [" + res.id + "] has been Deleted!")
+            flash_message("Pet Deleted!")
         });
 
         ajax.fail(function(res){
