@@ -6,7 +6,7 @@ $(function () {
 
     // Updates the form with data from the response
     function update_form_data(res) {
-        $("#pet_id").val(res.id);
+        $("#pet_id").val(res._id);
         $("#pet_name").val(res.name);
         $("#pet_category").val(res.category);
         if (res.available == true) {
@@ -48,7 +48,7 @@ $(function () {
         var ajax = $.ajax({
             type: "POST",
             url: "/pets",
-            contentType:"application/json",
+            contentType: "application/json",
             data: JSON.stringify(data),
         });
 
@@ -83,7 +83,7 @@ $(function () {
         var ajax = $.ajax({
                 type: "PUT",
                 url: "/pets/" + pet_id,
-                contentType:"application/json",
+                contentType: "application/json",
                 data: JSON.stringify(data)
             })
 
@@ -109,7 +109,7 @@ $(function () {
         var ajax = $.ajax({
             type: "GET",
             url: "/pets/" + pet_id,
-            contentType:"application/json",
+            contentType: "application/json",
             data: ''
         })
 
@@ -137,13 +137,13 @@ $(function () {
         var ajax = $.ajax({
             type: "DELETE",
             url: "/pets/" + pet_id,
-            contentType:"application/json",
+            contentType: "application/json",
             data: '',
         })
 
         ajax.done(function(res){
             clear_form_data()
-            flash_message("Pet with ID [" + res.id + "] has been Deleted!")
+            flash_message("Pet has been Deleted!")
         });
 
         ajax.fail(function(res){
@@ -193,7 +193,7 @@ $(function () {
         var ajax = $.ajax({
             type: "GET",
             url: "/pets?" + queryString,
-            contentType:"application/json",
+            contentType: "application/json",
             data: ''
         })
 
@@ -209,7 +209,7 @@ $(function () {
             $("#search_results").append(header);
             for(var i = 0; i < res.length; i++) {
                 var pet = res[i];
-                var row = "<tr><td>"+pet.id+"</td><td>"+pet.name+"</td><td>"+pet.category+"</td><td>"+pet.available+"</td></tr>";
+                var row = "<tr><td> "+pet._id+" </td><td> "+pet.name+" </td><td> "+pet.category+" </td><td> "+pet.available+" </td></tr>";
                 $("#search_results").append(row);
             }
 

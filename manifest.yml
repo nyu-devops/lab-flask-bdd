@@ -1,11 +1,13 @@
 applications:
 - path: .
-  memory: 64M
   instances: 2
-  domain: mybluemix.net
-  name: nyu-lab-bdd-jr
-  #host: nyu-lab-bdd-jr
-  disk_quota: 512M
+  memory: 64M
+  routes:
+  - route: lab-flask-bdd.mybluemix.net
+  disk_quota: 1024M
   buildpack: python_buildpack
   services:
-  - RedisCloud
+  - Cloudant
+  env:
+    FLASK_APP : app:app
+    FLASK_DEBUG : false

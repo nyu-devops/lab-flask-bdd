@@ -13,7 +13,6 @@ app.config.from_object('config')
 
 import server
 import models
-import custom_exceptions
 
 # Set up logging for production
 print('Setting up logging for {}...'.format(__name__))

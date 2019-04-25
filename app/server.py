@@ -39,6 +39,7 @@ from . import app
 # then only after we have initialized the Flask app instance
 import error_handlers
 
+
 ######################################################################
 # GET HEALTH CHECK
 ######################################################################
@@ -63,16 +64,21 @@ def index():
 @app.route('/pets', methods=['GET'])
 def list_pets():
     """ Returns all of the Pets """
+    app.logger.info('Request to list Pets...')
     pets = []
     category = request.args.get('category')
     name = request.args.get('name')
     if category:
+        app.logger.info('Find by category')
         pets = Pet.find_by_category(category)
     elif name:
+        app.logger.info('Find by name')
         pets = Pet.find_by_name(name)
     else:
+        app.logger.info('Find all')
         pets = Pet.all()
 
+    app.logger.info('[%s] Pets returned', len(pets))
     results = [pet.serialize() for pet in pets]
     return make_response(jsonify(results), status.HTTP_200_OK)
 
@@ -80,20 +86,21 @@ def list_pets():
 ######################################################################
 # RETRIEVE A PET
 ######################################################################
-@app.route('/pets/<int:pet_id>', methods=['GET'])
+@app.route('/pets/<pet_id>', methods=['GET'])
 def get_pets(pet_id):
     """
     Retrieve a single Pet
 
     This endpoint will return a Pet based on it's id
     """
+    app.logger.info("Request to Retrieve a pet with id [%s]", pet_id)
     pet = Pet.find(pet_id)
     if not pet:
         raise NotFound("Pet with id '{}' was not found.".format(pet_id))
     return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
 
 ######################################################################
-# ADD A NEW PET
+# CREATE A NEW PET
 ######################################################################
 @app.route('/pets', methods=['POST'])
 def create_pets():
@@ -101,6 +108,7 @@ def create_pets():
     Creates a Pet
     This endpoint will create a Pet based the data in the body that is posted
     """
+    app.logger.info('Request to Create a Pet...')
     data = {}
     # Check for form submission data
     if request.headers.get('Content-Type') == 'application/x-www-form-urlencoded':
@@ -111,12 +119,14 @@ def create_pets():
             'available': True
         }
     else:
-        app.logger.info('Getting data from API call')
+        check_content_type('application/json')
+        app.logger.info('Getting json data from API call')
         data = request.get_json()
     app.logger.info(data)
     pet = Pet()
     pet.deserialize(data)
     pet.save()
+    app.logger.info('Pet with new id [%s] saved!', pet.id)
     message = pet.serialize()
     location_url = url_for('get_pets', pet_id=pet.id, _external=True)
     return make_response(jsonify(message), status.HTTP_201_CREATED,
@@ -126,13 +136,14 @@ def create_pets():
 ######################################################################
 # UPDATE AN EXISTING PET
 ######################################################################
-@app.route('/pets/<int:pet_id>', methods=['PUT'])
+@app.route('/pets/<pet_id>', methods=['PUT'])
 def update_pets(pet_id):
     """
     Update a Pet
 
     This endpoint will update a Pet based the body that is posted
     """
+    app.logger.info('Request to Update a pet with id [%s]', pet_id)
     check_content_type('application/json')
     pet = Pet.find(pet_id)
     if not pet:
@@ -147,13 +158,14 @@ def update_pets(pet_id):
 ######################################################################
 # DELETE A PET
 ######################################################################
-@app.route('/pets/<int:pet_id>', methods=['DELETE'])
+@app.route('/pets/<pet_id>', methods=['DELETE'])
 def delete_pets(pet_id):
     """
     Delete a Pet
 
     This endpoint will delete a Pet based the id specified in the path
     """
+    app.logger.info('Request to Delete a pet with id [%s]', pet_id)
     pet = Pet.find(pet_id)
     if pet:
         pet.delete()
@@ -162,7 +174,7 @@ def delete_pets(pet_id):
 ######################################################################
 # PURCHASE A PET
 ######################################################################
-@app.route('/pets/<int:pet_id>/purchase', methods=['PUT'])
+@app.route('/pets/<pet_id>/purchase', methods=['PUT'])
 def purchase_pets(pet_id):
     """ Purchasing a Pet makes it unavailable """
     pet = Pet.find(pet_id)
@@ -188,14 +200,14 @@ def pets_reset():
 ######################################################################
 
 @app.before_first_request
-def init_db(redis=None):
+def init_db(dbname="pets"):
     """ Initlaize the model """
-    Pet.init_db(redis)
+    Pet.init_db(dbname)
 
 # load sample data
 def data_load(payload):
     """ Loads a Pet into the database """
-    pet = Pet(0, payload['name'], payload['category'])
+    pet = Pet(payload['name'], payload['category'], payload['available'])
     pet.save()
 
 def data_reset():
@@ -204,8 +216,13 @@ def data_reset():
 
 def check_content_type(content_type):
     """ Checks that the media type is correct """
+    if 'Content-Type' not in request.headers:
+        app.logger.error('No Content-Type specified.')
+        abort(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, 'Content-Type must be {}'.format(content_type))
+
     if request.headers['Content-Type'] == content_type:
         return
+
     app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
     abort(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, 'Content-Type must be {}'.format(content_type))
 

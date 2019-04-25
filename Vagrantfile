@@ -77,7 +77,23 @@ Vagrant.configure(2) do |config|
     # Install app dependencies
     cd /vagrant
     sudo pip install -r requirements.txt
+  SHELL
 
+
+  ######################################################################
+  # Add CouchDB docker container
+  ######################################################################
+  # docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass -v couchdb-data:/opt/couchdb/data couchdb
+  config.vm.provision "docker" do |d|
+    d.pull_images "couchdb"
+    d.run "couchdb",
+      args: "--restart=always -d --name couchdb -p 5984:5984 -v couchdb-data:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
+  end
+
+  ######################################################################
+  # Setup IBM Cloud CLI environment after Docker
+  ######################################################################
+  config.vm.provision "shell", inline: <<-SHELL
     echo "\n************************************"
     echo " Installing IBM Cloud CLI..."
     echo "************************************\n"
@@ -93,14 +109,5 @@ Vagrant.configure(2) do |config|
     echo "ibmcloud login -a https://api.ng.bluemix.net --apikey @~/.bluemix/apiKey.json"
     echo "\n"
   SHELL
-
-  ######################################################################
-  # Add Redis docker container
-  ######################################################################
-  config.vm.provision "docker" do |d|
-    d.pull_images "redis:alpine"
-    d.run "redis:alpine",
-      args: "--restart=always -d --name redis -h redis -p 6379:6379 -v redis_data:/data"
-  end
 
 end
