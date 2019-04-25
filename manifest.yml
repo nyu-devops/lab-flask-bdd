@@ -1,11 +1,14 @@
 applications:
-- path: .
+- nme: lab-flask-bdd
+  path: .
   instances: 2
   memory: 64M
+  disk_quota: 1024M
   routes:
   - route: lab-flask-bdd.mybluemix.net
-  disk_quota: 1024M
-  buildpack: python_buildpack
+  command: gunicorn --bind 0.0.0.0:$PORT --log-level=info app:app
+  buildpacks:
+  - python_buildpack
   services:
   - Cloudant
   env:
