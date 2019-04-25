@@ -200,20 +200,29 @@ $(function () {
         ajax.done(function(res){
             //alert(res.toSource())
             $("#search_results").empty();
-            $("#search_results").append('<table class="table-striped">');
+            $("#search_results").append('<table class="table-striped" cellpadding="10">');
             var header = '<tr>'
             header += '<th style="width:10%">ID</th>'
             header += '<th style="width:40%">Name</th>'
             header += '<th style="width:40%">Category</th>'
             header += '<th style="width:10%">Available</th></tr>'
             $("#search_results").append(header);
+            var firstPet = "";
             for(var i = 0; i < res.length; i++) {
                 var pet = res[i];
-                var row = "<tr><td> "+pet._id+" </td><td> "+pet.name+" </td><td> "+pet.category+" </td><td> "+pet.available+" </td></tr>";
+                var row = "<tr><td>"+pet._id+"</td><td>"+pet.name+"</td><td>"+pet.category+"</td><td>"+pet.available+"</td></tr>";
                 $("#search_results").append(row);
+                if (i == 0) {
+                    firstPet = pet;
+                }
             }
 
             $("#search_results").append('</table>');
+
+            // copy the first result to the form
+            if (firstPet != "") {
+                update_form_data(firstPet)
+            }
 
             flash_message("Success")
         });

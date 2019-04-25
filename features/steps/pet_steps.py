@@ -4,6 +4,7 @@ Pet Steps
 Steps file for Pet.feature
 """
 from os import getenv
+import logging
 import json
 import requests
 from behave import *
@@ -53,6 +54,29 @@ def step_impl(context, element_name, text_string):
     element = context.driver.find_element_by_id(element_id)
     element.clear()
     element.send_keys(text_string)
+
+##################################################################
+# These two function simulate copy and paste
+##################################################################
+@when('I copy the "{element_name}" field')
+def step_impl(context, element_name):
+    element_id = 'pet_' + element_name.lower()
+    element = context.driver.find_element_by_id(element_id)
+    # element = WebDriverWait(context.driver, WAIT_SECONDS).until(
+    #     expected_conditions.presence_of_element_located((By.ID, element_id))
+    # )
+    context.clipboard = element.get_attribute('value')
+    logging.info('Clipboard contains: %s', context.clipboard)
+
+@when('I paste the "{element_name}" field')
+def step_impl(context, element_name):
+    element_id = 'pet_' + element_name.lower()
+    element = context.driver.find_element_by_id(element_id)
+    # element = WebDriverWait(context.driver, WAIT_SECONDS).until(
+    #     expected_conditions.presence_of_element_located((By.ID, element_id))
+    # )
+    element.clear()
+    element.send_keys(context.clipboard)
 
 ##################################################################
 # This code works because of the following naming convention:

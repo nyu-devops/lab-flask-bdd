@@ -39,13 +39,16 @@ Scenario: List all dogs
 
 Scenario: Update a Pet
     When I visit the "Home Page"
-    And I set the "Id" to "1"
-    And I press the "Retrieve" button
+    And I set the "Name" to "fido"
+    And I press the "Search" button
     Then I should see "fido" in the "Name" field
+    And I should see "dog" in the "Category" field
     When I change "Name" to "Boxer"
     And I press the "Update" button
     Then I should see the message "Success"
-    When I set the "Id" to "1"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
     And I press the "Retrieve" button
     Then I should see "Boxer" in the "Name" field
     When I press the "Clear" button
