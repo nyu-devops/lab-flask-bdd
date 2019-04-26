@@ -31,7 +31,7 @@ Scenario: Create a Pet
     And I press the "Retrieve" button
     Then I should see "Happy" in the "Name" field
     And I should see "Hippo" in the "Category" field
-    And I should see "false" in the "Available" field
+    And I should see "False" in the "Available" dropdown
 
 Scenario: List all pets
     When I visit the "Home Page"
