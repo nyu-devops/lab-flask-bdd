@@ -11,6 +11,7 @@ from behave import *
 from compare import expect, ensure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions
 
 WAIT_SECONDS = int(getenv('WAIT_SECONDS', '30'))
@@ -54,6 +55,18 @@ def step_impl(context, element_name, text_string):
     element = context.driver.find_element_by_id(element_id)
     element.clear()
     element.send_keys(text_string)
+
+@when('I select "{message}" in the "{element_name}" field')
+def step_impl(context, message, element_name):
+    element_id = 'pet_' + element_name.lower()
+    element = Select(context.driver.find_element_by_id(element_id))
+    element.select_by_value(message)
+
+@then('the "{element_name}" field should be empty')
+def step_impl(context, element_name):
+    element_id = 'pet_' + element_name.lower()
+    element = context.driver.find_element_by_id(element_id)
+    expect(element.get_attribute('value')).to_be(u'')
 
 ##################################################################
 # These two function simulate copy and paste
