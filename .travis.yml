@@ -1,16 +1,25 @@
+sudo: required
+
 language: python
 python:
-  - "2.7"
+  - '2.7'
+
+services:
+  - docker
+
+# We need to run our own couchdb because Travis doesn't use credentials
+before_install:
+  - docker pull couchdb:latest
+  - docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass
+    couchdb:latest
+  - docker ps -a
 
 # command to install dependencies
-install: "pip install -r requirements.txt"
+install: pip install -r requirements.txt
 
-# command to run tests
 before_script:
-  - redis-cli ping
-  # - "export DISPLAY=:99.0"
-  # - "sh -e /etc/init.d/xvfb start"
-  # - sleep 3 # give xvfb some time to start
+  - curl -X GET http://localhost:5984/
+  - curl -X PUT http://admin:pass@localhost:5984/test
   - python run.py &  # start a Web server in the background
   - sleep 3 # give Web server some time to bind to sockets, etc
 
@@ -22,6 +31,3 @@ script:
 
 after_success:
   - codecov
-
-services:
-  - redis-server
