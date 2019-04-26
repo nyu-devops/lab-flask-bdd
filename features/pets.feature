@@ -19,7 +19,7 @@ Scenario: Create a Pet
     When I visit the "Home Page"
     And I set the "Name" to "Happy"
     And I set the "Category" to "Hippo"
-    And I select "false" in the "Available" field
+    And I select "false" in the "Available" dropdown
     And I press the "Create" button
     Then I should see the message "Success"
     When I copy the "Id" field
