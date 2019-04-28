@@ -4,7 +4,7 @@
 [![Codecov](https://img.shields.io/codecov/c/github/nyu-devops/lab-flask-bdd.svg)]()
 <a href="https://zenhub.com"><img src="https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png"></a>
 
-This repository is part of lab for the *NYU DevOps* class for Spring 2017, [CSCI-GA.3033-013](http://cs.nyu.edu/courses/spring17/CSCI-GA.3033-013/) on Behavior Driven Development with Flask and Behave
+This repository is originally one of the labs for the *NYU DevOps* class for Spring 2017, [CSCI-GA.3033-013](http://cs.nyu.edu/courses/spring17/CSCI-GA.3033-013/) on Behavior Driven Development with Flask and Behave
 
 The sample code is using [Flask microframework](http://flask.pocoo.org/) and is intented to test the Python support on [IBM Cloud](https://cloud.ibm.com/) environment which is based on [Cloud Foundry](https://www.cloudfoundry.org). It also uses [CouchDB](http://couchdb.apache.org) as a database for storing JSON objects.
 
@@ -73,19 +73,15 @@ Nose is configured to automatically include the flags `--with-spec --spec-color`
 
 If you want to deploy this example in a Docker container, you can run the tests from the container.
 
-To use with Docker couchdb database use:
-    docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
-
-
 This service requires CouchDB so first start a CouchDB Docker container
 ```
     docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
 ```
 
 **Docker Note:**
-CouchDB uses ``/opt/couchdb/data` to store its data, and is exposed as a volume
-e.g., to use current folder add: ``-v $(pwd):/opt/couchdb/data`
-You can also use Docker volumes like this: ``-v couchdb:/opt/couchdb/data`
+CouchDB uses `/opt/couchdb/data` to store its data, and is exposed as a volume
+e.g., to use current folder add: `-v $(pwd):/opt/couchdb/data`
+You can also use Docker volumes like this: `-v couchdb:/opt/couchdb/data`
 
 Next build this repo as a container
 
