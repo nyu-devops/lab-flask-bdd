@@ -9,8 +9,11 @@ Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "ubuntu/xenial64"
+  
   # set up network ip and port forwarding
   config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 5984, host: 5984, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 8001, host: 8001, host_ip: "127.0.0.1"
   config.vm.network "private_network", ip: "192.168.33.10"
 
   # Windows users need to change the permissions explicitly so that Windows doesn't
@@ -108,6 +111,16 @@ Vagrant.configure(2) do |config|
     echo "\n"
     echo "ibmcloud login -a https://api.ng.bluemix.net --apikey @~/.bluemix/apiKey.json"
     echo "\n"
+    echo "\n************************************"
+    echo " For the Kubernetes Dashboard use:"
+    echo " kubectl proxy --address='0.0.0.0'"
+    echo "************************************\n"
+
+    # Show the GUI URL for Couch DB
+    echo "\n"
+    echo "CouchDB Admin GUI can be found at:\n"
+    echo "http://127.0.0.1:5984/_utils"
+
   SHELL
 
 end
