@@ -6,7 +6,7 @@
 
 This repository is part of lab for the *NYU DevOps* class for Spring 2017, [CSCI-GA.3033-013](http://cs.nyu.edu/courses/spring17/CSCI-GA.3033-013/) on Behavior Driven Development with Flask and Behave
 
-The sample code is using [Flask microframework](http://flask.pocoo.org/) and is intented to test the Python support on [IBM's Bluemix](https://bluemix.net/) environment which is based on Cloud Foundry. It also uses [Redis](https://redis.io) as a database for storing JSON objects.
+The sample code is using [Flask microframework](http://flask.pocoo.org/) and is intented to test the Python support on [IBM Cloud](https://cloud.ibm.com/) environment which is based on [Cloud Foundry](https://www.cloudfoundry.org). It also uses [CouchDB](http://couchdb.apache.org) as a database for storing JSON objects.
 
 ## Introduction
 
@@ -24,11 +24,12 @@ It also introduces Behavior Driven Development using `Behave` as a way to define
 ## Setup
 
 For easy setup, you need to have [Vagrant](https://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/) installed. Then all you have to do is clone this repo and invoke vagrant:
-
+```bash
     git clone https://github.com/nyu-devops/lab-flask-bdd.git
     cd lab-flask-bdd
     vagrant up && vagrant ssh
     cd /vagrant
+```
 
 You can now run `behave` and `nosetests` to run the BDD and TDD tests respectively.
 
@@ -37,7 +38,6 @@ You can now run `behave` and `nosetests` to run the BDD and TDD tests respective
 These tests require the service to be running becasue unlike the the TDD unit tests that test the code locally, these BDD intagration tests are using Selenium to manipulate a web page on a running server.
 
 Run the tests using `behave`
-
 ```shell
     $ python run.py &
     $ behave
@@ -46,7 +46,6 @@ Run the tests using `behave`
 Note that the `&` runs the server in the background. To stop the server, you must bring it to the foreground and then press `Ctrl+C`
 
 Stop the server with
-
 ```shell
     $ fg
     $ <ctrl+c>
@@ -56,7 +55,9 @@ Alternately you can run the server in another `shell` by opening another termina
 
 This repo also has unit tests that you can run `nose`
 
+```bash
     $ nosetests
+```
 
 Nose is configured to automatically include the flags `--with-spec --spec-color` so that red-green-refactor is meaningful. If you are in a command shell that supports colors, passing tests will be green while failing tests will be red.
 
@@ -72,33 +73,52 @@ Nose is configured to automatically include the flags `--with-spec --spec-color`
 
 If you want to deploy this example in a Docker container, you can run the tests from the container.
 
-This service requires Redis so first start a Redis container
+To use with Docker couchdb database use:
+    docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
 
-    docker run -d --name redis-service -p 6379:6379 redis:alpine
+
+This service requires CouchDB so first start a CouchDB Docker container
+```
+    docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass couchdb
+```
+
+**Docker Note:**
+CouchDB uses ``/opt/couchdb/data` to store its data, and is exposed as a volume
+e.g., to use current folder add: ``-v $(pwd):/opt/couchdb/data`
+You can also use Docker volumes like this: ``-v couchdb:/opt/couchdb/data`
 
 Next build this repo as a container
 
+```bash
     docker build -t flask-bdd .
+```
 
-To run `nosetests` just run it in a container while linking it to the `redis-service` container that we have running.
+To run `nosetests` just run it in a container while linking it to the `couchdb` container that we have running.
 
-    docker run --rm --link redis-service flask-bdd nosetests
+```bash
+    docker run --rm --link couchdb flask-bdd nosetests
+```
 
 To run `behave` tests we need an instance of our service running so it takes two `docker` commands, one to run our service and another to run the `behave` tests
 
-    docker run -d --name flask-service --link redis-service -p 5000:5000 flask-bdd
+```bash
+    docker run -d --name flask-service --link couchdb -p 5000:5000 flask-bdd
     docker run --rm --link flask-service -e BASE_URL="http://flask-service:5000/" flask-bdd behave
+```
 
 Notice how we injected the URL of the running service into our container running the behave tests using an environment variable in keeping with 12-factor configuration recommendations.
 
 To bring down these services use:
 
+```bash
     docker stop flask-bdd
-    docker stop redis-service
-
+    docker stop couchdb
+```
 ...and to remove them with:
 
+```bash
     docker rm flask-bdd
-    docker rm redis-service
+    docker rm couchdb
+```
 
-John Rofrano, Adjunct Professor, NYU
+This repository is part of the NYU class CSCI-GA.2810-001: DevOps and Agile Methodologies taught by John Rofrano, Adjunct Instructor, NYU Curant Institute, Graduate Division, Computer Science.
