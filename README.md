@@ -2,7 +2,6 @@
 
 [![Build Status](https://travis-ci.org/nyu-devops/lab-flask-bdd.svg?branch=master)](https://travis-ci.org/nyu-devops/lab-flask-bdd)
 [![Codecov](https://img.shields.io/codecov/c/github/nyu-devops/lab-flask-bdd.svg)]()
-<a href="https://zenhub.com"><img src="https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png"></a>
 
 This repository is originally one of the labs for the *NYU DevOps* class for Spring 2017, [CSCI-GA.3033-013](http://cs.nyu.edu/courses/spring17/CSCI-GA.3033-013/) on Behavior Driven Development with Flask and Behave
 
@@ -84,27 +83,31 @@ e.g., to use current folder add: `-v $(pwd):/opt/couchdb/data`
 You can also use Docker volumes like this: `-v couchdb:/opt/couchdb/data`
 
 Next build this repo as a container
-
 ```bash
     docker build -t flask-bdd .
 ```
+This will build a Docker image with the name `flask-bdd`
 
-To run `nosetests` just run it in a container while linking it to the `couchdb` container that we have running.
-
+### nosetests
+To run `nosetests` just run it in a container while linking it to the `couchdb` container that we have running by adding `--link couchdb` and `CLOUDANT_HOST=couchdb` like this.
 ```bash
-    docker run --rm --link couchdb flask-bdd nosetests
+    docker run --rm --link couchdb -e CLOUDANT_HOST=couchdb flask-bdd nosetests
 ```
+The `--link couchdb` inserts the IP address of the `counchdb` container into the `/etc/hosts` file and then defining the environment variable `CLOUDANT_HOST=couchdb` tells our `models.py` file to use that as the name of the database server.
 
+### Behave
 To run `behave` tests we need an instance of our service running so it takes two `docker` commands, one to run our service and another to run the `behave` tests
 
 ```bash
-    docker run -d --name flask-service --link couchdb -p 5000:5000 flask-bdd
+    docker run -d --name flask-service --link couchdb -p 5000:5000 -e CLOUDANT_HOST=couchdb flask-bdd
     docker run --rm --link flask-service -e BASE_URL="http://flask-service:5000/" flask-bdd behave
 ```
 
-Notice how we injected the URL of the running service into our container running the behave tests using an environment variable in keeping with 12-factor configuration recommendations.
+Notice how we injected the URL of the running service into our container that is running the behave tests using an environment variable `BASE_URL` in keeping with 12-factor pratice "_III. Config:
+Store config in the environment_" which recommends the passing of configuraition parameters as environment variables.
 
-To bring down these services use:
+## Clean up
+When you are finished exploring this lab, you can bring down these services using:
 
 ```bash
     docker stop flask-bdd
