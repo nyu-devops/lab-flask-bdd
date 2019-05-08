@@ -33,7 +33,6 @@ Docker Note:
 
 import os
 import json
-import time
 import logging
 from retry import retry
 from cloudant.client import Cloudant
@@ -50,8 +49,6 @@ CLOUDANT_PASSWORD = os.environ.get('CLOUDANT_PASSWORD', 'pass')
 RETRY_COUNT = int(os.environ.get('RETRY_COUNT', 10))
 RETRY_DELAY = int(os.environ.get('RETRY_DELAY', 1))
 RETRY_BACKOFF = int(os.environ.get('RETRY_BACKOFF', 2))
-
-SLEEP_TIME = float(os.environ.get('SLEEP_TIME', 0.5))
 
 class DataValidationError(Exception):
     """ Custom Exception with data validation fails """
@@ -99,9 +96,7 @@ class Pet(object):
         except KeyError:
             document = None
         if document:
-            time.sleep(SLEEP_TIME) # avoid Cloudant throttle
             document.update(self.serialize())
-            time.sleep(SLEEP_TIME) # avoid Cloudant throttle
             document.save()
 
 
@@ -126,7 +121,6 @@ class Pet(object):
         except KeyError:
             document = None
         if document:
-            time.sleep(SLEEP_TIME) # avoid Cloudant throttle]
             document.delete()
 
 
@@ -191,7 +185,6 @@ class Pet(object):
     def remove_all(cls):
         """ Removes all documents from the database (use for testing)  """
         for document in cls.database:
-            time.sleep(SLEEP_TIME) # avoid Cloudant throttle
             document.delete()
 
     @classmethod
@@ -201,7 +194,6 @@ class Pet(object):
         """ Query that returns all Pets """
         results = []
         for doc in cls.database:
-            time.sleep(SLEEP_TIME) # avoid Cloudant throttle
             pet = Pet().deserialize(doc)
             pet.id = doc['_id']
             results.append(pet)
@@ -219,7 +211,6 @@ class Pet(object):
         query = Query(cls.database, selector=kwargs)
         results = []
         for doc in query.result:
-            time.sleep(SLEEP_TIME) # avoid Cloudant throttle
             pet = Pet()
             pet.deserialize(doc)
             results.append(pet)
