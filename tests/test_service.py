@@ -17,12 +17,13 @@ Pet API Service Test Suite
 
 Test cases can be run with the following:
 nosetests -v --with-spec --spec-color
+nosetests --stop tests/test_service.py:TestPetServer
 """
 
-import unittest
+from unittest import TestCase
 import logging
 from werkzeug.datastructures import MultiDict, ImmutableMultiDict
-from app import server
+from service import service
 
 # Status Codes
 HTTP_200_OK = 200
@@ -37,22 +38,22 @@ HTTP_415_UNSUPPORTED_MEDIA_TYPE = 415
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
-class TestPetServer(unittest.TestCase):
+class TestPetServer(TestCase):
     """ Pet Service tests """
 
     def setUp(self):
-        self.app = server.app.test_client()
-        server.initialize_logging(logging.INFO)
-        server.init_db()
-        server.data_reset()
-        server.data_load({"name": "fido", "category": "dog", "available": True})
-        server.data_load({"name": "kitty", "category": "cat", "available": False})
+        self.app = service.app.test_client()
+        service.initialize_logging(logging.INFO)
+        service.init_db()
+        service.data_reset()
+        service.data_load({"name": "fido", "category": "dog", "available": True})
+        service.data_load({"name": "kitty", "category": "cat", "available": False})
 
     def test_index(self):
         """ Test the index page """
         resp = self.app.get('/')
         self.assertEqual(resp.status_code, HTTP_200_OK)
-        self.assertIn('Pet Demo REST API Service', resp.data)
+        self.assertIn(b'Pet Demo REST API Service', resp.data)
 
     def test_get_pet_list(self):
         """ Get a list of Pets """
@@ -183,8 +184,8 @@ class TestPetServer(unittest.TestCase):
         resp = self.app.get('/pets', query_string='name=fido')
         self.assertEqual(resp.status_code, HTTP_200_OK)
         self.assertTrue(len(resp.data) > 0)
-        self.assertIn('fido', resp.data)
-        self.assertNotIn('kitty', resp.data)
+        self.assertIn(b'fido', resp.data)
+        self.assertNotIn(b'kitty', resp.data)
         data = resp.get_json()
         query_item = data[0]
         self.assertEqual(query_item['name'], 'fido')
@@ -194,8 +195,8 @@ class TestPetServer(unittest.TestCase):
         resp = self.app.get('/pets', query_string='category=dog')
         self.assertEqual(resp.status_code, HTTP_200_OK)
         self.assertTrue(len(resp.data) > 0)
-        self.assertIn('fido', resp.data)
-        self.assertNotIn('kitty', resp.data)
+        self.assertIn(b'fido', resp.data)
+        self.assertNotIn(b'kitty', resp.data)
         data = resp.get_json()
         query_item = data[0]
         self.assertEqual(query_item['category'], 'dog')
@@ -240,7 +241,6 @@ class TestPetServer(unittest.TestCase):
                             query_string='name={}'.format(name))
         self.assertEqual(resp.status_code, HTTP_200_OK)
         self.assertGreater(len(resp.data), 0)
-        self.assertIn(name, resp.data)
         data = resp.get_json()
         return data
 

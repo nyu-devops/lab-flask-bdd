@@ -15,8 +15,8 @@ PORT = os.getenv('PORT', '5000')
 #   M A I N
 ######################################################################
 if __name__ == "__main__":
-    print "****************************************"
-    print " P E T   S E R V I C E   R U N N I N G"
-    print "****************************************"
+    print("****************************************")
+    print(" P E T   S E R V I C E   R U N N I N G")
+    print("****************************************")
     server.initialize_logging()
     app.run(host='0.0.0.0', port=int(PORT), debug=DEBUG)
