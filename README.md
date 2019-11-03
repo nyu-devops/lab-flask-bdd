@@ -38,7 +38,7 @@ These tests require the service to be running becasue unlike the the TDD unit te
 
 Run the tests using `behave`
 ```shell
-    $ python run.py &
+    $ honcho start &
     $ behave
 ```
 
@@ -47,7 +47,7 @@ Note that the `&` runs the server in the background. To stop the server, you mus
 Stop the server with
 ```shell
     $ fg
-    $ <ctrl+c>
+    $ <Ctrl+C>
 ```
 
 Alternately you can run the server in another `shell` by opening another terminal window and using `vagrant ssh` to establish a second connection to the VM.
@@ -62,8 +62,8 @@ Nose is configured to automatically include the flags `--with-spec --spec-color`
 
 ## What's featured in the project?
 
-    * ./app/server.py -- the main Service using Python Flask
-    * ./tests/test_server.py -- unit test cases for the server
+    * ./service/service.py -- the main Service using Python Flask
+    * ./tests/test_service.py -- unit test cases for the server
     * ./tests/test_pets.py -- unit test cases for the model
     * ./features/pets.feature -- Behave feature file
     * ./features/steps/steps.py -- Behave step definitions
@@ -120,4 +120,4 @@ When you are finished exploring this lab, you can bring down these services usin
     docker rm couchdb
 ```
 
-This repository is part of the NYU class CSCI-GA.2810-001: DevOps and Agile Methodologies taught by John Rofrano, Adjunct Instructor, NYU Curant Institute, Graduate Division, Computer Science.
+This repository is part of the NYU class **CSCI-GA.2810-001: DevOps and Agile Methodologies** taught by John Rofrano, Adjunct Instructor, NYU Curant Institute, Graduate Division, Computer Science.
