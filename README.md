@@ -50,7 +50,19 @@ Stop the server with
     $ <Ctrl+C>
 ```
 
-Alternately you can run the server in another `shell` by opening another terminal window and using `vagrant ssh` to establish a second connection to the VM.
+Alternately you can run the server in another `shell` by opening another terminal window and using `vagrant ssh` to establish a second connection to the VM. You can also suppress all log output in the current shell with this command:
+
+```bash
+    honcho start 2>&1 > /dev/null &
+```
+
+or you can supress info logging with this command:
+
+```bash
+    gunicorn --bind 0.0.0.0 --log-level=error service:app &
+```
+
+This will suppress the normal `INFO` logging
 
 This repo also has unit tests that you can run `nose`
 
@@ -63,6 +75,7 @@ Nose is configured to automatically include the flags `--with-spec --spec-color`
 ## What's featured in the project?
 
     * ./service/service.py -- the main Service using Python Flask
+    * ./service/models.py -- the data models for persistence
     * ./tests/test_service.py -- unit test cases for the server
     * ./tests/test_pets.py -- unit test cases for the model
     * ./features/pets.feature -- Behave feature file
