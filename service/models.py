@@ -50,6 +50,10 @@ RETRY_COUNT = int(os.environ.get('RETRY_COUNT', 10))
 RETRY_DELAY = int(os.environ.get('RETRY_DELAY', 1))
 RETRY_BACKOFF = int(os.environ.get('RETRY_BACKOFF', 2))
 
+class DatabaseConnectionError(Exception):
+    """ Custom Exception when database connection fails """
+    pass
+
 class DataValidationError(Exception):
     """ Custom Exception with data validation fails """
     pass
@@ -258,41 +262,35 @@ class Pet(object):
         Initialized Coundant database connection
         """
         opts = {}
-        vcap_services = {}
-        # Try and get VCAP from the environment or a file if developing
+        # Try and get VCAP from the environment
         if 'VCAP_SERVICES' in os.environ:
-            Pet.logger.info('Running in Bluemix mode.')
+            Pet.logger.info('Found Cloud Foundry VCAP_SERVICES bindings')
             vcap_services = json.loads(os.environ['VCAP_SERVICES'])
+            # Look for Cloudant in VCAP_SERVICES
+            for service in vcap_services:
+                if service.startswith('cloudantNoSQLDB'):
+                    opts = vcap_services[service][0]['credentials']
+
         # if VCAP_SERVICES isn't found, maybe we are running on Kubernetes?
-        elif 'BINDING_CLOUDANT' in os.environ:
-            Pet.logger.info('Found Kubernetes Bindings')
-            creds = json.loads(os.environ['BINDING_CLOUDANT'])
-            vcap_services = {"cloudantNoSQLDB": [{"credentials": creds}]}
-        else:
+        if not opts and 'BINDING_CLOUDANT' in os.environ:
+            Pet.logger.info('Found Kubernetes BINDING_CLOUDANT bindings')
+            opts = json.loads(os.environ['BINDING_CLOUDANT'])
+
+        # If Cloudant not found in VCAP_SERVICES or BINDING_CLOUDANT
+        # get it from the CLOUDANT_xxx environment variables
+        if not opts:
             Pet.logger.info('VCAP_SERVICES and BINDING_CLOUDANT undefined.')
-            creds = {
+            opts = {
                 "username": CLOUDANT_USERNAME,
                 "password": CLOUDANT_PASSWORD,
                 "host": CLOUDANT_HOST,
                 "port": 5984,
                 "url": "http://"+CLOUDANT_HOST+":5984/"
             }
-            vcap_services = {"cloudantNoSQLDB": [{"credentials": creds}]}
-
-        # Look for Cloudant in VCAP_SERVICES
-        for service in vcap_services:
-            if service.startswith('cloudantNoSQLDB'):
-                cloudant_service = vcap_services[service][0]
-                opts['username'] = cloudant_service['credentials']['username']
-                opts['password'] = cloudant_service['credentials']['password']
-                opts['host'] = cloudant_service['credentials']['host']
-                opts['port'] = cloudant_service['credentials']['port']
-                opts['url'] = cloudant_service['credentials']['url']
 
         if any(k not in opts for k in ('host', 'username', 'password', 'port', 'url')):
-            Pet.logger.info('Error - Failed to retrieve options. ' \
+            raise DatabaseConnectionError('Error - Failed to retrieve options. ' \
                              'Check that app is bound to a Cloudant service.')
-            exit(-1)
 
         Pet.logger.info('Cloudant Endpoint: %s', opts['url'])
         try:
@@ -306,7 +304,7 @@ class Pet(object):
                                   admin_party=ADMIN_PARTY
                                  )
         except ConnectionError:
-            raise AssertionError('Cloudant service could not be reached')
+            raise DatabaseConnectionError('Cloudant service could not be reached')
 
         # Create database if it doesn't exist
         try:
@@ -316,4 +314,4 @@ class Pet(object):
             Pet.database = Pet.client.create_database(dbname)
         # check for success
         if not Pet.database.exists():
-            raise AssertionError('Database [{}] could not be obtained'.format(dbname))
+            raise DatabaseConnectionError('Database [{}] could not be obtained'.format(dbname))

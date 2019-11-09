@@ -32,12 +32,12 @@ import logging
 from flask import jsonify, request, json, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
-from app.models import Pet
+from service.models import Pet
 from . import app
 
-# Error handlers reuire app to be initialized so we must import
-# then only after we have initialized the Flask app instance
-import error_handlers
+# Error handlers require app to be initialized so we must import
+# them only after we have initialized the Flask app instance
+import service.error_handlers
 
 
 ######################################################################
@@ -230,7 +230,7 @@ def check_content_type(content_type):
 def initialize_logging(log_level=app.config['LOGGING_LEVEL']):
     """ Initialized the default logging to STDOUT """
     if not app.debug:
-        print 'Setting up logging...'
+        print('Setting up logging...')
         # Set up default logging for submodules to use STDOUT
         # datefmt='%m/%d/%Y %I:%M:%S %p'
         fmt = '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
