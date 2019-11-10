@@ -26,6 +26,8 @@ def before_all(context):
     options.add_argument("--no-sandbox") # Bypass OS security model
     options.add_argument("--headless")
     context.driver = webdriver.Chrome(options=options)
+    context.driver.implicitly_wait(WAIT_SECONDS) # seconds
+    # context.driver.set_window_size(1200, 600)
 
     context.base_url = BASE_URL
     # -- SET LOG LEVEL: behave --logging-level=ERROR ...
