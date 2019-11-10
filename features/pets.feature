@@ -38,7 +38,7 @@ Scenario: List all pets
     And I press the "Search" button
     Then I should see "fido" in the results
     And I should see "kitty" in the results
-    And I should see "leo" in the results
+    And I should not see "leo" in the results
 
 Scenario: List all dogs
     When I visit the "Home Page"
