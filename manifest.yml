@@ -4,13 +4,12 @@ applications:
   instances: 2
   memory: 64M
   disk_quota: 1024M
-  routes:
-  - route: lab-flask-bdd.mybluemix.net
-  command: gunicorn --bind 0.0.0.0:$PORT --log-level=info app:app
-  buildpacks:
-  - python_buildpack
-  # services:
-  # - Cloudant
+  host: lab-flask-bdd
+  domain: mybluemix.net
+  #command: gunicorn --bind 0.0.0.0:$PORT --log-level=info app:app
+  buildpack: python_buildpack
+  services:
+  - Cloudant
   env:
     FLASK_APP : app:app
     FLASK_DEBUG : false
