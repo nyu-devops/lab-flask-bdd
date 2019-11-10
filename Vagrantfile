@@ -61,22 +61,12 @@ Vagrant.configure(2) do |config|
     apt-get update
     apt-get install -y git zip tree python3 python3-pip python3-venv
     apt-get -y autoremove
-    pip3 install --upgrade pip3
 
-    # Install PhantomJS for Selenium browser support
-    echo "\n***********************************"
-    echo " Installing PhantomJS for Selenium"
-    echo "***********************************\n"
-    sudo apt-get install -y chrpath libssl-dev libxft-dev
-
-    # PhantomJS https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2
-    cd ~
-    export PHANTOM_JS="phantomjs-2.1.1-linux-x86_64"
-    wget https://bitbucket.org/ariya/phantomjs/downloads/$PHANTOM_JS.tar.bz2
-    sudo tar xvjf $PHANTOM_JS.tar.bz2
-    sudo mv $PHANTOM_JS /usr/local/share
-    sudo ln -sf /usr/local/share/$PHANTOM_JS/bin/phantomjs /usr/local/bin
-    rm -f $PHANTOM_JS.tar.bz2
+    echo "\n*****************************************"
+    echo " Installing Chrome Headless and Selenium"
+    echo "*****************************************\n"
+    apt-get install -y chromium-chromedriver python3-selenium
+    chromedriver --version
 
     # Install app dependencies
     cd /vagrant
