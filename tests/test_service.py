@@ -67,6 +67,7 @@ class TestPetServer(TestCase):
         resp = self.app.get('/pets/{}'.format(pet['_id']))
         self.assertEqual(resp.status_code, HTTP_200_OK)
         data = resp.get_json()
+        logging.debug('data = %s', data)
         self.assertEqual(data['name'], 'kitty')
 
     def test_get_pet_not_found(self):
@@ -74,6 +75,7 @@ class TestPetServer(TestCase):
         resp = self.app.get('/pets/0')
         self.assertEqual(resp.status_code, HTTP_404_NOT_FOUND)
         data = resp.get_json()
+        logging.debug('data = %s', data)
         self.assertIn('was not found', data['message'])
 
     def test_create_pet(self):
@@ -96,6 +98,7 @@ class TestPetServer(TestCase):
         # check that count has gone up and includes sammy
         resp = self.app.get('/pets')
         data = resp.get_json()
+        logging.debug('data = %s', data)
         self.assertEqual(resp.status_code, HTTP_200_OK)
         self.assertEqual(len(data), pet_count + 1)
         self.assertIn(new_json, data)
@@ -112,8 +115,9 @@ class TestPetServer(TestCase):
         location = resp.headers.get('Location', None)
         self.assertNotEqual(location, None)
         # Check the data is correct
-        new_json = resp.get_json()
-        self.assertEqual(new_json['name'], 'Timothy')
+        data = resp.get_json()
+        logging.debug('data = %s', data)
+        self.assertEqual(data['name'], 'Timothy')
 
     def test_update_pet(self):
         """ Update a Pet """
@@ -127,8 +131,9 @@ class TestPetServer(TestCase):
         # go back and get it again
         resp = self.app.get('/pets/{}'.format(pet['_id']), content_type='application/json')
         self.assertEqual(resp.status_code, HTTP_200_OK)
-        new_json = resp.get_json()
-        self.assertEqual(new_json['category'], 'tabby')
+        data = resp.get_json()
+        logging.debug('data = %s', data)
+        self.assertEqual(data['category'], 'tabby')
 
     def test_update_pet_with_no_name(self):
         """ Update a Pet without assigning a name """
@@ -187,6 +192,7 @@ class TestPetServer(TestCase):
         self.assertIn(b'fido', resp.data)
         self.assertNotIn(b'kitty', resp.data)
         data = resp.get_json()
+        logging.debug('data = %s', data)
         query_item = data[0]
         self.assertEqual(query_item['name'], 'fido')
 
@@ -198,6 +204,7 @@ class TestPetServer(TestCase):
         self.assertIn(b'fido', resp.data)
         self.assertNotIn(b'kitty', resp.data)
         data = resp.get_json()
+        logging.debug('data = %s', data)
         query_item = data[0]
         self.assertEqual(query_item['category'], 'dog')
 
@@ -206,9 +213,8 @@ class TestPetServer(TestCase):
         resp = self.app.get('/pets', query_string='available=true')
         self.assertEqual(resp.status_code, HTTP_200_OK)
         self.assertTrue(len(resp.data) > 0)
-        # self.assertIn('fido', resp.data)
-        # self.assertNotIn('harry', resp.data)
         data = resp.get_json()
+        logging.debug('data = %s', data)
         query_item = data[0]
         self.assertEqual(query_item['available'], True)
 
@@ -219,16 +225,18 @@ class TestPetServer(TestCase):
         self.assertEqual(resp.status_code, HTTP_200_OK)
         resp = self.app.get('/pets/{}'.format(pet['_id']), content_type='application/json')
         self.assertEqual(resp.status_code, HTTP_200_OK)
-        pet_data = resp.get_json()
-        self.assertEqual(pet_data['available'], False)
+        data = resp.get_json()
+        logging.debug('data = %s', data)
+        self.assertEqual(data['available'], False)
 
     def test_purchase_not_available(self):
         """ Purchase a Pet that is not available """
         pet = self.get_pet('kitty')[0]
         resp = self.app.put('/pets/{}/purchase'.format(pet['_id']), content_type='application/json')
         self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)
-        resp_json = resp.get_json()
-        self.assertIn('not available', resp_json['message'])
+        data = resp.get_json()
+        logging.debug('data = %s', data)
+        self.assertIn('not available', data['message'])
 
 
 ######################################################################
@@ -242,6 +250,7 @@ class TestPetServer(TestCase):
         self.assertEqual(resp.status_code, HTTP_200_OK)
         self.assertGreater(len(resp.data), 0)
         data = resp.get_json()
+        logging.debug('data = %s', data)
         return data
 
     def get_pet_count(self):
@@ -249,6 +258,7 @@ class TestPetServer(TestCase):
         resp = self.app.get('/pets')
         self.assertEqual(resp.status_code, HTTP_200_OK)
         data = resp.get_json()
+        logging.debug('data = %s', data)
         return len(data)
 
 

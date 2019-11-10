@@ -34,9 +34,9 @@ Docker Note:
 import os
 import json
 import logging
-from retry import retry
 from cloudant.client import Cloudant
 from cloudant.query import Query
+from cloudant.adapters import Replay429Adapter
 from requests import HTTPError, ConnectionError
 
 # get configruation from enviuronment (12-factor)
@@ -72,8 +72,6 @@ class Pet(object):
         self.category = category
         self.available = available
 
-    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT,
-           logger=logger)
     def create(self):
         """
         Creates a new Pet in the database
@@ -91,8 +89,6 @@ class Pet(object):
             self.id = document['_id']
 
 
-    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT,
-           logger=logger)
     def update(self):
         """ Updates a Pet in the database """
         try:
@@ -104,8 +100,6 @@ class Pet(object):
             document.save()
 
 
-    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT,
-           logger=logger)
     def save(self):
         """ Saves a Pet in the database """
         if self.name is None:   # name is the only required field
@@ -116,8 +110,6 @@ class Pet(object):
             self.create()
 
 
-    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT,
-           logger=logger)
     def delete(self):
         """ Deletes a Pet from the database """
         try:
@@ -177,23 +169,17 @@ class Pet(object):
         cls.client.disconnect()
 
     @classmethod
-    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT,
-           logger=logger)
     def create_query_index(cls, field_name, order='asc'):
         """ Creates a new query index for searching """
         cls.database.create_query_index(index_name=field_name, fields=[{field_name: order}])
 
     @classmethod
-    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT,
-           logger=logger)
     def remove_all(cls):
         """ Removes all documents from the database (use for testing)  """
         for document in cls.database:
             document.delete()
 
     @classmethod
-    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT,
-           logger=logger)
     def all(cls):
         """ Query that returns all Pets """
         results = []
@@ -208,8 +194,6 @@ class Pet(object):
 ######################################################################
 
     @classmethod
-    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT,
-           logger=logger)
     def find_by(cls, **kwargs):
         """ Find records using selector """
         query = Query(cls.database, selector=kwargs)
@@ -221,8 +205,6 @@ class Pet(object):
         return results
 
     @classmethod
-    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT,
-           logger=logger)
     def find(cls, pet_id):
         """ Query that finds Pets by their id """
         try:
@@ -232,22 +214,16 @@ class Pet(object):
             return None
 
     @classmethod
-    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT,
-           logger=logger)
     def find_by_name(cls, name):
         """ Query that finds Pets by their name """
         return cls.find_by(name=name)
 
     @classmethod
-    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT,
-           logger=logger)
     def find_by_category(cls, category):
         """ Query that finds Pets by their category """
         return cls.find_by(category=category)
 
     @classmethod
-    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT,
-           logger=logger)
     def find_by_availability(cls, available=True):
         """ Query that finds Pets by their availability """
         return cls.find_by(available=available)
@@ -301,8 +277,10 @@ class Pet(object):
                                   url=opts['url'],
                                   connect=True,
                                   auto_renew=True,
-                                  admin_party=ADMIN_PARTY
+                                  admin_party=ADMIN_PARTY,
+                                  adapter=Replay429Adapter(retries=10, initialBackoff=0.01)
                                  )
+
         except ConnectionError:
             raise DatabaseConnectionError('Cloudant service could not be reached')
 

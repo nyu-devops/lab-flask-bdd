@@ -68,12 +68,18 @@ def list_pets():
     pets = []
     category = request.args.get('category')
     name = request.args.get('name')
+    available = request.args.get('available')
+    if available:   # convert to boolean
+        available = available.lower() in ['true', 'yes', '1']
     if category:
-        app.logger.info('Find by category')
+        app.logger.info('Find by category: %s', category)
         pets = Pet.find_by_category(category)
     elif name:
-        app.logger.info('Find by name')
+        app.logger.info('Find by name: %s', name)
         pets = Pet.find_by_name(name)
+    elif available:
+        app.logger.info('Find by available: %s', available)
+        pets = Pet.find_by_availability(available)
     else:
         app.logger.info('Find all')
         pets = Pet.all()
