@@ -263,33 +263,33 @@ class TestPets(TestCase):
         self.assertRaises(DatabaseConnectionError, Pet.init_db, 'test')
 
 
-    @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_SERVICES)})
-    def test_vcap_services(self):
-        """ Test if VCAP_SERVICES works """
-        Pet.init_db("test")
-        self.assertIsNotNone(Pet.client)
-
-    @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_NO_SERVICES)})
-    def test_vcap_no_services(self):
-        """ Test VCAP_SERVICES without Cloudant """
-        Pet.init_db("test")
-        self.assertIsNotNone(Pet.client)
-        self.assertIsNotNone(Pet.database)
-
-    @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_NO_SERVICES),
-                             'BINDING_CLOUDANT': json.dumps(BINDING_CLOUDANT)})
-    def test_vcap_with_binding(self):
-        """ Test no VCAP_SERVICES with BINDING_CLOUDANT """
-        Pet.init_db("test")
-        self.assertIsNotNone(Pet.client)
-        self.assertIsNotNone(Pet.database)
-
-    @patch.dict(os.environ, {'BINDING_CLOUDANT': json.dumps(BINDING_CLOUDANT)})
-    def test_vcap_no_services(self):
-        """ Test BINDING_CLOUDANT """
-        Pet.init_db("test")
-        self.assertIsNotNone(Pet.client)
-        self.assertIsNotNone(Pet.database)
+    # @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_SERVICES)})
+    # def test_vcap_services(self):
+    #     """ Test if VCAP_SERVICES works """
+    #     Pet.init_db("test")
+    #     self.assertIsNotNone(Pet.client)
+    #
+    # @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_NO_SERVICES)})
+    # def test_vcap_no_services(self):
+    #     """ Test VCAP_SERVICES without Cloudant """
+    #     Pet.init_db("test")
+    #     self.assertIsNotNone(Pet.client)
+    #     self.assertIsNotNone(Pet.database)
+    #
+    # @patch.dict(os.environ, {'VCAP_SERVICES': json.dumps(VCAP_NO_SERVICES),
+    #                          'BINDING_CLOUDANT': json.dumps(BINDING_CLOUDANT)})
+    # def test_vcap_with_binding(self):
+    #     """ Test no VCAP_SERVICES with BINDING_CLOUDANT """
+    #     Pet.init_db("test")
+    #     self.assertIsNotNone(Pet.client)
+    #     self.assertIsNotNone(Pet.database)
+    #
+    # @patch.dict(os.environ, {'BINDING_CLOUDANT': json.dumps(BINDING_CLOUDANT)})
+    # def test_vcap_no_services(self):
+    #     """ Test BINDING_CLOUDANT """
+    #     Pet.init_db("test")
+    #     self.assertIsNotNone(Pet.client)
+    #     self.assertIsNotNone(Pet.database)
 
 
 
