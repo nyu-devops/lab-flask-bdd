@@ -9,7 +9,7 @@ Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "ubuntu/bionic64"
-  config.vm.hostname = "bdd"
+  config.vm.hostname = "devops"
 
   # set up network ip and port forwarding
   config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
@@ -19,7 +19,7 @@ Vagrant.configure(2) do |config|
 
   # Windows users need to change the permissions explicitly so that Windows doesn't
   # set the execute bit on all of your files which messes with GitHub users on Mac and Linux
-  config.vm.synced_folder "./", "/vagrant", owner: "vagrant", mount_options: ["dmode=775,fmode=664"]
+  config.vm.synced_folder "./", "/vagrant", owner: "vagrant", mount_options: ["dmode=755,fmode=644"]
 
   # Provider-specific configuration
   config.vm.provider "virtualbox" do |vb|
@@ -68,9 +68,12 @@ Vagrant.configure(2) do |config|
     apt-get install -y chromium-chromedriver python3-selenium
     chromedriver --version
 
+    # Create a Python3 Virtual Environment and Activate it in .profile
+    sudo -H -u vagrant sh -c 'python3 -m venv ~/venv'
+    sudo -H -u vagrant sh -c 'echo ". ~/venv/bin/activate" >> ~/.profile'
+
     # Install app dependencies
-    cd /vagrant
-    pip3 install -r requirements.txt
+    sudo -H -u vagrant sh -c '. ~/venv/bin/activate && cd /vagrant && pip install -r requirements.txt'
   SHELL
 
 
@@ -92,7 +95,6 @@ Vagrant.configure(2) do |config|
     echo " Installing IBM Cloud CLI..."
     echo "************************************\n"
     # Install IBM Cloud CLI as Vagrant user
-    # curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
     sudo -H -u vagrant sh -c 'curl -sL http://ibm.biz/idt-installer | bash'
     sudo -H -u vagrant sh -c 'ibmcloud config --usage-stats-collect false'
     sudo -H -u vagrant sh -c "echo 'source <(kubectl completion bash)' >> ~/.bashrc"
