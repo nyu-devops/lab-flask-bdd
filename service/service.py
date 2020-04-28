@@ -192,14 +192,6 @@ def purchase_pets(pet_id):
     pet.save()
     return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
 
-######################################################################
-# DELETE ALL PET DATA (for testing only)
-######################################################################
-@app.route('/pets/reset', methods=['DELETE'])
-def pets_reset():
-    """ Removes all pets from the database """
-    Pet.remove_all()
-    return make_response('', status.HTTP_204_NO_CONTENT)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S

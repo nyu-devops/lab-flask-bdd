@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    hostname: cloud
+    ports:
+      - 5000:5000
+    volumes:
+      - ~/.gitconfig:/home/vscode/.gitconfig
+      - ~/.ssh/:/home/vscode/.ssh/
+      - ..:/workspace
+    command: sleep infinity
+    environment:
+      FLASK_APP: service:app
+      COUCHDB_HOST: couchdb
+      COUCHDB_PORT: 5984
+      COUCHDB_USER: ${COUCHDB_USER}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+    networks:
+      - dev
+    depends_on:
+      - couchdb
+
+  couchdb:
+    image: couchdb:latest
+    hostname: couchdb
+    ports:
+      - 5984:5984
+    volumes:
+      - couchdb:/opt/couchdb/data
+    environment:
+      COUCHDB_USER: ${COUCHDB_USER}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+    networks:
+      - dev
+
+volumes:
+  couchdb:
+
+networks:
+  dev:
