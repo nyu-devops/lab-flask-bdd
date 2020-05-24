@@ -4,13 +4,12 @@ FROM python:3.7-slim
 # Add any tools that are needed beyond Python 3.7
 RUN apt-get update \
     && apt-get install -y sudo git tree curl wget jq \
-    # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Create a user for development
-ARG USERNAME=vscode
+ARG USERNAME=devops
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 

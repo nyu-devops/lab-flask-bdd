@@ -23,7 +23,7 @@ nosetests --stop tests/test_service.py:TestPetServer
 from unittest import TestCase
 import logging
 from werkzeug.datastructures import MultiDict, ImmutableMultiDict
-from service import service
+from service import routes
 
 # Status Codes
 HTTP_200_OK = 200
@@ -42,12 +42,12 @@ class TestPetServer(TestCase):
     """ Pet Service tests """
 
     def setUp(self):
-        self.app = service.app.test_client()
-        service.initialize_logging(logging.INFO)
-        service.init_db("test")
-        service.data_reset()
-        service.data_load({"name": "fido", "category": "dog", "available": True})
-        service.data_load({"name": "kitty", "category": "cat", "available": False})
+        self.app = routes.app.test_client()
+        routes.initialize_logging(logging.INFO)
+        routes.init_db("test")
+        routes.data_reset()
+        routes.data_load({"name": "fido", "category": "dog", "available": True})
+        routes.data_load({"name": "kitty", "category": "cat", "available": False})
 
     def test_index(self):
         """ Test the index page """

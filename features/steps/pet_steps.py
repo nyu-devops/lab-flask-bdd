@@ -18,6 +18,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions
 
 WAIT_SECONDS = int(getenv('WAIT_SECONDS', '60'))
+ID_PREFIX = 'pet_'
 
 @given('the following pets')
 def step_impl(context):
@@ -61,26 +62,26 @@ def step_impl(context, message):
 
 @when('I set the "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
-    element_id = 'pet_' + element_name.lower()
+    element_id = ID_PREFIX + element_name.lower()
     element = context.driver.find_element_by_id(element_id)
     element.clear()
     element.send_keys(text_string)
 
 @when('I select "{text}" in the "{element_name}" dropdown')
 def step_impl(context, text, element_name):
-    element_id = 'pet_' + element_name.lower()
+    element_id = ID_PREFIX + element_name.lower()
     element = Select(context.driver.find_element_by_id(element_id))
     element.select_by_visible_text(text)
 
 @then('I should see "{text}" in the "{element_name}" dropdown')
 def step_impl(context, text, element_name):
-    element_id = 'pet_' + element_name.lower()
+    element_id = ID_PREFIX + element_name.lower()
     element = Select(context.driver.find_element_by_id(element_id))
     expect(element.first_selected_option.text).to_equal(text)
 
 @then('the "{element_name}" field should be empty')
 def step_impl(context, element_name):
-    element_id = 'pet_' + element_name.lower()
+    element_id = ID_PREFIX + element_name.lower()
     element = context.driver.find_element_by_id(element_id)
     expect(element.get_attribute('value')).to_be(u'')
 
@@ -89,7 +90,7 @@ def step_impl(context, element_name):
 ##################################################################
 @when('I copy the "{element_name}" field')
 def step_impl(context, element_name):
-    element_id = 'pet_' + element_name.lower()
+    element_id = ID_PREFIX + element_name.lower()
     # element = context.driver.find_element_by_id(element_id)
     element = WebDriverWait(context.driver, WAIT_SECONDS).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
@@ -99,7 +100,7 @@ def step_impl(context, element_name):
 
 @when('I paste the "{element_name}" field')
 def step_impl(context, element_name):
-    element_id = 'pet_' + element_name.lower()
+    element_id = ID_PREFIX + element_name.lower()
     # element = context.driver.find_element_by_id(element_id)
     element = WebDriverWait(context.driver, WAIT_SECONDS).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
@@ -153,13 +154,13 @@ def step_impl(context, message):
 ##################################################################
 # This code works because of the following naming convention:
 # The id field for text input in the html is the element name
-# prefixed by 'pet_' so the Name field has an id='pet_name'
+# prefixed by ID_PREFIX so the Name field has an id='pet_name'
 # We can then lowercase the name and prefix with pet_ to get the id
 ##################################################################
 
 @then('I should see "{text_string}" in the "{element_name}" field')
 def step_impl(context, text_string, element_name):
-    element_id = 'pet_' + element_name.lower()
+    element_id = ID_PREFIX + element_name.lower()
     # element = context.driver.find_element_by_id(element_id)
     # expect(element.get_attribute('value')).to_equal(text_string)
     found = WebDriverWait(context.driver, WAIT_SECONDS).until(
@@ -172,20 +173,10 @@ def step_impl(context, text_string, element_name):
 
 @when('I change "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
-    element_id = 'pet_' + element_name.lower()
+    element_id = ID_PREFIX + element_name.lower()
     # element = context.driver.find_element_by_id(element_id)
     element = WebDriverWait(context.driver, WAIT_SECONDS).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
     element.clear()
     element.send_keys(text_string)
-
-# @when('I change "{key}" to "{value}"')
-# def step_impl(context, key, value):
-#     context.data[key] = value
-
-# @then('I should see "{message}" in "{field}"')
-# def step_impl(context, message, field):
-#     """ Check a field for text """
-#     element = context.driver.find_element_by_id(field)
-#     assert message in element.text

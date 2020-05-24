@@ -1,23 +1,15 @@
 """
 Environment for Behave Testing
 """
-import os
-from behave import *
+from os import getenv
 from selenium import webdriver
 
-WAIT_SECONDS = 120
-BASE_URL = os.getenv('BASE_URL', 'http://localhost:5000')
+WAIT_SECONDS = int(getenv('WAIT_SECONDS', '60'))
+BASE_URL = getenv('BASE_URL', 'http://localhost:5000')
 
 def before_all(context):
     """ Executed once before all tests """
-    # context.driver = webdriver.PhantomJS()
-    # context.driver.manage().timeouts().pageLoadTimeout(WAIT_SECONDS, TimeUnit.SECONDS);
-    # context.driver.manage().timeouts().setScriptTimeout(WAIT_SECONDS, TimeUnit.SECONDS);
-    # context.driver.implicitly_wait(WAIT_SECONDS) # seconds
-    # context.driver.set_window_size(1120, 550)
-
     options = webdriver.ChromeOptions()
-    # options.add_argument('window-size=1200x600')
     options.add_argument("start-maximized") # open Browser in maximized mode
     options.add_argument("disable-infobars") # disabling infobars
     options.add_argument("--disable-extensions") # disabling extensions

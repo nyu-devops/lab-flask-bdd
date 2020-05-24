@@ -5,20 +5,19 @@ services:
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile
-    hostname: cloud
+    hostname: nyu
     ports:
       - 5000:5000
     volumes:
-      - ~/.gitconfig:/home/vscode/.gitconfig
-      - ~/.ssh/:/home/vscode/.ssh/
+      - ~/.ssh/:/home/devops/.ssh/
       - ..:/workspace
     command: sleep infinity
     environment:
       FLASK_APP: service:app
       COUCHDB_HOST: couchdb
       COUCHDB_PORT: 5984
-      COUCHDB_USER: ${COUCHDB_USER}
-      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: pass
     networks:
       - dev
     depends_on:
@@ -32,8 +31,8 @@ services:
     volumes:
       - couchdb:/opt/couchdb/data
     environment:
-      COUCHDB_USER: ${COUCHDB_USER}
-      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}
+      COUCHDB_USER: admn
+      COUCHDB_PASSWORD: pass
     networks:
       - dev
 
