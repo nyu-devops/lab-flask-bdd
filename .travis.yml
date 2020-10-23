@@ -15,7 +15,7 @@ before_install:
   - docker ps -a
 
 env:
-  - BINDING_CLOUDANT='{"username": "admin","password": "pass","host": "localhost","port": 5984,"url": "http://admin:pass@localhost:5984"}'
+  - BINDING_CLOUDANT='{"username":"admin","password":"pass","host":"localhost","port":5984,"url":"http://admin:pass@localhost:5984"}'
 
 # command to install dependencies
 install: pip install -r requirements.txt
