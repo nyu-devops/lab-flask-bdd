@@ -3,7 +3,7 @@ FROM python:3.7-slim
 
 # Add any tools that are needed beyond Python 3.7
 RUN apt-get update \
-    && apt-get install -y sudo git tree curl wget jq \
+    && apt-get install -y sudo git tree curl wget jq python3-selenium \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*

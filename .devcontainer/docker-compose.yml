@@ -14,10 +14,7 @@ services:
     command: sleep infinity
     environment:
       FLASK_APP: service:app
-      COUCHDB_HOST: couchdb
-      COUCHDB_PORT: 5984
-      COUCHDB_USER: admin
-      COUCHDB_PASSWORD: pass
+      BINDING_CLOUDANT: '{"username":"admin","password":"pass","host":"couchdb","port":5984,"url":"http://admin:pass@couchdb:5984"}'
     networks:
       - dev
     depends_on:
@@ -31,7 +28,7 @@ services:
     volumes:
       - couchdb:/opt/couchdb/data
     environment:
-      COUCHDB_USER: admn
+      COUCHDB_USER: admin
       COUCHDB_PASSWORD: pass
     networks:
       - dev
