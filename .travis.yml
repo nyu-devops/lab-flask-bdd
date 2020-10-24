@@ -21,13 +21,16 @@ env:
   - BINDING_CLOUDANT='{"username":"admin","password":"pass","host":"localhost","port":5984,"url":"http://admin:pass@localhost:5984"}'
 
 # command to install dependencies
-install: pip install -r requirements.txt
+install: 
+  - apt-get install -y chromium-chromedriver python3-selenium
+  - pip install -r requirements.txt
 
 before_script:
   - curl -X GET http://localhost:5984/
   - curl -X PUT http://admin:pass@localhost:5984/test
   - gunicorn --log-level=critical service:app &  # start a Web server in the background
   - sleep 3 # give Web server some time to bind to sockets, etc
+  - chromedriver --version
 
 script:
   - nosetests
