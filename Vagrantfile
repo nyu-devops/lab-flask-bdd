@@ -1,15 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
 Vagrant.configure(2) do |config|
-  # Every Vagrant development environment requires a box. You can search for
-  # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "ubuntu/bionic64"
-  config.vm.hostname = "devops"
+  config.vm.box = "bento/ubuntu-20.04"
+  config.vm.hostname = "ubuntu"  
 
   # set up network ip and port forwarding
   config.vm.network "forwarded_port", guest: 5000, host: 5000, host_ip: "127.0.0.1"
@@ -21,7 +15,9 @@ Vagrant.configure(2) do |config|
   # set the execute bit on all of your files which messes with GitHub users on Mac and Linux
   config.vm.synced_folder "./", "/vagrant", owner: "vagrant", mount_options: ["dmode=755,fmode=644"]
 
-  # Provider-specific configuration
+  ############################################################
+  # Provider for VirtualBox
+  ############################################################
   config.vm.provider "virtualbox" do |vb|
     # Customize the amount of memory on the VM:
     vb.memory = "1024"
@@ -29,6 +25,20 @@ Vagrant.configure(2) do |config|
     # Fixes some DNS issues on some networks
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+  end
+
+  ############################################################
+  # Provider for Docker
+  ############################################################
+  config.vm.provider :docker do |docker, override|
+    override.vm.box = nil
+    #docker.image = "rofrano/vagrant-provider:ubuntu"
+    docker.image = "rofrano/vagrant-provider:debian"
+    docker.remains_running = true
+    docker.has_ssh = true
+    docker.privileged = true
+    docker.create_args = ["-v", "/sys/fs/cgroup:/sys/fs/cgroup:ro"]
+    # docker.create_args = ["--platform=linux/arm64", "-v", "/sys/fs/cgroup:/sys/fs/cgroup:ro"]
   end
 
   # Copy your .gitconfig file so that your git credentials are correct
@@ -39,9 +49,6 @@ Vagrant.configure(2) do |config|
   # Copy your ssh keys for github so that your git credentials work
   if File.exists?(File.expand_path("~/.ssh/id_rsa"))
     config.vm.provision "file", source: "~/.ssh/id_rsa", destination: "~/.ssh/id_rsa"
-  end
-  if File.exists?(File.expand_path("~/.ssh/id_rsa.pub"))
-    config.vm.provision "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/id_rsa.pub"
   end
 
   # Copy your IBM Clouid API Key if you have one
@@ -59,23 +66,20 @@ Vagrant.configure(2) do |config|
   ######################################################################
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
-    apt-get install -y git zip tree python3 python3-pip python3-venv
+    apt-get install -y git tree wget vim jq python3-dev python3-pip python3-venv python3-selenium
     apt-get -y autoremove
 
-    echo "\n*****************************************"
-    echo " Installing Chrome Headless and Selenium"
-    echo "*****************************************\n"
-    apt-get install -y chromium-chromedriver python3-selenium
-    chromedriver --version
-
+    # Install Chomium Driver
+    apt-get install -y chromium-chromedriver
+    
     # Create a Python3 Virtual Environment and Activate it in .profile
     sudo -H -u vagrant sh -c 'python3 -m venv ~/venv'
     sudo -H -u vagrant sh -c 'echo ". ~/venv/bin/activate" >> ~/.profile'
 
     # Install app dependencies
+    sudo -H -u vagrant sh -c '. ~/venv/bin/activate && pip install wheel'
     sudo -H -u vagrant sh -c '. ~/venv/bin/activate && cd /vagrant && pip install -r requirements.txt'
   SHELL
-
 
   ######################################################################
   # Add CouchDB docker container
