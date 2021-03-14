@@ -2,7 +2,9 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "bento/ubuntu-20.04"
+  # config.vm.box = "bento/ubuntu-20.04"
+  # Chrome driver only works with ubuntu/bionic64
+  config.vm.box = "ubuntu/bionic64"
   config.vm.hostname = "ubuntu"  
 
   # set up network ip and port forwarding
@@ -32,7 +34,6 @@ Vagrant.configure(2) do |config|
   ############################################################
   config.vm.provider :docker do |docker, override|
     override.vm.box = nil
-    #docker.image = "rofrano/vagrant-provider:ubuntu"
     docker.image = "rofrano/vagrant-provider:debian"
     docker.remains_running = true
     docker.has_ssh = true
@@ -69,7 +70,7 @@ Vagrant.configure(2) do |config|
     apt-get install -y git tree wget vim jq python3-dev python3-pip python3-venv python3-selenium
     apt-get -y autoremove
 
-    # Install Chomium Driver
+    # Install Chromium Driver
     apt-get install -y chromium-chromedriver
     
     # Create a Python3 Virtual Environment and Activate it in .profile
