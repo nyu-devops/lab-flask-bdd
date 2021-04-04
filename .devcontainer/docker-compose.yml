@@ -7,9 +7,11 @@ services:
       dockerfile: .devcontainer/Dockerfile
     hostname: nyu
     ports:
-      - 5000:5000
+      - 8080:8080
     volumes:
       - ~/.ssh/:/home/devops/.ssh/
+      - ~/.bluemix/:/home/devops/.bluemix/
+      - ~/.gitconfig:/home/vscode/.gitconfig
       - ..:/workspace
     command: sleep infinity
     environment:

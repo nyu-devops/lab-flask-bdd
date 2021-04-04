@@ -8,12 +8,11 @@
 		"VisualVisualStudioExptTeam.vscodeintellicodeStudio",
 		"ms-python.python",
     	"alexkrechik.cucumberautocomplete",
-    	"wholroyd.jinja",
-		"cstrap.flask-snippets",
 		"yzhang.markdown-all-in-one",
-		"hnw.vscode-auto-open-markdown-preview",
 		"donjayamanne.githistory",
-    	"bbenoist.vagrant"
+    	"bbenoist.vagrant",
+		"cstrap.flask-snippets",
+    	"wholroyd.jinja"
 	],
-	"forwardPorts": [5000]
+	"forwardPorts": [8080]
 }

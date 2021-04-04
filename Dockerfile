@@ -1,29 +1,26 @@
 # Start with a Linux micro-container to keep the image tiny
-FROM alpine:3.3
+FROM alpine:3
 
 # Document who is responsible for this image
-MAINTAINER John Rofrano "rofrano@us.ibm.com"
+LABEL MAINTAINER="John Rofrano <rofrano@us.ibm.com>"
 
 # Install just the Python runtime (no dev)
-# RUN apk add --update \
-#     python \
-#     py-pip \
-#  && rm -rf /var/cache/apk/*
 RUN apk --no-cache add \
-    python \
-    py-pip
-
-# Expose any ports the app is expecting in the environment
-ENV PORT 5000
-EXPOSE $PORT
+    python3 \
+    py3-pip
 
 # Set up a working folder and install the pre-reqs
 WORKDIR /app
-ADD requirements.txt /app
+ADD requirements.txt .
 RUN pip install -r requirements.txt
 
 # Add the code as the last Docker layer because it changes the most
-ADD . /app
+ADD . .
+
+# Expose any ports the app is expecting in the environment
+ENV PORT 8080
+EXPOSE $PORT
 
 # Run the service
-CMD [ "python", "run.py" ]
+ENV GUNICORN_BIND 0.0.0.0:$PORT
+CMD ["gunicorn", "--workers=1", "--log-level=info", "service:app"]

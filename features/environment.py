@@ -5,7 +5,7 @@ from os import getenv
 from selenium import webdriver
 
 WAIT_SECONDS = int(getenv('WAIT_SECONDS', '60'))
-BASE_URL = getenv('BASE_URL', 'http://localhost:5000')
+BASE_URL = getenv('BASE_URL', 'http://localhost:8080')
 
 def before_all(context):
     """ Executed once before all tests """
@@ -17,8 +17,9 @@ def before_all(context):
     options.add_argument("--disable-dev-shm-usage") # overcome limited resource problems
     options.add_argument("--no-sandbox") # Bypass OS security model
     options.add_argument("--headless")
+    context.WAIT_SECONDS = WAIT_SECONDS
     context.driver = webdriver.Chrome(options=options)
-    context.driver.implicitly_wait(WAIT_SECONDS) # seconds
+    context.driver.implicitly_wait(context.WAIT_SECONDS) # seconds
     # context.driver.set_window_size(1200, 600)
 
     context.base_url = BASE_URL

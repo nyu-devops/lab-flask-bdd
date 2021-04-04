@@ -40,9 +40,9 @@ jobs:
         - chromedriver --version
         - curl -X GET http://localhost:5984/
         - curl -X PUT http://admin:pass@localhost:5984/test
-        - gunicorn --log-level=critical --bind=127.0.0.1:5000 service:app &  # start a Web server in the background
+        - gunicorn --log-level=critical --bind=127.0.0.1:8080 service:app &  # start a Web server in the background
         - sleep 5 # give Web server some time to bind to sockets, etc
-        - curl -I http://localhost:5000/  # make sure the service is up
+        - curl -I http://localhost:8080/  # make sure the service is up
       script:
         - behave
 
