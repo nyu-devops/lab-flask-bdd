@@ -23,11 +23,21 @@ RUN groupadd --gid $USER_GID $USERNAME \
 # Set up the development environment
 WORKDIR /workspace
 
+# Add the IBM Cloud CLI
+RUN wget -O bluemix-cli.tar.gz https://clis.cloud.ibm.com/download/bluemix-cli/1.4.0/linux64 && \
+    tar xzf bluemix-cli.tar.gz && \
+    cd Bluemix_CLI/ && \
+    ./install && \
+    cd .. && \
+    rm -fr Bluemix_CLI/ bluemix-cli.tar.gz && \
+    ibmcloud cf install
+
+# Establish Python dependencies
 COPY requirements.txt .
 RUN pip install -U pip && \
     pip --no-cache-dir install -r requirements.txt
 
-EXPOSE 5000
+EXPOSE 8080
 
 # Become a regular user
 USER $USERNAME

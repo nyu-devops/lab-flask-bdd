@@ -17,7 +17,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions
 
-WAIT_SECONDS = int(getenv('WAIT_SECONDS', '60'))
 ID_PREFIX = 'pet_'
 
 @given('the following pets')
@@ -92,7 +91,7 @@ def step_impl(context, element_name):
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower()
     # element = context.driver.find_element_by_id(element_id)
-    element = WebDriverWait(context.driver, WAIT_SECONDS).until(
+    element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
     context.clipboard = element.get_attribute('value')
@@ -102,7 +101,7 @@ def step_impl(context, element_name):
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower()
     # element = context.driver.find_element_by_id(element_id)
-    element = WebDriverWait(context.driver, WAIT_SECONDS).until(
+    element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
     element.clear()
@@ -125,7 +124,7 @@ def step_impl(context, button):
 def step_impl(context, name):
     # element = context.driver.find_element_by_id('search_results')
     # expect(element.text).to_contain(name)
-    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
+    found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element(
             (By.ID, 'search_results'),
             name
@@ -143,7 +142,7 @@ def step_impl(context, name):
 def step_impl(context, message):
     # element = context.driver.find_element_by_id('flash_message')
     # expect(element.text).to_contain(message)
-    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
+    found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element(
             (By.ID, 'flash_message'),
             message
@@ -163,7 +162,7 @@ def step_impl(context, text_string, element_name):
     element_id = ID_PREFIX + element_name.lower()
     # element = context.driver.find_element_by_id(element_id)
     # expect(element.get_attribute('value')).to_equal(text_string)
-    found = WebDriverWait(context.driver, WAIT_SECONDS).until(
+    found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element_value(
             (By.ID, element_id),
             text_string
@@ -175,7 +174,7 @@ def step_impl(context, text_string, element_name):
 def step_impl(context, element_name, text_string):
     element_id = ID_PREFIX + element_name.lower()
     # element = context.driver.find_element_by_id(element_id)
-    element = WebDriverWait(context.driver, WAIT_SECONDS).until(
+    element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
     element.clear()
