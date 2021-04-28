@@ -40,7 +40,7 @@ Scenario: List all pets
     And I should see "kitty" in the results
     And I should not see "leo" in the results
 
-Scenario: List all dogs
+Scenario: Search all dogs
     When I visit the "Home Page"
     And I set the "Category" to "dog"
     And I press the "Search" button
