@@ -2,9 +2,9 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
+  # Chrome driver doesn't work with bento box
   # config.vm.box = "bento/ubuntu-20.04"
-  # Chrome driver only works with ubuntu/bionic64
-  config.vm.box = "ubuntu/bionic64"
+  config.vm.box = "ubuntu/focal64"
   config.vm.hostname = "ubuntu"  
 
   # set up network ip and port forwarding
@@ -37,8 +37,9 @@ Vagrant.configure(2) do |config|
     docker.remains_running = true
     docker.has_ssh = true
     docker.privileged = true
-    docker.create_args = ["-v", "/sys/fs/cgroup:/sys/fs/cgroup:ro"]
-    # docker.create_args = ["--platform=linux/arm64", "-v", "/sys/fs/cgroup:/sys/fs/cgroup:ro"]
+    docker.volumes = ["/sys/fs/cgroup:/sys/fs/cgroup:ro"]
+    # Uncomment to force arm64 for testing images on Intel
+    # docker.create_args = ["--platform=linux/arm64"] 
   end
 
   # Copy your .gitconfig file so that your git credentials are correct
