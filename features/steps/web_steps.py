@@ -1,7 +1,7 @@
 """
-Pet Steps
+Web Steps
 
-Steps file for Pet.feature
+Steps file for web interactions with Silenium
 
 For information on Waiting until elements are present in the HTML see:
     https://selenium-python.readthedocs.io/waits.html
@@ -18,29 +18,6 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions
 
 ID_PREFIX = 'pet_'
-
-@given('the following pets')
-def step_impl(context):
-    """ Delete all Pets and load new ones """
-    headers = {'Content-Type': 'application/json'}
-    # list all of the pets and delete them one by one
-    context.resp = requests.get(context.base_url + '/pets', headers=headers)
-    expect(context.resp.status_code).to_equal(200)
-    for pet in context.resp.json():
-        context.resp = requests.delete(context.base_url + '/pets/' + str(pet["_id"]), headers=headers)
-        expect(context.resp.status_code).to_equal(204)
-    
-    # load the database with new pets
-    create_url = context.base_url + '/pets'
-    for row in context.table:
-        data = {
-            "name": row['name'],
-            "category": row['category'],
-            "available": row['available'] in ['True', 'true', '1']
-            }
-        payload = json.dumps(data)
-        context.resp = requests.post(create_url, data=payload, headers=headers)
-        expect(context.resp.status_code).to_equal(201)
 
 @when('I visit the "home page"')
 def step_impl(context):
@@ -90,7 +67,6 @@ def step_impl(context, element_name):
 @when('I copy the "{element_name}" field')
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower()
-    # element = context.driver.find_element_by_id(element_id)
     element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
@@ -100,7 +76,6 @@ def step_impl(context, element_name):
 @when('I paste the "{element_name}" field')
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower()
-    # element = context.driver.find_element_by_id(element_id)
     element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
@@ -122,8 +97,6 @@ def step_impl(context, button):
 
 @then('I should see "{name}" in the results')
 def step_impl(context, name):
-    # element = context.driver.find_element_by_id('search_results')
-    # expect(element.text).to_contain(name)
     found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element(
             (By.ID, 'search_results'),
@@ -140,8 +113,6 @@ def step_impl(context, name):
 
 @then('I should see the message "{message}"')
 def step_impl(context, message):
-    # element = context.driver.find_element_by_id('flash_message')
-    # expect(element.text).to_contain(message)
     found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element(
             (By.ID, 'flash_message'),
@@ -160,8 +131,6 @@ def step_impl(context, message):
 @then('I should see "{text_string}" in the "{element_name}" field')
 def step_impl(context, text_string, element_name):
     element_id = ID_PREFIX + element_name.lower()
-    # element = context.driver.find_element_by_id(element_id)
-    # expect(element.get_attribute('value')).to_equal(text_string)
     found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.text_to_be_present_in_element_value(
             (By.ID, element_id),
@@ -173,7 +142,6 @@ def step_impl(context, text_string, element_name):
 @when('I change "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
     element_id = ID_PREFIX + element_name.lower()
-    # element = context.driver.find_element_by_id(element_id)
     element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
