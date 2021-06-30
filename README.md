@@ -101,10 +101,10 @@ This will suppress the normal `INFO` logging
     * ./service/routes.py -- the main Service using Python Flask
     * ./service/models.py -- the data models for persistence
     * ./service/eroor_handlers.py -- these error handlers send back json
-    * ./tests/test_service.py -- unit test cases for the server
-    * ./tests/test_pets.py -- unit test cases for the model
+    * ./tests/test_routes.py -- unit test cases for the server
+    * ./tests/test_models.py -- unit test cases for the model
     * ./features/pets.feature -- Behave feature file
-    * ./features/steps/steps.py -- Behave step definitions
+    * ./features/steps/web_steps.py -- Behave step definitions
 
 ## Running these tests using Docker containers
 
