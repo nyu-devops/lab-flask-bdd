@@ -30,10 +30,9 @@ DELETE /pets/{id} - deletes a Pet record in the database
 import sys
 import logging
 from flask import jsonify, request, json, url_for, make_response, abort
-from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
 from service.models import Pet
-from . import app
+from . import app, status   # HTTP Status Codes
 
 # Error handlers require app to be initialized so we must import
 # them only after we have initialized the Flask app instance

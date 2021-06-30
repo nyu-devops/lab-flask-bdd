@@ -3,7 +3,6 @@ Werkzeug==1.0.1
 
 # Core Service
 Flask==1.1.2
-Flask-API==2.0
 cloudant==2.14.0
 
 # Runtime
