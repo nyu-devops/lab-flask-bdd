@@ -6,11 +6,8 @@ Steps file for web interactions with Silenium
 For information on Waiting until elements are present in the HTML see:
     https://selenium-python.readthedocs.io/waits.html
 """
-from os import getenv
 import logging
-import json
-import requests
-from behave import *
+from behave import when, then
 from compare import expect, ensure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
