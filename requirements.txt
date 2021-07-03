@@ -4,6 +4,7 @@ Werkzeug==1.0.1
 # Core Service
 Flask==1.1.2
 cloudant==2.14.0
+retry==0.9.2
 
 # Runtime
 gunicorn==20.1.0
