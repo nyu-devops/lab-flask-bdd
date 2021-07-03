@@ -1,5 +1,5 @@
 ######################################################################
-# Copyright 2016, 2017 John J. Rofrano. All Rights Reserved.
+# Copyright 2016, 2021 John J. Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,55 +33,57 @@ from flask import jsonify, request, json, url_for, make_response, abort
 from werkzeug.exceptions import NotFound
 from . import app
 from service.models import Pet
-from .utils import status   # HTTP Status Codes
+from .utils import status  # HTTP Status Codes
 from .utils import error_handlers
 
 
 ######################################################################
 # GET HEALTH CHECK
 ######################################################################
-@app.route('/healthcheck')
+@app.route("/healthcheck")
 def healthcheck():
-    """ Let them know our heart is still beating """
-    return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
+    """Let them know our heart is still beating"""
+    return make_response(jsonify(status=200, message="Healthy"), status.HTTP_200_OK)
+
 
 ######################################################################
 # GET INDEX
 ######################################################################
-@app.route('/')
+@app.route("/")
 def index():
     # data = '{name: <string>, category: <string>}'
     # url = request.base_url + 'pets' # url_for('list_pets')
     # return jsonify(name='Pet Demo REST API Service', version='1.0', url=url, data=data), status.HTTP_200_OK
-    return app.send_static_file('index.html')
+    return app.send_static_file("index.html")
+
 
 ######################################################################
 # LIST ALL PETS
 ######################################################################
-@app.route('/pets', methods=['GET'])
+@app.route("/pets", methods=["GET"])
 def list_pets():
-    """ Returns all of the Pets """
-    app.logger.info('Request to list Pets...')
+    """Returns all of the Pets"""
+    app.logger.info("Request to list Pets...")
     pets = []
-    category = request.args.get('category')
-    name = request.args.get('name')
-    available = request.args.get('available')
-    if available:   # convert to boolean
-        available = available.lower() in ['true', 'yes', '1']
+    category = request.args.get("category")
+    name = request.args.get("name")
+    available = request.args.get("available")
+    if available:  # convert to boolean
+        available = available.lower() in ["true", "yes", "1"]
     if category:
-        app.logger.info('Find by category: %s', category)
+        app.logger.info("Find by category: %s", category)
         pets = Pet.find_by_category(category)
     elif name:
-        app.logger.info('Find by name: %s', name)
+        app.logger.info("Find by name: %s", name)
         pets = Pet.find_by_name(name)
     elif available:
-        app.logger.info('Find by available: %s', available)
+        app.logger.info("Find by available: %s", available)
         pets = Pet.find_by_availability(available)
     else:
-        app.logger.info('Find all')
+        app.logger.info("Find all")
         pets = Pet.all()
 
-    app.logger.info('[%s] Pets returned', len(pets))
+    app.logger.info("[%s] Pets returned", len(pets))
     results = [pet.serialize() for pet in pets]
     return make_response(jsonify(results), status.HTTP_200_OK)
 
@@ -89,7 +91,7 @@ def list_pets():
 ######################################################################
 # RETRIEVE A PET
 ######################################################################
-@app.route('/pets/<pet_id>', methods=['GET'])
+@app.route("/pets/<pet_id>", methods=["GET"])
 def get_pets(pet_id):
     """
     Retrieve a single Pet
@@ -102,52 +104,54 @@ def get_pets(pet_id):
         raise NotFound("Pet with id '{}' was not found.".format(pet_id))
     return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
 
+
 ######################################################################
 # CREATE A NEW PET
 ######################################################################
-@app.route('/pets', methods=['POST'])
+@app.route("/pets", methods=["POST"])
 def create_pets():
     """
     Creates a Pet
     This endpoint will create a Pet based the data in the body that is posted
     """
-    app.logger.info('Request to Create a Pet...')
+    app.logger.info("Request to Create a Pet...")
     data = {}
     # Check for form submission data
-    if request.headers.get('Content-Type') == 'application/x-www-form-urlencoded':
-        app.logger.info('Getting data from form submit')
+    if request.headers.get("Content-Type") == "application/x-www-form-urlencoded":
+        app.logger.info("Getting data from form submit")
         data = {
-            'name': request.form['name'],
-            'category': request.form['category'],
-            'available': True
+            "name": request.form["name"],
+            "category": request.form["category"],
+            "available": True,
         }
     else:
-        check_content_type('application/json')
-        app.logger.info('Getting json data from API call')
+        check_content_type("application/json")
+        app.logger.info("Getting json data from API call")
         data = request.get_json()
     app.logger.info(data)
     pet = Pet()
     pet.deserialize(data)
     pet.save()
-    app.logger.info('Pet with new id [%s] saved!', pet.id)
+    app.logger.info("Pet with new id [%s] saved!", pet.id)
     message = pet.serialize()
-    location_url = url_for('get_pets', pet_id=pet.id, _external=True)
-    return make_response(jsonify(message), status.HTTP_201_CREATED,
-                         {'Location': location_url})
+    location_url = url_for("get_pets", pet_id=pet.id, _external=True)
+    return make_response(
+        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    )
 
 
 ######################################################################
 # UPDATE AN EXISTING PET
 ######################################################################
-@app.route('/pets/<pet_id>', methods=['PUT'])
+@app.route("/pets/<pet_id>", methods=["PUT"])
 def update_pets(pet_id):
     """
     Update a Pet
 
     This endpoint will update a Pet based the body that is posted
     """
-    app.logger.info('Request to Update a pet with id [%s]', pet_id)
-    check_content_type('application/json')
+    app.logger.info("Request to Update a pet with id [%s]", pet_id)
+    check_content_type("application/json")
     pet = Pet.find(pet_id)
     if not pet:
         raise NotFound("Pet with id '{}' was not found.".format(pet_id))
@@ -158,33 +162,40 @@ def update_pets(pet_id):
     pet.save()
     return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
 
+
 ######################################################################
 # DELETE A PET
 ######################################################################
-@app.route('/pets/<pet_id>', methods=['DELETE'])
+@app.route("/pets/<pet_id>", methods=["DELETE"])
 def delete_pets(pet_id):
     """
     Delete a Pet
 
     This endpoint will delete a Pet based the id specified in the path
     """
-    app.logger.info('Request to Delete a pet with id [%s]', pet_id)
+    app.logger.info("Request to Delete a pet with id [%s]", pet_id)
     pet = Pet.find(pet_id)
     if pet:
         pet.delete()
-    return make_response('', status.HTTP_204_NO_CONTENT)
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
 
 ######################################################################
 # PURCHASE A PET
 ######################################################################
-@app.route('/pets/<pet_id>/purchase', methods=['PUT'])
+@app.route("/pets/<pet_id>/purchase", methods=["PUT"])
 def purchase_pets(pet_id):
-    """ Purchasing a Pet makes it unavailable """
+    """Purchasing a Pet makes it unavailable"""
     pet = Pet.find(pet_id)
     if not pet:
-        abort(status.HTTP_404_NOT_FOUND, "Pet with id '{}' was not found.".format(pet_id))
+        abort(
+            status.HTTP_404_NOT_FOUND, "Pet with id '{}' was not found.".format(pet_id)
+        )
     if not pet.available:
-        abort(status.HTTP_400_BAD_REQUEST, "Pet with id '{}' is not available.".format(pet_id))
+        abort(
+            status.HTTP_400_BAD_REQUEST,
+            "Pet with id '{}' is not available.".format(pet_id),
+        )
     pet.available = False
     pet.save()
     return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
@@ -194,42 +205,53 @@ def purchase_pets(pet_id):
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
+
 @app.before_first_request
 def init_db(dbname="pets"):
-    """ Initlaize the model """
+    """Initlaize the model"""
     Pet.init_db(dbname)
+
 
 # load sample data
 def data_load(payload):
-    """ Loads a Pet into the database """
-    pet = Pet(payload['name'], payload['category'], payload['available'])
+    """Loads a Pet into the database"""
+    pet = Pet(payload["name"], payload["category"], payload["available"])
     pet.save()
 
+
 def data_reset():
-    """ Removes all Pets from the database """
+    """Removes all Pets from the database"""
     if app.testing:
         Pet.remove_all()
 
-def check_content_type(content_type):
-    """ Checks that the media type is correct """
-    if 'Content-Type' not in request.headers:
-        app.logger.error('No Content-Type specified.')
-        abort(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, 'Content-Type must be {}'.format(content_type))
 
-    if request.headers['Content-Type'] == content_type:
+def check_content_type(content_type):
+    """Checks that the media type is correct"""
+    if "Content-Type" not in request.headers:
+        app.logger.error("No Content-Type specified.")
+        abort(
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            "Content-Type must be {}".format(content_type),
+        )
+
+    if request.headers["Content-Type"] == content_type:
         return
 
-    app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
-    abort(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, 'Content-Type must be {}'.format(content_type))
+    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        "Content-Type must be {}".format(content_type),
+    )
 
-#@app.before_first_request
-def initialize_logging(log_level=app.config['LOGGING_LEVEL']):
-    """ Initialized the default logging to STDOUT """
+
+# @app.before_first_request
+def initialize_logging(log_level=app.config["LOGGING_LEVEL"]):
+    """Initialized the default logging to STDOUT"""
     if not app.debug:
-        print('Setting up logging...')
+        print("Setting up logging...")
         # Set up default logging for submodules to use STDOUT
         # datefmt='%m/%d/%Y %I:%M:%S %p'
-        fmt = '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
+        fmt = "[%(asctime)s] %(levelname)s in %(module)s: %(message)s"
         logging.basicConfig(stream=sys.stdout, level=log_level, format=fmt)
         # Make a new log handler that uses STDOUT
         handler = logging.StreamHandler(sys.stdout)
@@ -241,4 +263,4 @@ def initialize_logging(log_level=app.config['LOGGING_LEVEL']):
             app.logger.removeHandler(log_handler)
         app.logger.addHandler(handler)
         app.logger.setLevel(log_level)
-        app.logger.info('Logging handler established')
+        app.logger.info("Logging handler established")
