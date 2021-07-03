@@ -31,12 +31,10 @@ import sys
 import logging
 from flask import jsonify, request, json, url_for, make_response, abort
 from werkzeug.exceptions import NotFound
+from . import app
 from service.models import Pet
-from . import app, status   # HTTP Status Codes
-
-# Error handlers require app to be initialized so we must import
-# them only after we have initialized the Flask app instance
-import service.error_handlers
+from .utils import status   # HTTP Status Codes
+from .utils import error_handlers
 
 
 ######################################################################

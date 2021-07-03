@@ -24,16 +24,8 @@ from unittest import TestCase
 import logging
 from werkzeug.datastructures import MultiDict, ImmutableMultiDict
 from service import routes
+from service.utils import status
 
-# Status Codes
-HTTP_200_OK = 200
-HTTP_201_CREATED = 201
-HTTP_204_NO_CONTENT = 204
-HTTP_400_BAD_REQUEST = 400
-HTTP_404_NOT_FOUND = 404
-HTTP_405_METHOD_NOT_ALLOWED = 405
-HTTP_409_CONFLICT = 409
-HTTP_415_UNSUPPORTED_MEDIA_TYPE = 415
 
 ######################################################################
 #  T E S T   C A S E S
@@ -52,20 +44,20 @@ class TestPetServer(TestCase):
     def test_index(self):
         """ Test the index page """
         resp = self.app.get('/')
-        self.assertEqual(resp.status_code, HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertIn(b'Pet Demo REST API Service', resp.data)
 
     def test_get_pet_list(self):
         """ Get a list of Pets """
         resp = self.app.get('/pets')
-        self.assertEqual(resp.status_code, HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertTrue(len(resp.data) > 0)
 
     def test_get_pet(self):
         """ get a single Pet """
         pet = self.get_pet('kitty')[0] # returns a list
         resp = self.app.get('/pets/{}'.format(pet['_id']))
-        self.assertEqual(resp.status_code, HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         logging.debug('data = %s', data)
         self.assertEqual(data['name'], 'kitty')
@@ -73,7 +65,7 @@ class TestPetServer(TestCase):
     def test_get_pet_not_found(self):
         """ Get a Pet that doesn't exist """
         resp = self.app.get('/pets/0')
-        self.assertEqual(resp.status_code, HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         data = resp.get_json()
         logging.debug('data = %s', data)
         self.assertIn('was not found', data['message'])
@@ -88,7 +80,7 @@ class TestPetServer(TestCase):
         # if resp.status_code == 429: # rate limit exceeded
         #     sleep(1)                # wait for 1 second and try again
         #     resp = self.app.post('/pets', data=data, content_type='application/json')
-        self.assertEqual(resp.status_code, HTTP_201_CREATED)
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
         location = resp.headers.get('Location', None)
         self.assertNotEqual(location, None)
@@ -99,7 +91,7 @@ class TestPetServer(TestCase):
         resp = self.app.get('/pets')
         data = resp.get_json()
         logging.debug('data = %s', data)
-        self.assertEqual(resp.status_code, HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(len(data), pet_count + 1)
         self.assertIn(new_json, data)
 
@@ -110,7 +102,7 @@ class TestPetServer(TestCase):
         pet_data.add('available', 'True')
         data = ImmutableMultiDict(pet_data)
         resp = self.app.post('/pets', data=data, content_type='application/x-www-form-urlencoded')
-        self.assertEqual(resp.status_code, HTTP_201_CREATED)
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
         location = resp.headers.get('Location', None)
         self.assertNotEqual(location, None)
@@ -127,10 +119,10 @@ class TestPetServer(TestCase):
         # make the call
         resp = self.app.put('/pets/{}'.format(pet['_id']), json=pet,
                             content_type='application/json')
-        self.assertEqual(resp.status_code, HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         # go back and get it again
         resp = self.app.get('/pets/{}'.format(pet['_id']), content_type='application/json')
-        self.assertEqual(resp.status_code, HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         logging.debug('data = %s', data)
         self.assertEqual(data['category'], 'tabby')
@@ -141,13 +133,13 @@ class TestPetServer(TestCase):
         del pet['name']
         resp = self.app.put('/pets/{}'.format(pet['_id']), json=pet,
                             content_type='application/json')
-        self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_pet_not_found(self):
         """ Update a Pet that doesn't exist """
         new_kitty = {"name": "timothy", "category": "mouse"}
         resp = self.app.put('/pets/0', json=new_kitty, content_type='application/json')
-        self.assertEqual(resp.status_code, HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_pet(self):
         """ Delete a Pet """
@@ -156,7 +148,7 @@ class TestPetServer(TestCase):
         pet_count = self.get_pet_count()
         # delete a pet
         resp = self.app.delete('/pets/{}'.format(pet['_id']), content_type='application/json')
-        self.assertEqual(resp.status_code, HTTP_204_NO_CONTENT)
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(resp.data), 0)
         new_count = self.get_pet_count()
         self.assertEqual(new_count, pet_count - 1)
@@ -165,29 +157,29 @@ class TestPetServer(TestCase):
         """ Create a Pet without a name """
         new_pet = {'category': 'dog', 'available': True}
         resp = self.app.post('/pets', json=new_pet, content_type='application/json')
-        self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_pet_no_content_type(self):
         """ Create a Pet with no Content-Type """
         resp = self.app.post('/pets', data="new_pet")
-        self.assertEqual(resp.status_code, HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_create_pet_wrong_content_type(self):
         """ Create a Pet with wrong Content-Type """
         data = "jimmy the fish"
         resp = self.app.post('/pets', data=data, content_type='plain/text')
-        self.assertEqual(resp.status_code, HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_call_create_with_an_id(self):
         """ Call create passing an id """
         new_pet = {'name': 'sammy', 'category': 'snake', 'available': True}
         resp = self.app.post('/pets/1', json=new_pet)
-        self.assertEqual(resp.status_code, HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_query_by_name(self):
         """ Query Pets by name """
         resp = self.app.get('/pets', query_string='name=fido')
-        self.assertEqual(resp.status_code, HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertTrue(len(resp.data) > 0)
         self.assertIn(b'fido', resp.data)
         self.assertNotIn(b'kitty', resp.data)
@@ -199,7 +191,7 @@ class TestPetServer(TestCase):
     def test_query_by_category(self):
         """ Query Pets by category """
         resp = self.app.get('/pets', query_string='category=dog')
-        self.assertEqual(resp.status_code, HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertTrue(len(resp.data) > 0)
         self.assertIn(b'fido', resp.data)
         self.assertNotIn(b'kitty', resp.data)
@@ -211,7 +203,7 @@ class TestPetServer(TestCase):
     def test_query_by_available(self):
         """ Query Pets by availability """
         resp = self.app.get('/pets', query_string='available=true')
-        self.assertEqual(resp.status_code, HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertTrue(len(resp.data) > 0)
         data = resp.get_json()
         logging.debug('data = %s', data)
@@ -222,9 +214,9 @@ class TestPetServer(TestCase):
         """ Purchase a Pet """
         pet = self.get_pet('fido')[0] # returns a list
         resp = self.app.put('/pets/{}/purchase'.format(pet['_id']), content_type='application/json')
-        self.assertEqual(resp.status_code, HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         resp = self.app.get('/pets/{}'.format(pet['_id']), content_type='application/json')
-        self.assertEqual(resp.status_code, HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         logging.debug('data = %s', data)
         self.assertEqual(data['available'], False)
@@ -233,7 +225,7 @@ class TestPetServer(TestCase):
         """ Purchase a Pet that is not available """
         pet = self.get_pet('kitty')[0]
         resp = self.app.put('/pets/{}/purchase'.format(pet['_id']), content_type='application/json')
-        self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
         data = resp.get_json()
         logging.debug('data = %s', data)
         self.assertIn('not available', data['message'])
@@ -247,7 +239,7 @@ class TestPetServer(TestCase):
         """ retrieves a pet for use in other actions """
         resp = self.app.get('/pets',
                             query_string='name={}'.format(name))
-        self.assertEqual(resp.status_code, HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertGreater(len(resp.data), 0)
         data = resp.get_json()
         logging.debug('data = %s', data)
@@ -256,7 +248,7 @@ class TestPetServer(TestCase):
     def get_pet_count(self):
         """ save the current number of pets """
         resp = self.app.get('/pets')
-        self.assertEqual(resp.status_code, HTTP_200_OK)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         logging.debug('data = %s', data)
         return len(data)
