@@ -5,7 +5,7 @@ Vagrant.configure(2) do |config|
   # Chrome driver doesn't work with bento box
   # config.vm.box = "bento/ubuntu-20.04"
   config.vm.box = "ubuntu/focal64"
-  config.vm.hostname = "ubuntu"  
+  config.vm.hostname = "ubuntu"
 
   # set up network ip and port forwarding
   config.vm.network "forwarded_port", guest: 8080, host: 8080, host_ip: "127.0.0.1"
@@ -33,6 +33,8 @@ Vagrant.configure(2) do |config|
   ############################################################
   config.vm.provider :docker do |docker, override|
     override.vm.box = nil
+    # Chromium driver does not work with ubuntu so we use debian
+    override.vm.hostname = "debian"
     docker.image = "rofrano/vagrant-provider:debian"
     docker.remains_running = true
     docker.has_ssh = true
@@ -78,7 +80,7 @@ Vagrant.configure(2) do |config|
     sudo -H -u vagrant sh -c 'echo ". ~/venv/bin/activate" >> ~/.profile'
 
     # Install app dependencies
-    sudo -H -u vagrant sh -c '. ~/venv/bin/activate && pip install wheel'
+    sudo -H -u vagrant sh -c '. ~/venv/bin/activate && pip install -U pip && pip install wheel'
     sudo -H -u vagrant sh -c '. ~/venv/bin/activate && cd /vagrant && pip install -r requirements.txt'
   SHELL
 
@@ -93,22 +95,38 @@ Vagrant.configure(2) do |config|
   end
 
   ######################################################################
+  # Configure CouchDB
+  ######################################################################
+  config.vm.provision "shell", inline: <<-SHELL
+    echo "Waiting 15 seconds for CouchDB to initialize..."
+    sleep 15
+    echo "Creating CouchDB _users database"
+    curl -i -X PUT http://admin:pass@localhost:5984/_users
+  SHELL
+
+  ######################################################################
   # Setup a Bluemix and Kubernetes environment
   ######################################################################
   config.vm.provision "shell", inline: <<-SHELL
     echo "\n************************************"
     echo " Installing IBM Cloud CLI..."
     echo "************************************\n"
+    # WARNING!!! This only works on Intel computers
     # Install IBM Cloud CLI as Vagrant user
-    sudo -H -u vagrant sh -c '
-    wget -O bluemix-cli.tar.gz https://clis.cloud.ibm.com/download/bluemix-cli/1.4.0/linux64 && \
-    tar xzf bluemix-cli.tar.gz && \
-    cd Bluemix_CLI/ && \
-    ./install && \
-    cd .. && \
-    rm -fr Bluemix_CLI/ bluemix-cli.tar.gz && \
-    ibmcloud cf install
+    sudo -H -u vagrant bash -c '
+    ARCH=$(dpkg --print-architecture) && \
+    if [ "$ARCH" == "amd64" ]
+    then
+      wget -O ibmcloud-cli.tar.gz https://download.clis.cloud.ibm.com/ibm-cloud-cli/2.0.0/IBM_Cloud_CLI_2.0.0_amd64.tar.gz; \
+      tar xzf ibmcloud-cli.tar.gz; \
+      cd Bluemix_CLI/; \
+      ./install; \
+      cd ..; \
+      rm -fr Bluemix_CLI/ ibmcloud-cli.tar.gz; \
+      ibmcloud cf install; 
+    fi
     '
+
     sudo -H -u vagrant sh -c "echo alias ic=/usr/local/bin/ibmcloud >> ~/.bash_aliases"
     echo "\n************************************"
     echo ""
