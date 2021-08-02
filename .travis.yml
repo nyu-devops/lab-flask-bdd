@@ -37,7 +37,12 @@ jobs:
             - chromium-driver 
             - python3-selenium
       before_script:
+        # Update the chromedriver to the latest version, otherwise it would not be compatible with Chrome v92
+        - LATEST_CHROMEDRIVER_VERSION=`curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"`
+        - curl "https://chromedriver.storage.googleapis.com/${LATEST_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" -O
+        - unzip chromedriver_linux64.zip -d ~/bin
         - chromedriver --version
+        # Continue running application
         - curl -X GET http://localhost:5984/
         - curl -X PUT http://admin:pass@localhost:5984/test
         - gunicorn --log-level=critical --bind=127.0.0.1:8080 service:app &  # start a Web server in the background
