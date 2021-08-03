@@ -34,7 +34,7 @@ jobs:
         chrome: stable
         apt:
           packages:
-            - chromium-driver 
+            - chromium-chromedriver
             - python3-selenium
       before_script:
         # Update the chromedriver to the latest version, otherwise it would not be compatible with Chrome v92
