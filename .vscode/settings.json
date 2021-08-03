@@ -1,3 +1,12 @@
 {
-    "python.linting.pylintEnabled": true
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.testing.nosetestsEnabled": true,
+    "python.testing.nosetestArgs": ["-c=setup.cfg"],
+    "cucumberautocomplete.steps": ["features/steps/*.py"],
+    "cucumberautocomplete.syncfeatures": "features/*.feature",
+    "cucumberautocomplete.strictGherkinCompletion": true,
+    "cucumberautocomplete.strictGherkinValidation": true,
+    "cucumberautocomplete.smartSnippets": true,
+    "cucumberautocomplete.gherkinDefinitionPart": "@(given|when|then)\\(",
 }

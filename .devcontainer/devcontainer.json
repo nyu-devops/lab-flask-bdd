@@ -12,7 +12,10 @@
 		"donjayamanne.githistory",
     	"bbenoist.vagrant",
 		"cstrap.flask-snippets",
-    	"wholroyd.jinja"
+    	"wholroyd.jinja",
+		"github.vscode-pull-request-github"
 	],
-	"forwardPorts": [8080]
+	"forwardPorts": [8080],
+	// Create .env file if it doesn't exist
+	"postAttachCommand": "if [ ! -f /.env ]; then cp dot-env-example .env; fi; "
 }

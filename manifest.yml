@@ -1,5 +1,5 @@
 applications:
-- nme: lab-flask-bdd
+- name: lab-flask-bdd
   path: .
   instances: 2
   memory: 64M

@@ -1,0 +1,38 @@
+// Test tasks for NYU course DevOps and Agile Methodologies taught by John Rofrano
+// Copyright Shuhong Cai 2021. Licensed under the Apache License, Version 2.0
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "TDD tests",
+            "type": "shell",
+            "command": "nosetests",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+            }
+        },
+        {
+            "label": "BDD tests",
+            "type": "shell",
+            "command": "honcho start >/dev/null 2>&1 & sleep 5 && behave; kill %%",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+            }
+        },
+        {
+            "label": "TDD & BDD tests",
+            "type": "shell",
+            "group": "test",
+            "dependsOrder": "sequence",
+            "dependsOn": ["TDD tests", "BDD tests"],
+            "presentation": {
+                "reveal": "never",
+            }
+        },
+    ]
+        
+}
