@@ -18,5 +18,5 @@
 	],
 	"forwardPorts": [8080],
 	// Create .env file if it doesn't exist
-	"postAttachCommand": "if [ ! -f /.env ]; then cp dot-env-example .env; fi; "
+	"postAttachCommand": "if [ ! -f .env ]; then cp dot-env-example .env; fi; "
 }
