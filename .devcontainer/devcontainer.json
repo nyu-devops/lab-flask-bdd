@@ -2,21 +2,23 @@
 	"name": "Python 3 & CouchDB",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
-	"workspaceFolder": "/workspace",
+	"workspaceFolder": "/app",
 	"remoteUser": "devops",
 	"extensions": [
 		"VisualVisualStudioExptTeam.vscodeintellicodeStudio",
 		"ms-python.python",
-    	"alexkrechik.cucumberautocomplete",
-        "bierner.github-markdown-preview",
-		"yzhang.markdown-all-in-one",
-		"donjayamanne.githistory",
-    	"bbenoist.vagrant",
-		"cstrap.flask-snippets",
+		"ms-python.vscode-pylance",
     	"wholroyd.jinja",
-		"github.vscode-pull-request-github"
+		"cstrap.flask-snippets",
+		"yzhang.markdown-all-in-one",
+		"DavidAnson.vscode-markdownlint",
+		"bierner.github-markdown-preview",        
+		"donjayamanne.githistory",
+		"redhat.vscode-yaml",
+		"bbenoist.vagrant",
+		"sonarsource.sonarlint-vscode"
 	],
-	"forwardPorts": [8080],
+	// "forwardPorts": [8080],
 	// Create .env file if it doesn't exist
 	"postAttachCommand": "if [ ! -f .env ]; then cp dot-env-example .env; fi; "
 }

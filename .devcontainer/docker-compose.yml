@@ -9,10 +9,10 @@ services:
     ports:
       - 8080:8080
     volumes:
+      - ~/.gitconfig:/home/vscode/.gitconfig
       - ~/.ssh/:/home/devops/.ssh/
       - ~/.bluemix/:/home/devops/.bluemix/
-      - ~/.gitconfig:/home/vscode/.gitconfig
-      - ..:/workspace
+      - ..:/app
     command: sleep infinity
     environment:
       FLASK_APP: service:app

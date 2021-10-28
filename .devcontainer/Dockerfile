@@ -1,5 +1,5 @@
 # Image for a Python 3 development environment
-FROM python:3.8-slim
+FROM python:3.9-slim
 
 # Add any tools that are needed beyond Python 3.7
 RUN apt-get update \
@@ -20,25 +20,21 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
-# Set up the development environment
-WORKDIR /workspace
-
-# Add the IBM Cloud CLI
+# Add the IBM Cloud CLI if not ARM architecture
 RUN if [ $(uname -m) != aarch64 ]; then \
-        wget -O bluemix-cli.tar.gz https://clis.cloud.ibm.com/download/bluemix-cli/1.4.0/linux64 && \
-        tar xzf bluemix-cli.tar.gz && \
-        cd Bluemix_CLI/ && \
-        ./install && \
-        cd .. && \
-        rm -fr Bluemix_CLI/ bluemix-cli.tar.gz && \
-        ibmcloud cf install; \
+        curl -fsSL https://clis.cloud.ibm.com/install/linux | sh && \
+        echo "alias ic=ibmcloud" >> /home/$USERNAME/.bashrc && \
+        su -l devops -c "ibmcloud cf install"; \
     else \
         echo "aarch64 not supported"; \
     fi;
 
-# Establish Python dependencies
+# Set up the development environment
+WORKDIR /app
+
+# Install application dependencies
 COPY requirements.txt .
-RUN pip install -U pip && \
+RUN pip --no-cache-dir install -U pip wheel && \
     pip --no-cache-dir install -r requirements.txt
 
 EXPOSE 8080
