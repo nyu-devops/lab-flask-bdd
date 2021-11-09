@@ -113,17 +113,6 @@ Vagrant.configure(2) do |config|
     echo "************************************\n"
     # WARNING!!! This only works on Intel computers
     # Install IBM Cloud CLI as Vagrant user
-    # sudo -H -u vagrant bash -c '
-    # ARCH=$(dpkg --print-architecture) && \
-    # if [ "$ARCH" == "amd64" ]
-    # then
-    #   curl -fsSL https://clis.cloud.ibm.com/install/linux | sh; \
-    #   echo "alias ic=/usr/local/bin/ibmcloud" >> /home/vagrant/.bash_aliases; \
-    #   su -l vagrant -c "ibmcloud cf install"; \
-    # else
-    #   echo "*** WARNING: IBM Cloud CLI does not suport your architecture :("; \
-    # fi
-    # '
     ARCH=$(dpkg --print-architecture)
     if [ "$ARCH" == "amd64" ]
     then
