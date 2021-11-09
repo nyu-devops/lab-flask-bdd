@@ -113,33 +113,41 @@ Vagrant.configure(2) do |config|
     echo "************************************\n"
     # WARNING!!! This only works on Intel computers
     # Install IBM Cloud CLI as Vagrant user
-    sudo -H -u vagrant bash -c '
-    ARCH=$(dpkg --print-architecture) && \
+    # sudo -H -u vagrant bash -c '
+    # ARCH=$(dpkg --print-architecture) && \
+    # if [ "$ARCH" == "amd64" ]
+    # then
+    #   curl -fsSL https://clis.cloud.ibm.com/install/linux | sh; \
+    #   echo "alias ic=/usr/local/bin/ibmcloud" >> /home/vagrant/.bash_aliases; \
+    #   su -l vagrant -c "ibmcloud cf install"; \
+    # else
+    #   echo "*** WARNING: IBM Cloud CLI does not suport your architecture :("; \
+    # fi
+    # '
+    ARCH=$(dpkg --print-architecture)
     if [ "$ARCH" == "amd64" ]
     then
-      wget -O ibmcloud-cli.tar.gz https://download.clis.cloud.ibm.com/ibm-cloud-cli/2.0.0/IBM_Cloud_CLI_2.0.0_amd64.tar.gz; \
-      tar xzf ibmcloud-cli.tar.gz; \
-      cd Bluemix_CLI/; \
-      ./install; \
-      cd ..; \
-      rm -fr Bluemix_CLI/ ibmcloud-cli.tar.gz; \
-      ibmcloud cf install; 
+      curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+      sudo -H -u vagrant bash -c '
+          echo "alias ic=/usr/local/bin/ibmcloud" >> ~/.bash_aliases &&
+          ibmcloud cf install'
+    else
+      echo "*** WARNING: IBM Cloud CLI does not suport your architecture :("; \
     fi
-    '
 
-    sudo -H -u vagrant sh -c "echo alias ic=/usr/local/bin/ibmcloud >> ~/.bash_aliases"
     echo "\n************************************"
     echo ""
-    echo "If you have an IBM Cloud API key in ~/.bluemix/apiKey.json"
+    echo "If you have an IBM Cloud API key in ~/.bluemix/apikey.json"
     echo "You can login with the following command:"
     echo ""
-    echo "ibmcloud login -a https://cloud.ibm.com --apikey @~/.bluemix/apiKey.json -r us-south"
-    echo "\nibmcloud target -o [your-org] -s dev"
+    echo "ibmcloud login -a https://cloud.ibm.com --apikey @~/.bluemix/apikey.json -r us-south"
+    echo "\nibmcloud target --cf"
     echo "\n************************************"
     # Show the GUI URL for Couch DB
     echo "\n"
     echo "CouchDB Admin GUI can be found at:\n"
     echo "http://127.0.0.1:5984/_utils"
+    echo "The credentials are: userid:admin password:pass"
   SHELL
 
 end

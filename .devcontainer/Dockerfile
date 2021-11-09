@@ -23,7 +23,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
 # Add the IBM Cloud CLI if not ARM architecture
 RUN if [ $(uname -m) != aarch64 ]; then \
         curl -fsSL https://clis.cloud.ibm.com/install/linux | sh && \
-        echo "alias ic=ibmcloud" >> /home/$USERNAME/.bashrc && \
+        echo "alias ic=ibmcloud" >> /home/$USERNAME/.bash_aliases && \
         su -l devops -c "ibmcloud cf install"; \
     else \
         echo "aarch64 not supported"; \
