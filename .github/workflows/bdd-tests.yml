@@ -1,0 +1,64 @@
+name: BDD Tests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: python:3.9-slim
+
+    services:
+      couchdb:
+        image: couchdb:latest
+        ports:
+          - 5984:5984
+        env:
+          COUCHDB_USER: admin                  
+          COUCHDB_PASSWORD: pass                  
+        options: >-
+          --health-cmd "curl -X GET http://couchdb:5984/"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Chrome
+        run: |
+          set -ex
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo apt install ./google-chrome-stable_current_amd64.deb
+
+      - name: Install Chromium
+        run: |
+          LATEST_CHROMEDRIVER_VERSION=`curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"`
+          curl "https://chromedriver.storage.googleapis.com/${LATEST_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" -O
+          unzip chromedriver_linux64.zip -d ~/bin
+          chromedriver --version
+
+      - name: Install package dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install -r requirements.txt
+
+      - name: Run the server locally
+        run: |
+          curl -X PUT http://admin:pass@couchdb:5984/test
+          gunicorn --log-level=critical --bind=127.0.0.1:8080 service:app &  # start a Web server in the background
+          sleep 5
+          curl -I http://localhost:8080/
+
+      - name: Run unit tests with nose
+        run: behave
+        env:
+          BINDING_CLOUDANT: '{"username":"admin","password":"pass","host":"couchdb","port":5984,"url":"http://admin:pass@couchdb:5984"}'
+
+      - name: Upload code coverage
+        uses: codecov/codecov-action@v2  
+  
