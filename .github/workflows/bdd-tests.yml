@@ -29,17 +29,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install Chrome
-        run: |
-          set -ex
-          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-          sudo apt install ./google-chrome-stable_current_amd64.deb
+      - name: setup-chromedriver
+        uses: nanasess/setup-chromedriver@v1.0.1
 
       - name: Install Chromium
         run: |
-          LATEST_CHROMEDRIVER_VERSION=`curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"`
-          curl "https://chromedriver.storage.googleapis.com/${LATEST_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" -O
-          unzip chromedriver_linux64.zip -d ~/bin
+          # LATEST_CHROMEDRIVER_VERSION=`curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"`
+          # curl "https://chromedriver.storage.googleapis.com/${LATEST_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" -O
+          # unzip chromedriver_linux64.zip -d ~/bin
           chromedriver --version
 
       - name: Install package dependencies
