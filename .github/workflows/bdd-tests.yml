@@ -29,13 +29,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup Chrome
-        uses: browser-actions/setup-chrome@latest
-        run: chrome --version
+      - uses: browser-actions/setup-chrome@latest
+      - run: chrome --version
 
       - name: setup-chromedriver
         uses: nanasess/setup-chromedriver@v1.0.1
+
+      - name: Which Chrome
         run: |
+          which chromedriver
           chromedriver --version
 
       - name: Install package dependencies
