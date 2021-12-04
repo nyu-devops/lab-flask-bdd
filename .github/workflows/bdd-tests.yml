@@ -29,18 +29,25 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: browser-actions/setup-chrome@latest
-      - run: chrome --version
+      # - uses: browser-actions/setup-chrome@latest
+      # - run: chrome --version
 
-      - name: setup-chromedriver
-        uses: nanasess/setup-chromedriver@v1.0.1
+      # - name: setup-chromedriver
+      #   uses: nanasess/setup-chromedriver@v1.0.1
 
-      - name: Which Chrome
+      - name: Install dependencies
         run: |
+          apt-get update
+          apt-get install -y sudo git curl wget python3-selenium
+
+      - name: Test for Chrome Drivers
+        run: |
+          which chrome
+          chrome --version
           which chromedriver
           chromedriver --version
 
-      - name: Install package dependencies
+      - name: Install packages
         run: |
           python -m pip install --upgrade pip wheel
           pip install -r requirements.txt
