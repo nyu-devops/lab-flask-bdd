@@ -36,6 +36,8 @@ jobs:
 
       - name: Create the test database
         run: |
+          apt-get update
+          apt-get install -y curl
           curl -X PUT http://admin:pass@couchdb:5984/test
 
       - name: Run unit tests with nose
