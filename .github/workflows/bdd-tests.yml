@@ -40,13 +40,6 @@ jobs:
           apt-get update
           apt-get install -y sudo git curl wget python3-selenium
 
-      - name: Test for Chrome Drivers
-        run: |
-          which chrome
-          chrome --version
-          which chromedriver
-          chromedriver --version
-
       - name: Install packages
         run: |
           python -m pip install --upgrade pip wheel
