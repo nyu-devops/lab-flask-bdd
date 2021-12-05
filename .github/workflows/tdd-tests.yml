@@ -1,4 +1,4 @@
-name: BDD Tests
+name: TDD Tests
 on:
   push:
     branches:
@@ -31,26 +31,18 @@ jobs:
 
       - name: Install dependencies
         run: |
-          apt-get update
-          apt-get install -y curl wget python3-selenium
-
-      - name: Install packages
-        run: |
           python -m pip install --upgrade pip wheel
           pip install -r requirements.txt
 
-      - name: Run the server locally
+      - name: Create the test database
         run: |
-          echo "\n*** CREATING TEST DB ***\n"
           curl -X PUT http://admin:pass@couchdb:5984/test
-          echo "\n*** STARTING APPLICATION ***\n"
-          gunicorn --log-level=critical --bind=0.0.0.0:8080 service:app &
-          sleep 5
-          curl -I http://localhost:8080/
-          echo "\n*** SERVER IS RUNNING ***"
+
+      - name: Run unit tests with nose
+        run: nosetests
         env:
           BINDING_CLOUDANT: '{"username":"admin","password":"pass","host":"couchdb","port":5984,"url":"http://admin:pass@couchdb:5984"}'
 
-      - name: Run unit tests with nose
-        run: behave
+      - name: Upload code coverage
+        uses: codecov/codecov-action@v2  
   
