@@ -35,17 +35,19 @@ $(function () {
 
     $("#create-btn").click(function () {
 
-        var name = $("#pet_name").val();
-        var category = $("#pet_category").val();
-        var available = $("#pet_available").val() == "true";
+        let name = $("#pet_name").val();
+        let category = $("#pet_category").val();
+        let available = $("#pet_available").val() == "true";
 
-        var data = {
+        let data = {
             "name": name,
             "category": category,
             "available": available
         };
 
-        var ajax = $.ajax({
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
             type: "POST",
             url: "/pets",
             contentType: "application/json",
@@ -69,18 +71,20 @@ $(function () {
 
     $("#update-btn").click(function () {
 
-        var pet_id = $("#pet_id").val();
-        var name = $("#pet_name").val();
-        var category = $("#pet_category").val();
-        var available = $("#pet_available").val() == "true";
+        let pet_id = $("#pet_id").val();
+        let name = $("#pet_name").val();
+        let category = $("#pet_category").val();
+        let available = $("#pet_available").val() == "true";
 
-        var data = {
+        let data = {
             "name": name,
             "category": category,
             "available": available
         };
 
-        var ajax = $.ajax({
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
                 type: "PUT",
                 url: "/pets/" + pet_id,
                 contentType: "application/json",
@@ -104,9 +108,11 @@ $(function () {
 
     $("#retrieve-btn").click(function () {
 
-        var pet_id = $("#pet_id").val();
+        let pet_id = $("#pet_id").val();
 
-        var ajax = $.ajax({
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
             type: "GET",
             url: "/pets/" + pet_id,
             contentType: "application/json",
@@ -132,9 +138,11 @@ $(function () {
 
     $("#delete-btn").click(function () {
 
-        var pet_id = $("#pet_id").val();
+        let pet_id = $("#pet_id").val();
 
-        var ajax = $.ajax({
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
             type: "DELETE",
             url: "/pets/" + pet_id,
             contentType: "application/json",
@@ -157,6 +165,7 @@ $(function () {
 
     $("#clear-btn").click(function () {
         $("#pet_id").val("");
+        $("#flash_message").empty();
         clear_form_data()
     });
 
@@ -166,11 +175,11 @@ $(function () {
 
     $("#search-btn").click(function () {
 
-        var name = $("#pet_name").val();
-        var category = $("#pet_category").val();
-        var available = $("#pet_available").val() == "true";
+        let name = $("#pet_name").val();
+        let category = $("#pet_category").val();
+        let available = $("#pet_available").val() == "true";
 
-        var queryString = ""
+        let queryString = ""
 
         if (name) {
             queryString += 'name=' + name
@@ -190,7 +199,9 @@ $(function () {
             }
         }
 
-        var ajax = $.ajax({
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
             type: "GET",
             url: "/pets?" + queryString,
             contentType: "application/json",
@@ -201,16 +212,16 @@ $(function () {
             //alert(res.toSource())
             $("#search_results").empty();
             $("#search_results").append('<table class="table-striped" cellpadding="10">');
-            var header = '<tr>'
+            let header = '<tr>'
             header += '<th style="width:10%">ID</th>'
             header += '<th style="width:40%">Name</th>'
             header += '<th style="width:40%">Category</th>'
             header += '<th style="width:10%">Available</th></tr>'
             $("#search_results").append(header);
-            var firstPet = "";
-            for(var i = 0; i < res.length; i++) {
-                var pet = res[i];
-                var row = "<tr><td>"+pet._id+"</td><td>"+pet.name+"</td><td>"+pet.category+"</td><td>"+pet.available+"</td></tr>";
+            let firstPet = "";
+            for(let i = 0; i < res.length; i++) {
+                let pet = res[i];
+                let row = "<tr><td>"+pet._id+"</td><td>"+pet.name+"</td><td>"+pet.category+"</td><td>"+pet.available+"</td></tr>";
                 $("#search_results").append(row);
                 if (i == 0) {
                     firstPet = pet;
