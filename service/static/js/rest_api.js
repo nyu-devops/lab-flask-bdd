@@ -86,7 +86,7 @@ $(function () {
 
         let ajax = $.ajax({
                 type: "PUT",
-                url: "/pets/" + pet_id,
+                url: `/pets/${pet_id}`,
                 contentType: "application/json",
                 data: JSON.stringify(data)
             })
@@ -114,7 +114,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: "/pets/" + pet_id,
+            url: `/pets/${pet_id}`,
             contentType: "application/json",
             data: ''
         })
@@ -144,7 +144,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "DELETE",
-            url: "/pets/" + pet_id,
+            url: `/pets/${pet_id}`,
             contentType: "application/json",
             data: '',
         })
@@ -203,7 +203,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: "/pets?" + queryString,
+            url: `/pets?${queryString}`,
             contentType: "application/json",
             data: ''
         })
@@ -221,7 +221,7 @@ $(function () {
             let firstPet = "";
             for(let i = 0; i < res.length; i++) {
                 let pet = res[i];
-                let row = "<tr><td>"+pet._id+"</td><td>"+pet.name+"</td><td>"+pet.category+"</td><td>"+pet.available+"</td></tr>";
+                let row = `<tr><td>${pet._id}</td><td>${pet.name}</td><td>${pet.category}</td><td>${pet.available}</td></tr>`;
                 $("#search_results").append(row);
                 if (i == 0) {
                     firstPet = pet;
