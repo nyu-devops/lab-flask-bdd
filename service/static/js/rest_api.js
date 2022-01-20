@@ -211,24 +211,23 @@ $(function () {
         ajax.done(function(res){
             //alert(res.toSource())
             $("#search_results").empty();
-            $("#search_results").append('<table class="table-striped" cellpadding="10">');
-            let header = '<tr>'
-            header += '<th style="width:10%">ID</th>'
-            header += '<th style="width:40%">Name</th>'
-            header += '<th style="width:40%">Category</th>'
-            header += '<th style="width:10%">Available</th></tr>'
-            $("#search_results").append(header);
+            let table = '<table class="table table-striped" cellpadding="10">'
+            table += '<thead><tr>'
+            table += '<th class="col-md-4">ID</th>'
+            table += '<th class="col-md-3">Name</th>'
+            table += '<th class="col-md-3">Category</th>'
+            table += '<th class="col-md-2">Available</th>'
+            table += '</tr></thead><tbody>'
             let firstPet = "";
             for(let i = 0; i < res.length; i++) {
                 let pet = res[i];
-                let row = `<tr><td>${pet._id}</td><td>${pet.name}</td><td>${pet.category}</td><td>${pet.available}</td></tr>`;
-                $("#search_results").append(row);
+                table +=  `<tr id="row_${i}"><td>${pet._id}</td><td>${pet.name}</td><td>${pet.category}</td><td>${pet.available}</td></tr>`;
                 if (i == 0) {
                     firstPet = pet;
                 }
             }
-
-            $("#search_results").append('</table>');
+            table += '</tbody></table>';
+            $("#search_results").append(table);
 
             // copy the first result to the form
             if (firstPet != "") {
