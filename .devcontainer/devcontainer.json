@@ -5,20 +5,25 @@
 	"workspaceFolder": "/app",
 	"remoteUser": "devops",
 	"extensions": [
-		"VisualVisualStudioExptTeam.vscodeintellicodeStudio",
+		"VisualStudioExptTeam.vscodeintellicode",
 		"ms-python.python",
 		"ms-python.vscode-pylance",
-    	"wholroyd.jinja",
+		"alexkrechik.cucumberautocomplete",
 		"cstrap.flask-snippets",
 		"yzhang.markdown-all-in-one",
+		"bierner.github-markdown-preview",
+		"hnw.vscode-auto-open-markdown-preview",
 		"DavidAnson.vscode-markdownlint",
-		"bierner.github-markdown-preview",        
 		"donjayamanne.githistory",
+		"GitHub.vscode-pull-request-github",
+		"hbenl.vscode-test-explorer",
+		"njpwerner.autodocstring",
 		"redhat.vscode-yaml",
-		"bbenoist.vagrant",
-		"sonarsource.sonarlint-vscode"
+		"streetsidesoftware.code-spell-checker",
+		"wholroyd.jinja",
+		"bbenoist.vagrant"
 	],
 	// "forwardPorts": [8080],
 	// Create .env file if it doesn't exist
-	"postAttachCommand": "if [ ! -f .env ]; then cp dot-env-example .env; fi; "
+	"postCreateCommand": "if [ ! -f .env ]; then cp dot-env-example .env; fi; "
 }
