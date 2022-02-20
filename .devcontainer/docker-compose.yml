@@ -20,6 +20,7 @@ services:
     depends_on:
       - couchdb
 
+  # CouchDB database service at: http://127.0.0.1:5984/_utils
   couchdb:
     image: couchdb:latest
     hostname: couchdb
@@ -32,6 +33,19 @@ services:
       COUCHDB_PASSWORD: pass
     networks:
       - dev
+
+  # Create a few databases needed by CouchDB
+  setup:
+    image: couchdb:latest
+    command: >
+      bash -c "echo '*** SETUP: waiting 15 seconds for couchdb to initialize...'; sleep 15
+      && curl -X PUT http://admin:pass@couchdb:5984/_users
+      && curl -X PUT http://admin:pass@couchdb:5984/_replicator
+      && curl -X PUT http://admin:pass@couchdb:5984/_global_changes"
+    networks:
+      - dev
+    depends_on:
+      - couchdb   
 
 volumes:
   couchdb:
