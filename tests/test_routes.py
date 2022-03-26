@@ -27,6 +27,7 @@ import logging
 from werkzeug.datastructures import MultiDict, ImmutableMultiDict
 from service import routes
 from service.utils import status
+from .factories import PetFactory
 
 
 ######################################################################
@@ -74,10 +75,12 @@ class TestPetServer(TestCase):
 
     def test_create_pet(self):
         """Create a new Pet"""
-        # save the current number of pets for later comparrison
+        # save the current number of pets for later comparison
         pet_count = self.get_pet_count()
         # add a new pet
-        new_pet = {"name": "sammy", "category": "snake", "available": True}
+        new_pet = PetFactory().serialize()
+        logging.debug(new_pet)
+        # new_pet = {"name": "sammy", "category": "snake", "available": True}
         resp = self.app.post("/pets", json=new_pet, content_type="application/json")
         # if resp.status_code == 429: # rate limit exceeded
         #     sleep(1)                # wait for 1 second and try again
@@ -88,7 +91,7 @@ class TestPetServer(TestCase):
         self.assertNotEqual(location, None)
         # Check the data is correct
         new_json = resp.get_json()
-        self.assertEqual(new_json["name"], "sammy")
+        self.assertEqual(new_json["name"], new_pet["name"])
         # check that count has gone up and includes sammy
         resp = self.app.get("/pets")
         data = resp.get_json()
@@ -102,6 +105,7 @@ class TestPetServer(TestCase):
         pet_data.add("name", "Timothy")
         pet_data.add("category", "mouse")
         pet_data.add("available", "True")
+        pet_data.add("gender", "MALE")
         data = ImmutableMultiDict(pet_data)
         resp = self.app.post(
             "/pets", data=data, content_type="application/x-www-form-urlencoded"

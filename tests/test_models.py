@@ -22,12 +22,14 @@ nosetests -v --with-spec --spec-color
 nosetests --stop tests/test_pets.py:TestPets
 """
 
+import logging
 import os
 import json
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from requests import HTTPError, ConnectionError
-from service.models import Pet, DataValidationError, DatabaseConnectionError
+from service.models import Pet, Gender, DataValidationError, DatabaseConnectionError
+from .factories import PetFactory
 
 VCAP_SERVICES = {
     "cloudantNoSQLDB": [
@@ -66,18 +68,19 @@ class TestPets(TestCase):
 
     def test_create_a_pet(self):
         """Create a pet and assert that it exists"""
-        pet = Pet("fido", "dog", False)
+        pet = Pet("fido", "dog", False, Gender.MALE)
         self.assertNotEqual(pet, None)
         self.assertEqual(pet.id, None)
         self.assertEqual(pet.name, "fido")
         self.assertEqual(pet.category, "dog")
         self.assertEqual(pet.available, False)
+        self.assertEqual(pet.gender, Gender.MALE)
 
     def test_add_a_pet(self):
         """Create a pet and add it to the database"""
         pets = Pet.all()
         self.assertEqual(pets, [])
-        pet = Pet("fido", "dog", True)
+        pet = PetFactory()
         self.assertNotEqual(pet, None)
         self.assertEqual(pet.id, None)
         pet.save()
@@ -85,9 +88,10 @@ class TestPets(TestCase):
         self.assertNotEqual(pet.id, None)
         pets = Pet.all()
         self.assertEqual(len(pets), 1)
-        self.assertEqual(pets[0].name, "fido")
-        self.assertEqual(pets[0].category, "dog")
-        self.assertEqual(pets[0].available, True)
+        self.assertEqual(pets[0].name, pet.name)
+        self.assertEqual(pets[0].category, pet.category)
+        self.assertEqual(pets[0].available, pet.available)
+        self.assertEqual(pets[0].gender, pet.gender)
 
     def test_update_a_pet(self):
         """Update a Pet"""
@@ -128,14 +132,16 @@ class TestPets(TestCase):
 
     def test_deserialize_a_pet(self):
         """Deserialize a Pet"""
-        data = {"name": "kitty", "category": "cat", "available": True}
+        data = PetFactory().serialize()
+        logging.debug(data)
         pet = Pet()
         pet.deserialize(data)
         self.assertNotEqual(pet, None)
         self.assertEqual(pet.id, None)
-        self.assertEqual(pet.name, "kitty")
-        self.assertEqual(pet.category, "cat")
-        self.assertEqual(pet.available, True)
+        self.assertEqual(pet.name, data["name"])
+        self.assertEqual(pet.category, data["category"])
+        self.assertEqual(pet.available, data["available"])
+        self.assertEqual(pet.gender.name, data["gender"])
 
     def test_deserialize_with_no_name(self):
         """Deserialize a Pet that has no name"""
