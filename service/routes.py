@@ -30,7 +30,6 @@ DELETE /pets/{id} - deletes a Pet record in the database
 import sys
 import logging
 from flask import jsonify, request, json, url_for, make_response, abort
-from werkzeug.exceptions import NotFound
 from . import app
 from service.models import Pet
 from .utils import status  # HTTP Status Codes
@@ -64,10 +63,12 @@ def index():
 def list_pets():
     """Returns all of the Pets"""
     app.logger.info("Request to list Pets...")
+    
     pets = []
     category = request.args.get("category")
     name = request.args.get("name")
     available = request.args.get("available")
+    
     if available:  # convert to boolean
         available = available.lower() in ["true", "yes", "1"]
     if category:
@@ -99,9 +100,12 @@ def get_pets(pet_id):
     This endpoint will return a Pet based on it's id
     """
     app.logger.info("Request to Retrieve a pet with id [%s]", pet_id)
+    
     pet = Pet.find(pet_id)
     if not pet:
-        raise NotFound("Pet with id '{}' was not found.".format(pet_id))
+        abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{pet_id}' was not found.")
+    
+    app.logger.info("Returning pet: %s", pet.name)
     return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
 
 
@@ -123,16 +127,19 @@ def create_pets():
             "name": request.form["name"],
             "category": request.form["category"],
             "available": True,
+            "gender": "UNKNOWN"
         }
     else:
         check_content_type("application/json")
         app.logger.info("Getting json data from API call")
         data = request.get_json()
+
     app.logger.info(data)
     pet = Pet()
     pet.deserialize(data)
     pet.save()
     app.logger.info("Pet with new id [%s] saved!", pet.id)
+    
     message = pet.serialize()
     location_url = url_for("get_pets", pet_id=pet.id, _external=True)
     return make_response(
@@ -152,9 +159,11 @@ def update_pets(pet_id):
     """
     app.logger.info("Request to Update a pet with id [%s]", pet_id)
     check_content_type("application/json")
+
     pet = Pet.find(pet_id)
     if not pet:
-        raise NotFound("Pet with id '{}' was not found.".format(pet_id))
+        abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{pet_id}' was not found.")
+
     data = request.get_json()
     app.logger.info(data)
     pet.deserialize(data)
@@ -174,9 +183,11 @@ def delete_pets(pet_id):
     This endpoint will delete a Pet based the id specified in the path
     """
     app.logger.info("Request to Delete a pet with id [%s]", pet_id)
+    
     pet = Pet.find(pet_id)
     if pet:
         pet.delete()
+    
     return make_response("", status.HTTP_204_NO_CONTENT)
 
 

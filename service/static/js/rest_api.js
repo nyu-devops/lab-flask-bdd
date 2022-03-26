@@ -14,6 +14,7 @@ $(function () {
         } else {
             $("#pet_available").val("false");
         }
+        $("#pet_gender").val(res.gender);
     }
 
     /// Clears all form fields
@@ -21,6 +22,7 @@ $(function () {
         $("#pet_name").val("");
         $("#pet_category").val("");
         $("#pet_available").val("");
+        $("#pet_gender").val("");
     }
 
     // Updates the flash message area
@@ -38,11 +40,13 @@ $(function () {
         let name = $("#pet_name").val();
         let category = $("#pet_category").val();
         let available = $("#pet_available").val() == "true";
+        let gender = $("#pet_gender").val();
 
         let data = {
             "name": name,
             "category": category,
-            "available": available
+            "available": available,
+            "gender": gender
         };
 
         $("#flash_message").empty();
@@ -75,11 +79,13 @@ $(function () {
         let name = $("#pet_name").val();
         let category = $("#pet_category").val();
         let available = $("#pet_available").val() == "true";
+        let gender = $("#pet_gender").val();
 
         let data = {
             "name": name,
             "category": category,
-            "available": available
+            "available": available,
+            "gender": gender
         };
 
         $("#flash_message").empty();
@@ -217,11 +223,12 @@ $(function () {
             table += '<th class="col-md-3">Name</th>'
             table += '<th class="col-md-3">Category</th>'
             table += '<th class="col-md-2">Available</th>'
+            table += '<th class="col-md-2">Gender</th>'
             table += '</tr></thead><tbody>'
             let firstPet = "";
             for(let i = 0; i < res.length; i++) {
                 let pet = res[i];
-                table +=  `<tr id="row_${i}"><td>${pet._id}</td><td>${pet.name}</td><td>${pet.category}</td><td>${pet.available}</td></tr>`;
+                table +=  `<tr id="row_${i}"><td>${pet._id}</td><td>${pet.name}</td><td>${pet.category}</td><td>${pet.available}</td><td>${pet.gender}</td></tr>`;
                 if (i == 0) {
                     firstPet = pet;
                 }

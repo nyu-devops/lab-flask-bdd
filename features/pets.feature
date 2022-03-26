@@ -5,10 +5,10 @@ Feature: The pet store service back-end
 
 Background:
     Given the following pets
-        | name       | category | available |
-        | fido       | dog      | True      |
-        | kitty      | cat      | True      |
-        | leo        | lion     | False     |
+        | name       | category | available | gender  |
+        | fido       | dog      | True      | MALE    |
+        | kitty      | cat      | True      | FEMALE  |
+        | leo        | lion     | False     | UNKNOWN |
 
 Scenario: The server is running
     When I visit the "Home Page"

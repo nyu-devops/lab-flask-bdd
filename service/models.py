@@ -16,7 +16,7 @@
 """
 Pet Model that uses Cloudant
 
-You must initlaize this class before use by calling inititlize().
+You must initialize this class before use by calling initialize().
 This class looks for an environment variable called VCAP_SERVICES
 to get it's database credentials from. If it cannot find one, it
 tries to connect to Cloudant on the localhost. If that fails it looks
@@ -34,6 +34,7 @@ Docker Note:
 import os
 import json
 import logging
+from enum import Enum
 from retry import retry
 from cloudant.client import Cloudant
 from cloudant.query import Query
@@ -41,7 +42,7 @@ from cloudant.adapters import Replay429Adapter
 from cloudant.database import CloudantDatabase
 from requests import HTTPError, ConnectionError
 
-# get configruation from enviuronment (12-factor)
+# get configuration from environment (12-factor)
 ADMIN_PARTY = os.environ.get("ADMIN_PARTY", "False").lower() == "true"
 CLOUDANT_HOST = os.environ.get("CLOUDANT_HOST", "localhost")
 CLOUDANT_USERNAME = os.environ.get("CLOUDANT_USERNAME", "admin")
@@ -60,20 +61,33 @@ class DatabaseConnectionError(Exception):
 class DataValidationError(Exception):
     """Custom Exception with data validation fails"""
 
+class Gender(Enum):
+    """Enumeration of valid Pet Genders"""
+    MALE = 0
+    FEMALE = 1
+    UNKNOWN = 3
+
 
 class Pet:
-    """Pet interface to database"""
+    """
+    Class that represents a Pet
+
+    This version uses a NoSQL database for persistence
+    """
 
     logger = logging.getLogger(__name__)
     client: Cloudant = None
     database: CloudantDatabase = None
 
-    def __init__(self, name=None, category=None, available=True):
+    def __init__(self, name:str = None, category:str = None, 
+                available:bool =True, gender: Gender = Gender.UNKNOWN
+        ):
         """Constructor"""
         self.id = None  # pylint: disable=invalid-name
         self.name = name
         self.category = category
         self.available = available
+        self.gender = gender
 
     @retry(
         HTTPError,
@@ -147,18 +161,19 @@ class Pet:
         if document:
             document.delete()
 
-    def serialize(self):
+    def serialize(self) -> dict:
         """serializes a Pet into a dictionary"""
         pet = {
             "name": self.name,
             "category": self.category,
             "available": self.available,
+            "gender": self.gender.name  # convert enum to string
         }
         if self.id:
             pet["_id"] = self.id
         return pet
 
-    def deserialize(self, data: dict):
+    def deserialize(self, data: dict) -> None:
         """deserializes a Pet my marshalling the data.
 
         :param data: a Python dictionary representing a Pet.
@@ -167,7 +182,14 @@ class Pet:
         try:
             self.name = data["name"]
             self.category = data["category"]
-            self.available = data["available"]
+            if isinstance(data["available"], bool):
+                self.available = data["available"]
+            else:
+                raise DataValidationError(
+                    "Invalid type for boolean [available]: "
+                    + str(type(data["available"]))
+                )
+            self.gender = getattr(Gender, data["gender"])  # create enum from string
         except KeyError as error:
             raise DataValidationError("Invalid pet: missing " + error.args[0])
         except TypeError as error:
