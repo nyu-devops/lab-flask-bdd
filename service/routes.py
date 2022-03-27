@@ -63,12 +63,12 @@ def index():
 def list_pets():
     """Returns all of the Pets"""
     app.logger.info("Request to list Pets...")
-    
+
     pets = []
     category = request.args.get("category")
     name = request.args.get("name")
     available = request.args.get("available")
-    
+
     if available:  # convert to boolean
         available = available.lower() in ["true", "yes", "1"]
     if category:
@@ -100,11 +100,11 @@ def get_pets(pet_id):
     This endpoint will return a Pet based on it's id
     """
     app.logger.info("Request to Retrieve a pet with id [%s]", pet_id)
-    
+
     pet = Pet.find(pet_id)
     if not pet:
         abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{pet_id}' was not found.")
-    
+
     app.logger.info("Returning pet: %s", pet.name)
     return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
 
@@ -123,12 +123,7 @@ def create_pets():
     # Check for form submission data
     if request.headers.get("Content-Type") == "application/x-www-form-urlencoded":
         app.logger.info("Getting data from form submit")
-        data = {
-            "name": request.form["name"],
-            "category": request.form["category"],
-            "available": True,
-            "gender": "UNKNOWN"
-        }
+        data = {"name": request.form["name"], "category": request.form["category"], "available": True, "gender": "UNKNOWN"}
     else:
         check_content_type("application/json")
         app.logger.info("Getting json data from API call")
@@ -137,14 +132,12 @@ def create_pets():
     app.logger.info(data)
     pet = Pet()
     pet.deserialize(data)
-    pet.save()
+    pet.create()
     app.logger.info("Pet with new id [%s] saved!", pet.id)
-    
+
     message = pet.serialize()
     location_url = url_for("get_pets", pet_id=pet.id, _external=True)
-    return make_response(
-        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
-    )
+    return make_response(jsonify(message), status.HTTP_201_CREATED, {"Location": location_url})
 
 
 ######################################################################
@@ -168,7 +161,7 @@ def update_pets(pet_id):
     app.logger.info(data)
     pet.deserialize(data)
     pet.id = pet_id
-    pet.save()
+    pet.update()
     return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
 
 
@@ -183,11 +176,11 @@ def delete_pets(pet_id):
     This endpoint will delete a Pet based the id specified in the path
     """
     app.logger.info("Request to Delete a pet with id [%s]", pet_id)
-    
+
     pet = Pet.find(pet_id)
     if pet:
         pet.delete()
-    
+
     return make_response("", status.HTTP_204_NO_CONTENT)
 
 
@@ -199,16 +192,14 @@ def purchase_pets(pet_id):
     """Purchasing a Pet makes it unavailable"""
     pet = Pet.find(pet_id)
     if not pet:
-        abort(
-            status.HTTP_404_NOT_FOUND, "Pet with id '{}' was not found.".format(pet_id)
-        )
+        abort(status.HTTP_404_NOT_FOUND, "Pet with id '{}' was not found.".format(pet_id))
     if not pet.available:
         abort(
             status.HTTP_400_BAD_REQUEST,
             "Pet with id '{}' is not available.".format(pet_id),
         )
     pet.available = False
-    pet.save()
+    pet.update()
     return make_response(jsonify(pet.serialize()), status.HTTP_200_OK)
 
 
@@ -227,7 +218,7 @@ def init_db(dbname="pets"):
 def data_load(payload):
     """Loads a Pet into the database"""
     pet = Pet(payload["name"], payload["category"], payload["available"])
-    pet.save()
+    pet.create()
 
 
 def data_reset():

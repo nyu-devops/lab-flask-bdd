@@ -83,7 +83,7 @@ class TestPets(TestCase):
         pet = PetFactory()
         self.assertNotEqual(pet, None)
         self.assertEqual(pet.id, None)
-        pet.save()
+        pet.create()
         # Asert that it was assigned an id and shows up in the database
         self.assertNotEqual(pet.id, None)
         pets = Pet.all()
@@ -96,11 +96,11 @@ class TestPets(TestCase):
     def test_update_a_pet(self):
         """Update a Pet"""
         pet = Pet("fido", "dog", True)
-        pet.save()
+        pet.create()
         self.assertNotEqual(pet.id, None)
         # Change it an save it
         pet.category = "k9"
-        pet.save()
+        pet.update()
         # Fetch it back and make sure the id hasn't changed
         # but the data did change
         pets = Pet.all()
@@ -111,7 +111,7 @@ class TestPets(TestCase):
     def test_delete_a_pet(self):
         """Delete a Pet"""
         pet = Pet("fido", "dog")
-        pet.save()
+        pet.create()
         self.assertEqual(len(Pet.all()), 1)
         # delete the pet and make sure it isn't in the database
         pet.delete()
@@ -162,7 +162,7 @@ class TestPets(TestCase):
     def test_save_a_pet_with_no_name(self):
         """Save a Pet with no name"""
         pet = Pet(None, "cat")
-        self.assertRaises(DataValidationError, pet.save)
+        self.assertRaises(DataValidationError, pet.create)
 
     def test_create_a_pet_with_no_name(self):
         """Create a Pet with no name"""
@@ -171,10 +171,10 @@ class TestPets(TestCase):
 
     def test_find_pet(self):
         """Find a Pet by id"""
-        Pet("fido", "dog").save()
-        # saved_pet = Pet("kitty", "cat").save()
+        Pet("fido", "dog").create()
+        # saved_pet = Pet("kitty", "cat").create()
         saved_pet = Pet("kitty", "cat")
-        saved_pet.save()
+        saved_pet.create()
         pet = Pet.find(saved_pet.id)
         self.assertIsNot(pet, None)
         self.assertEqual(pet.id, saved_pet.id)
@@ -187,14 +187,14 @@ class TestPets(TestCase):
 
     def test_pet_not_found(self):
         """Find a Pet that doesnt exist"""
-        Pet("fido", "dog").save()
+        Pet("fido", "dog").create()
         pet = Pet.find("2")
         self.assertIs(pet, None)
 
     def test_find_by_name(self):
         """Find a Pet by Name"""
-        Pet("fido", "dog").save()
-        Pet("kitty", "cat").save()
+        Pet("fido", "dog").create()
+        Pet("kitty", "cat").create()
         pets = Pet.find_by_name("fido")
         self.assertNotEqual(len(pets), 0)
         self.assertEqual(pets[0].category, "dog")
@@ -202,8 +202,8 @@ class TestPets(TestCase):
 
     def test_find_by_category(self):
         """Find a Pet by Category"""
-        Pet("fido", "dog").save()
-        Pet("kitty", "cat").save()
+        Pet("fido", "dog").create()
+        Pet("kitty", "cat").create()
         pets = Pet.find_by_category("cat")
         self.assertNotEqual(len(pets), 0)
         self.assertEqual(pets[0].category, "cat")
@@ -211,23 +211,23 @@ class TestPets(TestCase):
 
     def test_find_by_availability(self):
         """Find a Pet by Availability"""
-        Pet("fido", "dog", False).save()
-        Pet("kitty", "cat", True).save()
+        Pet("fido", "dog", False).create()
+        Pet("kitty", "cat", True).create()
         pets = Pet.find_by_availability(True)
         self.assertEqual(len(pets), 1)
         self.assertEqual(pets[0].name, "kitty")
 
     def test_create_query_index(self):
         """Test create query index"""
-        Pet("fido", "dog", False).save()
-        Pet("kitty", "cat", True).save()
+        Pet("fido", "dog", False).create()
+        Pet("kitty", "cat", True).create()
         Pet.create_query_index("category")
 
     def test_disconnect(self):
         """Test Disconnet"""
         Pet.disconnect()
         pet = Pet("fido", "dog", False)
-        self.assertRaises(AttributeError, pet.save)
+        self.assertRaises(AttributeError, pet.create)
 
     @patch("cloudant.database.CloudantDatabase.create_document")
     def test_http_error(self, bad_mock):
@@ -250,7 +250,7 @@ class TestPets(TestCase):
         """Test KeyError on update"""
         bad_mock.side_effect = KeyError()
         pet = Pet("fido", "dog", False)
-        pet.save()
+        pet.create()
         pet.name = "Fifi"
         pet.update()
         # self.assertEqual(pet.name, 'fido')

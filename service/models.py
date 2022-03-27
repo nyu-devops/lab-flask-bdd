@@ -1,5 +1,5 @@
 ######################################################################
-# Copyright 2016, 2021 John Rofrano. All Rights Reserved.
+# Copyright 2016, 2022 John Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import json
 import logging
 from enum import Enum
 from retry import retry
+from datetime import datetime
 from cloudant.client import Cloudant
 from cloudant.query import Query
 from cloudant.adapters import Replay429Adapter
@@ -61,8 +62,10 @@ class DatabaseConnectionError(Exception):
 class DataValidationError(Exception):
     """Custom Exception with data validation fails"""
 
+
 class Gender(Enum):
     """Enumeration of valid Pet Genders"""
+
     MALE = 0
     FEMALE = 1
     UNKNOWN = 3
@@ -79,23 +82,23 @@ class Pet:
     client: Cloudant = None
     database: CloudantDatabase = None
 
-    def __init__(self, name:str = None, category:str = None, 
-                available:bool =True, gender: Gender = Gender.UNKNOWN
-        ):
+    def __init__(
+        self,
+        name: str = None,
+        category: str = None,
+        available: bool = True,
+        gender: Gender = Gender.UNKNOWN,
+        birthday: datetime = datetime.now(),
+    ):
         """Constructor"""
         self.id = None  # pylint: disable=invalid-name
         self.name = name
         self.category = category
         self.available = available
         self.gender = gender
+        self.birthday = birthday
 
-    @retry(
-        HTTPError,
-        delay=RETRY_DELAY,
-        backoff=RETRY_BACKOFF,
-        tries=RETRY_COUNT,
-        logger=logger,
-    )
+    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
     def create(self):
         """
         Creates a new Pet in the database
@@ -112,13 +115,7 @@ class Pet:
         if document.exists():
             self.id = document["_id"]
 
-    @retry(
-        HTTPError,
-        delay=RETRY_DELAY,
-        backoff=RETRY_BACKOFF,
-        tries=RETRY_COUNT,
-        logger=logger,
-    )
+    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
     def update(self):
         """Updates a Pet in the database"""
         try:
@@ -129,29 +126,7 @@ class Pet:
             document.update(self.serialize())
             document.save()
 
-    @retry(
-        HTTPError,
-        delay=RETRY_DELAY,
-        backoff=RETRY_BACKOFF,
-        tries=RETRY_COUNT,
-        logger=logger,
-    )
-    def save(self):
-        """Saves a Pet in the database"""
-        if self.name is None:  # name is the only required field
-            raise DataValidationError("name attribute is not set")
-        if self.id:
-            self.update()
-        else:
-            self.create()
-
-    @retry(
-        HTTPError,
-        delay=RETRY_DELAY,
-        backoff=RETRY_BACKOFF,
-        tries=RETRY_COUNT,
-        logger=logger,
-    )
+    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
     def delete(self):
         """Deletes a Pet from the database"""
         try:
@@ -167,7 +142,7 @@ class Pet:
             "name": self.name,
             "category": self.category,
             "available": self.available,
-            "gender": self.gender.name  # convert enum to string
+            "gender": self.gender.name,  # convert enum to string
         }
         if self.id:
             pet["_id"] = self.id
@@ -185,17 +160,12 @@ class Pet:
             if isinstance(data["available"], bool):
                 self.available = data["available"]
             else:
-                raise DataValidationError(
-                    "Invalid type for boolean [available]: "
-                    + str(type(data["available"]))
-                )
+                raise DataValidationError("Invalid type for boolean [available]: " + str(type(data["available"])))
             self.gender = getattr(Gender, data["gender"])  # create enum from string
         except KeyError as error:
             raise DataValidationError("Invalid pet: missing " + error.args[0])
         except TypeError as error:
-            raise DataValidationError(
-                "Invalid pet: body of request contained bad or no data"
-            )
+            raise DataValidationError("Invalid pet: body of request contained bad or no data")
 
         # if there is no id and the data has one, assign it
         if not self.id and "_id" in data:
@@ -218,40 +188,20 @@ class Pet:
         cls.client.disconnect()
 
     @classmethod
-    @retry(
-        HTTPError,
-        delay=RETRY_DELAY,
-        backoff=RETRY_BACKOFF,
-        tries=RETRY_COUNT,
-        logger=logger,
-    )
+    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
     def create_query_index(cls, field_name: str, order: str = "asc"):
         """Creates a new query index for searching"""
-        cls.database.create_query_index(
-            index_name=field_name, fields=[{field_name: order}]
-        )
+        cls.database.create_query_index(index_name=field_name, fields=[{field_name: order}])
 
     @classmethod
-    @retry(
-        HTTPError,
-        delay=RETRY_DELAY,
-        backoff=RETRY_BACKOFF,
-        tries=RETRY_COUNT,
-        logger=logger,
-    )
+    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
     def remove_all(cls):
         """Removes all documents from the database (use for testing)"""
         for document in cls.database:
             document.delete()
 
     @classmethod
-    @retry(
-        HTTPError,
-        delay=RETRY_DELAY,
-        backoff=RETRY_BACKOFF,
-        tries=RETRY_COUNT,
-        logger=logger,
-    )
+    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
     def all(cls):
         """Query that returns all Pets"""
         results = []
@@ -266,13 +216,7 @@ class Pet:
     ######################################################################
 
     @classmethod
-    @retry(
-        HTTPError,
-        delay=RETRY_DELAY,
-        backoff=RETRY_BACKOFF,
-        tries=RETRY_COUNT,
-        logger=logger,
-    )
+    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
     def find_by(cls, **kwargs):
         """Find records using selector"""
         query = Query(cls.database, selector=kwargs)
@@ -284,13 +228,7 @@ class Pet:
         return results
 
     @classmethod
-    @retry(
-        HTTPError,
-        delay=RETRY_DELAY,
-        backoff=RETRY_BACKOFF,
-        tries=RETRY_COUNT,
-        logger=logger,
-    )
+    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
     def find(cls, pet_id: str):
         """Query that finds Pets by their id"""
         try:
@@ -300,37 +238,19 @@ class Pet:
             return None
 
     @classmethod
-    @retry(
-        HTTPError,
-        delay=RETRY_DELAY,
-        backoff=RETRY_BACKOFF,
-        tries=RETRY_COUNT,
-        logger=logger,
-    )
+    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
     def find_by_name(cls, name: str):
         """Query that finds Pets by their name"""
         return cls.find_by(name=name)
 
     @classmethod
-    @retry(
-        HTTPError,
-        delay=RETRY_DELAY,
-        backoff=RETRY_BACKOFF,
-        tries=RETRY_COUNT,
-        logger=logger,
-    )
+    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
     def find_by_category(cls, category: str):
         """Query that finds Pets by their category"""
         return cls.find_by(category=category)
 
     @classmethod
-    @retry(
-        HTTPError,
-        delay=RETRY_DELAY,
-        backoff=RETRY_BACKOFF,
-        tries=RETRY_COUNT,
-        logger=logger,
-    )
+    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
     def find_by_availability(cls, available: bool = True):
         """Query that finds Pets by their availability"""
         return cls.find_by(available=available)
@@ -342,7 +262,7 @@ class Pet:
     @staticmethod
     def init_db(dbname: str = "pets"):
         """
-        Initialized Coundant database connection
+        Initialized Cloudant database connection
         """
         opts = {}
         # Try and get VCAP from the environment
@@ -373,8 +293,7 @@ class Pet:
 
         if any(k not in opts for k in ("host", "username", "password", "port", "url")):
             raise DatabaseConnectionError(
-                "Error - Failed to retrieve options. "
-                "Check that app is bound to a Cloudant service."
+                "Error - Failed to retrieve options. " "Check that app is bound to a Cloudant service."
             )
 
         Pet.logger.info("Cloudant Endpoint: %s", opts["url"])
@@ -402,6 +321,4 @@ class Pet:
             Pet.database = Pet.client.create_database(dbname)
         # check for success
         if not Pet.database.exists():
-            raise DatabaseConnectionError(
-                "Database [{}] could not be obtained".format(dbname)
-            )
+            raise DatabaseConnectionError("Database [{}] could not be obtained".format(dbname))
