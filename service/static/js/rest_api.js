@@ -15,6 +15,7 @@ $(function () {
             $("#pet_available").val("false");
         }
         $("#pet_gender").val(res.gender);
+        $("#pet_birthday").val(res.birthday);
     }
 
     /// Clears all form fields
@@ -23,6 +24,7 @@ $(function () {
         $("#pet_category").val("");
         $("#pet_available").val("");
         $("#pet_gender").val("");
+        $("#pet_birthday").val("");
     }
 
     // Updates the flash message area
@@ -41,12 +43,14 @@ $(function () {
         let category = $("#pet_category").val();
         let available = $("#pet_available").val() == "true";
         let gender = $("#pet_gender").val();
+        let birthday = $("#pet_birthday").val();
 
         let data = {
             "name": name,
             "category": category,
             "available": available,
-            "gender": gender
+            "gender": gender,
+            "birthday": birthday
         };
 
         $("#flash_message").empty();
@@ -80,12 +84,14 @@ $(function () {
         let category = $("#pet_category").val();
         let available = $("#pet_available").val() == "true";
         let gender = $("#pet_gender").val();
+        let birthday = $("#pet_birthday").val();
 
         let data = {
             "name": name,
             "category": category,
             "available": available,
-            "gender": gender
+            "gender": gender,
+            "birthday": birthday
         };
 
         $("#flash_message").empty();
@@ -219,16 +225,17 @@ $(function () {
             $("#search_results").empty();
             let table = '<table class="table table-striped" cellpadding="10">'
             table += '<thead><tr>'
-            table += '<th class="col-md-4">ID</th>'
-            table += '<th class="col-md-3">Name</th>'
-            table += '<th class="col-md-3">Category</th>'
+            table += '<th class="col-md-2">ID</th>'
+            table += '<th class="col-md-2">Name</th>'
+            table += '<th class="col-md-2">Category</th>'
             table += '<th class="col-md-2">Available</th>'
             table += '<th class="col-md-2">Gender</th>'
+            table += '<th class="col-md-2">Birthday</th>'
             table += '</tr></thead><tbody>'
             let firstPet = "";
             for(let i = 0; i < res.length; i++) {
                 let pet = res[i];
-                table +=  `<tr id="row_${i}"><td>${pet._id}</td><td>${pet.name}</td><td>${pet.category}</td><td>${pet.available}</td><td>${pet.gender}</td></tr>`;
+                table +=  `<tr id="row_${i}"><td>${pet._id}</td><td>${pet.name}</td><td>${pet.category}</td><td>${pet.available}</td><td>${pet.gender}</td><td>${pet.birthday}</td></tr>`;
                 if (i == 0) {
                     firstPet = pet;
                 }

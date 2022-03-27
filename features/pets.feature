@@ -5,10 +5,10 @@ Feature: The pet store service back-end
 
 Background:
     Given the following pets
-        | name       | category | available | gender  |
-        | fido       | dog      | True      | MALE    |
-        | kitty      | cat      | True      | FEMALE  |
-        | leo        | lion     | False     | UNKNOWN |
+        | name       | category | available | gender  | birthday   |
+        | fido       | dog      | True      | MALE    | 2019-11-18 |
+        | kitty      | cat      | True      | FEMALE  | 2020-08-13 |
+        | leo        | lion     | False     | UNKNOWN | 2021-04-01 |
 
 Scenario: The server is running
     When I visit the "Home Page"
@@ -20,6 +20,8 @@ Scenario: Create a Pet
     And I set the "Name" to "Happy"
     And I set the "Category" to "Hippo"
     And I select "False" in the "Available" dropdown
+    And I select "Male" in the "Gender" dropdown
+    And I set the "Birthday" to "2022-01-01"
     And I press the "Create" button
     Then I should see the message "Success"
     When I copy the "Id" field
@@ -32,6 +34,8 @@ Scenario: Create a Pet
     Then I should see "Happy" in the "Name" field
     And I should see "Hippo" in the "Category" field
     And I should see "False" in the "Available" dropdown
+    And I should see "Male" in the "Gender" dropdown
+    And I should see "2022-01-01" in the "Birthday" field
 
 Scenario: List all pets
     When I visit the "Home Page"
