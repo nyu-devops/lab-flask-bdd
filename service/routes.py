@@ -1,5 +1,5 @@
 ######################################################################
-# Copyright 2016, 2021 John J. Rofrano. All Rights Reserved.
+# Copyright 2016, 2022 John J. Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,9 +50,7 @@ def healthcheck():
 ######################################################################
 @app.route("/")
 def index():
-    # data = '{name: <string>, category: <string>}'
-    # url = request.base_url + 'pets' # url_for('list_pets')
-    # return jsonify(name='Pet Demo REST API Service', version='1.0', url=url, data=data), status.HTTP_200_OK
+    """Base URL for our service"""
     return app.send_static_file("index.html")
 
 
@@ -68,9 +66,11 @@ def list_pets():
     category = request.args.get("category")
     name = request.args.get("name")
     available = request.args.get("available")
+    gender = request.args.get("gender")
 
     if available:  # convert to boolean
         available = available.lower() in ["true", "yes", "1"]
+
     if category:
         app.logger.info("Find by category: %s", category)
         pets = Pet.find_by_category(category)
@@ -80,6 +80,9 @@ def list_pets():
     elif available:
         app.logger.info("Find by available: %s", available)
         pets = Pet.find_by_availability(available)
+    elif gender:
+        app.logger.info("Find by gender: %s", gender)
+        pets = Pet.find_by_gender(gender)
     else:
         app.logger.info("Find all")
         pets = Pet.all()
@@ -122,14 +125,20 @@ def create_pets():
     data = {}
     # Check for form submission data
     if request.headers.get("Content-Type") == "application/x-www-form-urlencoded":
-        app.logger.info("Getting data from form submit")
-        data = {"name": request.form["name"], "category": request.form["category"], "available": True, "gender": "UNKNOWN"}
+        app.logger.info("Getting data from FORM submit")
+        data = {
+            "name": request.form["name"],
+            "category": request.form["category"],
+            "available": request.form["available"] in ['True', 'true', '1'],
+            "gender": request.form["gender"],
+            "birthday": request.form["birthday"]
+        }
     else:
         check_content_type("application/json")
         app.logger.info("Getting json data from API call")
         data = request.get_json()
 
-    app.logger.info(data)
+    app.logger.info("Processing: %s", data)
     pet = Pet()
     pet.deserialize(data)
     pet.create()
@@ -192,11 +201,11 @@ def purchase_pets(pet_id):
     """Purchasing a Pet makes it unavailable"""
     pet = Pet.find(pet_id)
     if not pet:
-        abort(status.HTTP_404_NOT_FOUND, "Pet with id '{}' was not found.".format(pet_id))
+        abort(status.HTTP_404_NOT_FOUND, f"Pet with id '{pet_id}' was not found.")
     if not pet.available:
         abort(
-            status.HTTP_400_BAD_REQUEST,
-            "Pet with id '{}' is not available.".format(pet_id),
+            status.HTTP_409_CONFLICT,
+            f"Pet with id '{pet_id}' is not available.",
         )
     pet.available = False
     pet.update()
@@ -214,13 +223,6 @@ def init_db(dbname="pets"):
     Pet.init_db(dbname)
 
 
-# load sample data
-def data_load(payload):
-    """Loads a Pet into the database"""
-    pet = Pet(payload["name"], payload["category"], payload["available"])
-    pet.create()
-
-
 def data_reset():
     """Removes all Pets from the database"""
     if app.testing:
@@ -233,7 +235,7 @@ def check_content_type(content_type):
         app.logger.error("No Content-Type specified.")
         abort(
             status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            "Content-Type must be {}".format(content_type),
+            f"Content-Type must be {content_type}",
         )
 
     if request.headers["Content-Type"] == content_type:
@@ -242,7 +244,7 @@ def check_content_type(content_type):
     app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
     abort(
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        "Content-Type must be {}".format(content_type),
+        f"Content-Type must be {content_type}",
     )
 
 

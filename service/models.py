@@ -35,8 +35,9 @@ import os
 import json
 import logging
 from enum import Enum
+from signal import raise_signal
 from retry import retry
-from datetime import datetime
+from datetime import date
 from cloudant.client import Cloudant
 from cloudant.query import Query
 from cloudant.adapters import Replay429Adapter
@@ -88,7 +89,7 @@ class Pet:
         category: str = None,
         available: bool = True,
         gender: Gender = Gender.UNKNOWN,
-        birthday: datetime = datetime.now(),
+        birthday: date = date.today(),
     ):
         """Constructor"""
         self.id = None  # pylint: disable=invalid-name
@@ -97,6 +98,9 @@ class Pet:
         self.available = available
         self.gender = gender
         self.birthday = birthday
+
+    def __repr__(self):
+        return f"<Pet {self.name} id=[{self.id}]>"
 
     @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
     def create(self):
@@ -143,6 +147,7 @@ class Pet:
             "category": self.category,
             "available": self.available,
             "gender": self.gender.name,  # convert enum to string
+            "birthday": self.birthday.isoformat()
         }
         if self.id:
             pet["_id"] = self.id
@@ -162,6 +167,7 @@ class Pet:
             else:
                 raise DataValidationError("Invalid type for boolean [available]: " + str(type(data["available"])))
             self.gender = getattr(Gender, data["gender"])  # create enum from string
+            self.birthday = date.fromisoformat(data["birthday"])
         except KeyError as error:
             raise DataValidationError("Invalid pet: missing " + error.args[0])
         except TypeError as error:
@@ -233,6 +239,10 @@ class Pet:
         """Query that finds Pets by their id"""
         try:
             document = cls.database[pet_id]
+            # Cloudant doesn't delete documents. :( It leaves the _id with no data
+            # so we must validate that _id that came back has a valid _rev
+            # if this next line throws a KeyError the document was deleted
+            _ = document['_rev']
             return Pet().deserialize(document)
         except KeyError:
             return None
@@ -254,6 +264,12 @@ class Pet:
     def find_by_availability(cls, available: bool = True):
         """Query that finds Pets by their availability"""
         return cls.find_by(available=available)
+
+    @classmethod
+    @retry(HTTPError, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
+    def find_by_gender(cls, gender: str = Gender.UNKNOWN.name):
+        """Query that finds Pets by their gender as a string"""
+        return cls.find_by(gender=gender)
 
     ############################################################
     #  C L O U D A N T   D A T A B A S E   C O N N E C T I O N

@@ -15,8 +15,9 @@
 """
 Test Factory to make fake objects for testing
 """
+from datetime import date
 import factory
-from factory.fuzzy import FuzzyChoice
+from factory.fuzzy import FuzzyChoice, FuzzyDate
 from service.models import Pet, Gender
 
 
@@ -25,9 +26,11 @@ class PetFactory(factory.Factory):
 
     class Meta:  # pylint: disable=too-few-public-methods
         """Maps factory to data model"""
+
         model = Pet
 
     name = factory.Faker("first_name")
-    category = FuzzyChoice(choices=["dog", "cat", "bird", "fish"])
+    category = FuzzyChoice(choices=["dog", "cat", "bird", "fish", "reptile"])
     available = FuzzyChoice(choices=[True, False])
     gender = FuzzyChoice(choices=[Gender.MALE, Gender.FEMALE, Gender.UNKNOWN])
+    birthday = FuzzyDate(date(2019,1,1))
