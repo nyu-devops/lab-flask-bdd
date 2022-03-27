@@ -38,18 +38,24 @@
           </div> <!-- form horizontal -->
 
           <div class="form-horizontal">
+
+            <!-- NAME -->
             <div class="form-group">
               <label class="control-label col-sm-2" for="pet_name">Name:</label>
               <div class="col-sm-10">
                 <input type="text" class="form-control" id="pet_name" placeholder="Enter name for Pet">
               </div>
             </div>
+
+            <!-- CATEGORY -->
             <div class="form-group">
               <label class="control-label col-sm-2" for="pet_category">Category:</label>
               <div class="col-sm-10">
                 <input type="text" class="form-control" id="pet_category" placeholder="Enter category for Pet">
               </div>
             </div>
+
+            <!-- AVAILABLE -->
             <div class="form-group">
               <label class="control-label col-sm-2" for="pet_available">Available:</label>
               <div class="col-sm-10">
@@ -59,6 +65,29 @@
                 </select>
               </div>
             </div>
+
+            <!-- GENDER -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="pet_gender">Gender:</label>
+              <div class="col-sm-10">
+                <select class="form-control" id="pet_gender">
+                  <option value="UNKNOWN" selected>Unknown</option>
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- BIRTHDAY -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="pet_birthday">Category:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="pet_birthday" placeholder="2020-04-01">
+              </div>
+            </div>
+
+
+            <!-- SUBMIT BUTTONS -->
             <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
                 <button type="submit" class="btn btn-primary" id="search-btn">Search</button>
@@ -80,6 +109,8 @@
             <th class="col-md-4">Name</th>
             <th class="col-md-4">Category</th>
             <th class="col-md-3">Available</th>
+            <th class="col-md-3">Gender</th>
+            <th class="col-md-3">Birthday</th>
           </tr>
           </thead>
         </table>

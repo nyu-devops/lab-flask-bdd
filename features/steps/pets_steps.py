@@ -44,8 +44,10 @@ def step_impl(context):
         data = {
             "name": row['name'],
             "category": row['category'],
-            "available": row['available'] in ['True', 'true', '1']
-            }
+            "available": row['available'] in ['True', 'true', '1'],
+            "gender": row['gender'],
+            "birthday": row['birthday']
+        }
         payload = json.dumps(data)
         context.resp = requests.post(create_url, data=payload, headers=headers)
         expect(context.resp.status_code).to_equal(201)

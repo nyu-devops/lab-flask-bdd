@@ -14,6 +14,7 @@ services:
     environment:
       FLASK_APP: service:app
       FLASK_ENV: development
+      GUNICORN_BIND: "0.0.0.0:8000"
       BINDING_CLOUDANT: '{"username":"admin","password":"pass","host":"couchdb","port":5984,"url":"http://admin:pass@couchdb:5984"}'
     networks:
       - dev
