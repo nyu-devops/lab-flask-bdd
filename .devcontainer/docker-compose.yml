@@ -6,6 +6,7 @@ services:
       context: ..
       dockerfile: .devcontainer/Dockerfile
     hostname: nyu
+    container_name: lab-flask-bdd
     # ports:
     #   - 8080:8080
     volumes:
@@ -25,6 +26,7 @@ services:
   couchdb:
     image: couchdb:latest
     hostname: couchdb
+    container_name: lab-flask-bdd-couchdb
     ports:
       - 5984:5984
     volumes:
