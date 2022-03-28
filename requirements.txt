@@ -1,3 +1,6 @@
+# Werkzeug keeps breakng Flask!
+Werkzeug==2.0.3
+
 # Runtime dependencies
 Flask==2.0.2
 cloudant==2.15.0
