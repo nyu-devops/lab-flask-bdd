@@ -1,5 +1,9 @@
-# Image for a Python 3 development environment
+# Image for a Python 3 development environment with selenium
 # FROM python:3.9-slim
+# RUN apt-get update && apt-get install -y \
+#     chromium-driver \
+#     python3-selenium
+
 # This image has selenium and chrome driver already installed
 FROM rofrano/pipeline-selenium:latest
 
@@ -21,19 +25,13 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
-# # Add selenium and chrome driver
-# RUN apt-get update && apt-get install -y \
-#     chromium-driver \
-#     python3-selenium
-
 # Set up the Python development environment
 WORKDIR /app
-COPY requirements.txt .
-# Chrome has broken the build. Need to pin a working version :(
-RUN python -m pip install --upgrade pip wheel && \
-    pip install -r requirements.txt
+ENV PIPENV_VENV_IN_PROJECT "enabled"
+RUN python -m pip install --upgrade pip wheel pipenv
 
-EXPOSE 8080
+ENV PORT 8080
+EXPOSE $PORT
 
 # Enable color terminal for docker exec bash
 ENV TERM=xterm-256color

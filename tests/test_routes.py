@@ -30,6 +30,10 @@ from service import routes
 from service.utils import status
 from .factories import PetFactory
 
+# Disable all but critical errors during normal test run
+# uncomment for debugging failing tests
+logging.disable(logging.CRITICAL)
+
 BASE_URL = "/pets"
 CONTENT_TYPE_JSON = "application/json"
 
@@ -42,7 +46,6 @@ class TestPetRoutes(TestCase):
     @classmethod
     def setUpClass(cls):
         """Run once before all tests"""
-        # app.logger.setLevel(logging.CRITICAL)
         routes.initialize_logging(logging.INFO)
         routes.init_db("test")
 

@@ -1,5 +1,5 @@
 {
-	"name": "Python 3 & CouchDB",
+	"name": "Python & CouchDB",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/app",
@@ -24,6 +24,6 @@
 		"bbenoist.vagrant"
 	],
 	// "forwardPorts": [8080],
-	// Create .env file if it doesn't exist
-	"postCreateCommand": "if [ ! -f .env ]; then cp dot-env-example .env; fi; "
+	// Create .env file if it doesn't exist and install package dependencies with pipenv
+	"postCreateCommand": "if [ ! -f .env ]; then cp dot-env-example .env; fi; pipenv install --dev"
 }
