@@ -23,15 +23,14 @@ nosetests --stop tests/test_pets.py:TestPets
 """
 
 import logging
-import os
-import json
 from datetime import date
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from requests import HTTPError, ConnectionError
 from service.models import Pet, Gender, DataValidationError, DatabaseConnectionError
-from .factories import PetFactory
+from tests.factories import PetFactory
 
+# cspell:ignore VCAP SQLDB
 VCAP_SERVICES = {
     "cloudantNoSQLDB": [
         {
@@ -260,7 +259,7 @@ class TestPetModel(TestCase):
 
     def test_create_query_index(self):
         """Test create query index"""
-        pets = self._create_pets(5)
+        self._create_pets(5)
         Pet.create_query_index("category")
 
     def test_disconnect(self):

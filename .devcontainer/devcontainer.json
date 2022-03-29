@@ -1,3 +1,4 @@
+// cspell:disable
 {
 	"name": "Python & CouchDB",
 	"dockerComposeFile": "docker-compose.yml",
@@ -21,6 +22,7 @@
 		"redhat.vscode-yaml",
 		"streetsidesoftware.code-spell-checker",
 		"wholroyd.jinja",
+		"LittleFoxTeam.vscode-python-test-adapter",
 		"bbenoist.vagrant"
 	],
 	// "forwardPorts": [8080],

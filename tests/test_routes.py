@@ -28,7 +28,7 @@ from urllib.parse import quote_plus
 from werkzeug.datastructures import MultiDict, ImmutableMultiDict
 from service import routes
 from service.utils import status
-from .factories import PetFactory
+from tests.factories import PetFactory
 
 # Disable all but critical errors during normal test run
 # uncomment for debugging failing tests
@@ -118,11 +118,11 @@ class TestPetRoutes(TestCase):
             BASE_URL, json=test_pet.serialize(), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        
+
         # Make sure location header is set
         location = resp.headers.get("Location", None)
         self.assertIsNotNone(location)
-        
+
         # Check the data is correct
         new_pet = resp.get_json()
         self.assertEqual(new_pet["name"], test_pet.name)
@@ -130,7 +130,7 @@ class TestPetRoutes(TestCase):
         self.assertEqual(new_pet["available"], test_pet.available)
         self.assertEqual(new_pet["gender"], test_pet.gender.name)
         self.assertEqual(new_pet["birthday"], test_pet.birthday.isoformat())
-        
+
         # Check that the location header was correct
         resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -309,7 +309,7 @@ class TestPetRoutes(TestCase):
     def test_purchase_a_pet(self):
         """Purchase a Pet"""
         pets = self._create_pets(10)
-        available_pets = [pet for pet in pets if pet.available == True]
+        available_pets = [pet for pet in pets if pet.available is True]
         pet = available_pets[0]
         resp = self.app.put(f"{BASE_URL}/{pet.id}/purchase", content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -322,7 +322,7 @@ class TestPetRoutes(TestCase):
     def test_purchase_not_available(self):
         """Purchase a Pet that is not available"""
         pets = self._create_pets(10)
-        unavailable_pets = [pet for pet in pets if pet.available == False]
+        unavailable_pets = [pet for pet in pets if pet.available is False]
         pet = unavailable_pets[0]
         resp = self.app.put(f"{BASE_URL}/{pet.id}/purchase", content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
