@@ -25,5 +25,6 @@
 		"wholroyd.jinja",
 		"bbenoist.vagrant"
 	],
-	"postCreateCommand": "pipenv sync --dev"
+	// Create .env file if it doesn't exist
+	"postCreateCommand": "if [ ! -f .env ]; then cp dot-env-example .env; fi; "
 }
