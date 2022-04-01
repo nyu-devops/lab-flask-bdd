@@ -2,6 +2,7 @@
 
 [![Build Status](https://github.com/nyu-devops/lab-flask-bdd/actions/workflows/tdd-tests.yml/badge.svg)](https://github.com/nyu-devops/lab-flask-bdd/actions)
 [![Build Status](https://github.com/nyu-devops/lab-flask-bdd/actions/workflows/bdd-tests.yml/badge.svg)](https://github.com/nyu-devops/lab-flask-bdd/actions)
+[![Open in Remote - Containers](https://img.shields.io/static/v1?label=Remote%20-%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/nyu-devops/lab-flask-bdd)
 
 This repository is a lab from the *NYU DevOps and Agile Methodologies* graduate course [CSCI-GA.2820-001](https://cs.nyu.edu/courses/spring21/CSCI-GA.2820-001/) on Behavior Driven Development with Flask and Behave
 
