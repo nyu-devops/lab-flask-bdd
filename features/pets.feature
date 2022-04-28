@@ -32,7 +32,8 @@ Scenario: Create a Pet
     And the "Category" field should be empty
     When I paste the "Id" field
     And I press the "Retrieve" button
-    Then I should see "Happy" in the "Name" field
+    Then I should see the message "Success"
+    And I should see "Happy" in the "Name" field
     And I should see "Hippo" in the "Category" field
     And I should see "False" in the "Available" dropdown
     And I should see "Male" in the "Gender" dropdown
@@ -41,7 +42,8 @@ Scenario: Create a Pet
 Scenario: List all pets
     When I visit the "Home Page"
     And I press the "Search" button
-    Then I should see "fido" in the results
+    Then I should see the message "Success"
+    And I should see "fido" in the results
     And I should see "kitty" in the results
     And I should not see "leo" in the results
 
@@ -49,7 +51,8 @@ Scenario: Search for dogs
     When I visit the "Home Page"
     And I set the "Category" to "dog"
     And I press the "Search" button
-    Then I should see "fido" in the results
+    Then I should see the message "Success"
+    And I should see "fido" in the results
     And I should not see "kitty" in the results
     And I should not see "leo" in the results
 
@@ -57,7 +60,8 @@ Scenario: Search for available
     When I visit the "Home Page"
     And I select "True" in the "Available" dropdown
     And I press the "Search" button
-    Then I should see "fido" in the results
+    Then I should see the message "Success"
+    And I should see "fido" in the results
     And I should see "kitty" in the results
     And I should see "sammy" in the results
     And I should not see "leo" in the results
@@ -66,7 +70,8 @@ Scenario: Update a Pet
     When I visit the "Home Page"
     And I set the "Name" to "fido"
     And I press the "Search" button
-    Then I should see "fido" in the "Name" field
+    Then I should see the message "Success"
+    And I should see "fido" in the "Name" field
     And I should see "dog" in the "Category" field
     When I change "Name" to "Boxer"
     And I press the "Update" button
@@ -75,8 +80,10 @@ Scenario: Update a Pet
     And I press the "Clear" button
     And I paste the "Id" field
     And I press the "Retrieve" button
-    Then I should see "Boxer" in the "Name" field
+    Then I should see the message "Success"
+    And I should see "Boxer" in the "Name" field
     When I press the "Clear" button
     And I press the "Search" button
-    Then I should see "Boxer" in the results
-    Then I should not see "fido" in the results
+    Then I should see the message "Success"
+    And I should see "Boxer" in the results
+    And I should not see "fido" in the results
