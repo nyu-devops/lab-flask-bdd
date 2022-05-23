@@ -30,24 +30,22 @@ from compare import expect
 @given('the following pets')
 def step_impl(context):
     """ Delete all Pets and load new ones """
-    headers = {'Content-Type': 'application/json'}
-    # list all of the pets and delete them one by one
-    context.resp = requests.get(context.base_url + '/pets')
+    # List all of the pets and delete them one by one
+    rest_endpoint = f"{context.BASE_URL}/pets"
+    context.resp = requests.get(rest_endpoint)
     expect(context.resp.status_code).to_equal(200)
     for pet in context.resp.json():
-        context.resp = requests.delete(context.base_url + '/pets/' + str(pet["_id"]))
+        context.resp = requests.delete(f"{rest_endpoint}/{pet['_id']}")
         expect(context.resp.status_code).to_equal(204)
     
     # load the database with new pets
-    create_url = context.base_url + '/pets'
     for row in context.table:
-        data = {
+        payload = {
             "name": row['name'],
             "category": row['category'],
             "available": row['available'] in ['True', 'true', '1'],
             "gender": row['gender'],
             "birthday": row['birthday']
         }
-        payload = json.dumps(data)
-        context.resp = requests.post(create_url, data=payload, headers=headers)
+        context.resp = requests.post(rest_endpoint, json=payload)
         expect(context.resp.status_code).to_equal(201)

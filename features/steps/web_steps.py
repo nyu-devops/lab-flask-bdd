@@ -28,8 +28,7 @@ import logging
 from behave import when, then
 from compare import expect, ensure
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
 ID_PREFIX = 'pet_'
@@ -37,7 +36,7 @@ ID_PREFIX = 'pet_'
 @when('I visit the "home page"')
 def step_impl(context):
     """ Make a call to the base URL """
-    context.driver.get(context.base_url)
+    context.driver.get(context.BASE_URL)
     # Uncomment next line to take a screenshot of the web page
     #context.driver.save_screenshot('home_page.png')
 
@@ -46,12 +45,11 @@ def step_impl(context, message):
     """ Check the document title for a message """
     expect(context.driver.title).to_contain(message)
 
-@then('I should not see "{message}"')
-def step_impl(context, message):
-    elements = context.driver.find_elements(By.TAG_NAME, 'body')
-    body = elements[0].text
-    error_msg = "I should not see '%s' in '%s'" % (message, body)
-    ensure(message in body, False, error_msg)
+@then('I should not see "{text_string}"')
+def step_impl(context, text_string):
+    element = context.driver.find_element(By.TAG_NAME, 'body')
+    error_msg = "I should not see '%s' in '%s'" % (text_string, element.text)
+    ensure(text_string in element.text, False, error_msg)
 
 @when('I set the "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
