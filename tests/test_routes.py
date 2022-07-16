@@ -98,9 +98,16 @@ class TestPetRoutes(TestCase):
     ############################################################
     def test_index(self):
         """It should return the index page"""
-        resp = self.client.get("/")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertIn(b"Pet Demo REST API Service", resp.data)
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn(b"Pet Demo REST API Service", response.data)
+
+    def test_health(self):
+        """It should be healthy"""
+        response = self.client.get("/health")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data['message'], 'OK')
 
     # ----------------------------------------------------------
     # TEST LIST
@@ -174,13 +181,13 @@ class TestPetRoutes(TestCase):
         pet_data.add("birthday", pet["birthday"])
         data = ImmutableMultiDict(pet_data)
         logging.debug("Sending Pet data: %s", data)
-        resp = self.client.post(BASE_URL, data=data, content_type="application/x-www-form-urlencoded")
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        response = self.client.post(BASE_URL, data=data, content_type="application/x-www-form-urlencoded")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
-        location = resp.headers.get("Location", None)
+        location = response.headers.get("Location", None)
         self.assertNotEqual(location, None)
         # Check the data is correct
-        data = resp.get_json()
+        data = response.get_json()
         logging.debug("data = %s", data)
         self.assertEqual(data["name"], pet["name"])
 
@@ -190,23 +197,23 @@ class TestPetRoutes(TestCase):
         new_pet = pet.serialize()
         del new_pet["name"]
         logging.debug("Pet no name: %s", new_pet)
-        resp = self.client.post(BASE_URL, json=new_pet)
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.client.post(BASE_URL, json=new_pet)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_pet_no_content_type(self):
         """It should not Create a Pet with no Content-Type"""
-        resp = self.client.post(BASE_URL, data="bad data")
-        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        response = self.client.post(BASE_URL, data="bad data")
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_create_pet_wrong_content_type(self):
         """It should not Create a Pet with wrong Content-Type"""
-        resp = self.client.post(BASE_URL, data={}, content_type="plain/text")
-        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        response = self.client.post(BASE_URL, data={}, content_type="plain/text")
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     def test_call_create_with_an_id(self):
         """It should not allow calling endpoint incorrectly"""
-        resp = self.client.post(f"{BASE_URL}/0", json={})
-        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        response = self.client.post(f"{BASE_URL}/0", json={})
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     # ----------------------------------------------------------
     # TEST UPDATE
@@ -232,17 +239,13 @@ class TestPetRoutes(TestCase):
         pet = self._create_pets()[0]
         pet_data = pet.serialize()
         del pet_data["name"]
-        resp = self.client.put(
-            f"{BASE_URL}/{pet.id}",
-            json=pet_data,
-            content_type="application/json"
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        response = self.client.put(f"{BASE_URL}/{pet.id}", json=pet_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_pet_not_found(self):
         """It should not Update a Pet that doesn't exist"""
-        resp = self.client.put(f"{BASE_URL}/foo", json={}, content_type="application/json")
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        response = self.client.put(f"{BASE_URL}/foo", json={})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     # ----------------------------------------------------------
     # TEST DELETE
@@ -252,20 +255,20 @@ class TestPetRoutes(TestCase):
         pets = self._create_pets(5)
         pet_count = self.get_pet_count()
         test_pet = pets[0]
-        resp = self.client.delete(f"{BASE_URL}/{test_pet.id}")
-        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(len(resp.data), 0)
+        response = self.client.delete(f"{BASE_URL}/{test_pet.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
         # make sure they are deleted
-        resp = self.client.get(f"{BASE_URL}/{test_pet.id}")
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        response = self.client.get(f"{BASE_URL}/{test_pet.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         new_count = self.get_pet_count()
         self.assertEqual(new_count, pet_count - 1)
 
     def test_delete_non_existing_pet(self):
         """It should Delete a Pet even if it doesn't exist"""
-        resp = self.client.delete(f"{BASE_URL}/0")
-        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(len(resp.data), 0)
+        response = self.client.delete(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
 
     # ----------------------------------------------------------
     # TEST QUERY
@@ -275,11 +278,11 @@ class TestPetRoutes(TestCase):
         pets = self._create_pets(5)
         test_name = pets[0].name
         name_count = len([pet for pet in pets if pet.name == test_name])
-        resp = self.client.get(
+        response = self.client.get(
             BASE_URL, query_string=f"name={quote_plus(test_name)}"
         )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
         self.assertEqual(len(data), name_count)
         # check the data just to be sure
         for pet in data:
@@ -312,22 +315,22 @@ class TestPetRoutes(TestCase):
         logging.debug("Unavailable Pets [%d] %s", unavailable_count, unavailable_pets)
 
         # test for available
-        resp = self.client.get(
+        response = self.client.get(
             BASE_URL, query_string="available=true"
         )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
         self.assertEqual(len(data), available_count)
         # check the data just to be sure
         for pet in data:
             self.assertEqual(pet["available"], True)
 
         # test for unavailable
-        resp = self.client.get(
+        response = self.client.get(
             BASE_URL, query_string="available=false"
         )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
         self.assertEqual(len(data), unavailable_count)
         # check the data just to be sure
         for pet in data:
@@ -341,11 +344,9 @@ class TestPetRoutes(TestCase):
         logging.debug("Female Pets [%d] %s", female_count, female_pets)
 
         # test for available
-        resp = self.client.get(
-            BASE_URL, query_string="gender=female"
-        )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
+        response = self.client.get(BASE_URL, query_string="gender=female")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
         self.assertEqual(len(data), female_count)
         # check the data just to be sure
         for pet in data:
@@ -359,11 +360,11 @@ class TestPetRoutes(TestCase):
         pets = self._create_pets(10)
         available_pets = [pet for pet in pets if pet.available is True]
         pet = available_pets[0]
-        resp = self.client.put(f"{BASE_URL}/{pet.id}/purchase", content_type="application/json")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        resp = self.client.get(f"{BASE_URL}/{pet.id}")
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
+        response = self.client.put(f"{BASE_URL}/{pet.id}/purchase")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(f"{BASE_URL}/{pet.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
         logging.debug("Response data: %s", data)
         self.assertEqual(data["available"], False)
 
@@ -372,8 +373,8 @@ class TestPetRoutes(TestCase):
         pets = self._create_pets(10)
         unavailable_pets = [pet for pet in pets if pet.available is False]
         pet = unavailable_pets[0]
-        resp = self.client.put(f"{BASE_URL}/{pet.id}/purchase", content_type="application/json")
-        self.assertEqual(resp.status_code, status.HTTP_409_CONFLICT)
+        response = self.client.put(f"{BASE_URL}/{pet.id}/purchase")
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
     ######################################################################
     # Utility functions
@@ -381,8 +382,8 @@ class TestPetRoutes(TestCase):
 
     def get_pet_count(self):
         """save the current number of pets"""
-        resp = self.client.get(BASE_URL)
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
         # logging.debug("data = %s", data)
         return len(data)
