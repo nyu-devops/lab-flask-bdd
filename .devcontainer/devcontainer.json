@@ -1,6 +1,6 @@
 // cspell:disable
 {
-	"name": "Python & CouchDB",
+	"name": "Python 3 & PostgeSQL",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/app",
@@ -8,6 +8,7 @@
 	"extensions": [
 		"VisualStudioExptTeam.vscodeintellicode",
 		"ms-python.python",
+        "ms-python.pylint",
 		"ms-python.vscode-pylance",
 		"alexkrechik.cucumberautocomplete",
 		"cstrap.flask-snippets",
@@ -26,5 +27,5 @@
 		"bbenoist.vagrant"
 	],
 	// Create .env file if it doesn't exist
-	"postCreateCommand": "if [ ! -f .env ]; then cp dot-env-example .env; fi; "
+	"postCreateCommand": "if [ ! -f .env ]; then cp dot-env-example .env; fi; sudo pip install -r requirements.txt"
 }
