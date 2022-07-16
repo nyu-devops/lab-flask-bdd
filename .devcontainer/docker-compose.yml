@@ -1,3 +1,5 @@
+---
+# Python 3 with PostgreSQL
 version: "3"
 
 services:
@@ -7,51 +9,32 @@ services:
       dockerfile: .devcontainer/Dockerfile
     hostname: nyu
     container_name: lab-flask-bdd
-    # ports:
-    #   - 8080:8080
     volumes:
       - ..:/app
     command: sleep infinity
     environment:
       FLASK_APP: service:app
       FLASK_ENV: development
-      GUNICORN_BIND: "0.0.0.0:8000"
-      BINDING_CLOUDANT: '{"username":"admin","password":"pass","host":"couchdb","port":5984,"url":"http://admin:pass@couchdb:5984"}'
+      GUNICORN_BIND: "0.0.0.0:8080"
+      DATABASE_URI: postgresql://postgres:postgres@postgres:5432/postgres
     networks:
       - dev
     depends_on:
-      - couchdb
+      - postgres
 
-  # CouchDB database service at: http://127.0.0.1:5984/_utils
-  couchdb:
-    image: couchdb:latest
-    hostname: couchdb
-    container_name: lab-flask-bdd-couchdb
-    ports:
-      - 5984:5984
-    volumes:
-      - couchdb:/opt/couchdb/data
+  postgres:
+    image: postgres:alpine
+    # ports:
+    #   - 5432:5432
     environment:
-      COUCHDB_USER: admin
-      COUCHDB_PASSWORD: pass
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
     networks:
       - dev
-
-  # Create a few databases needed by CouchDB
-  setup:
-    image: couchdb:latest
-    command: >
-      bash -c "echo '*** SETUP: waiting 15 seconds for couchdb to initialize...'; sleep 15
-      && curl -X PUT http://admin:pass@couchdb:5984/_users
-      && curl -X PUT http://admin:pass@couchdb:5984/_replicator
-      && curl -X PUT http://admin:pass@couchdb:5984/_global_changes"
-    networks:
-      - dev
-    depends_on:
-      - couchdb   
 
 volumes:
-  couchdb:
+  postgres:
 
 networks:
   dev:

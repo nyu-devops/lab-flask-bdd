@@ -1,16 +1,11 @@
-name: TDD Tests
-
+name: CI Build
 on:
   push:
-    branches:
-      - master
-    paths-ignore:
-      - '**.md'      
   pull_request:
     branches:
       - master
     paths-ignore:
-      - '**.md'      
+      - '**.md'
 
 jobs:
   build:
@@ -18,39 +13,52 @@ jobs:
     container: python:3.9-slim
 
     services:
-      couchdb:
-        image: couchdb:latest
-        ports:
-          - 5984:5984
+      postgres:
+        image: postgres
         env:
-          COUCHDB_USER: admin                  
-          COUCHDB_PASSWORD: pass                  
+          POSTGRES_PASSWORD: pgs3cr3t
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
         options: >-
-          --health-cmd "curl -X GET http://couchdb:5984/"
+          --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
 
+    # Steps for the build
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip wheel
-          pip install -r requirements.txt
-
-      - name: Create the test database
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Install OS dependencies
         run: |
           apt-get update
-          apt-get install -y curl
-          curl -X PUT http://admin:pass@couchdb:5984/test
+          apt-get install -y gcc libpq-dev
+
+      - name: Install Python packages
+        run: |
+          python -m pip install --upgrade pip wheel
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run Code Quality Checks
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
+          # Run pylint on the service
+          pylint service
 
       - name: Run unit tests with nose
-        run: nosetests
+        run: |
+          export FLASK_APP=service:app
+          nosetests
         env:
-          BINDING_CLOUDANT: '{"username":"admin","password":"pass","host":"couchdb","port":5984,"url":"http://admin:pass@couchdb:5984"}'
+          DATABASE_URI: "postgresql://postgres:pgs3cr3t@postgres:5432/testdb"
 
       - name: Upload code coverage
-        uses: codecov/codecov-action@v2  
+        uses: codecov/codecov-action@v2 
         with:
-          version: "v0.1.13"  
+          version: "v0.1.13"   

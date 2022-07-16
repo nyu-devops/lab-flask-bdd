@@ -1,5 +1,5 @@
 ######################################################################
-# Copyright 2016, 2021 John J. Rofrano. All Rights Reserved.
+# Copyright 2016, 2022 John J. Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,9 +21,10 @@ Package for the application models and service routes
 This module creates and configures the Flask app and sets up the logging
 and SQL database
 """
-import logging
+import sys
 from flask import Flask
-from .utils import log_handlers
+from service import config
+from service.utils import log_handlers
 
 # NOTE: Do not change the order of this code
 # The Flask app must be created
@@ -33,14 +34,12 @@ from .utils import log_handlers
 app = Flask(__name__)  # pylint: disable=invalid-name
 
 # Load Configurations
-app.config.from_object("config")
+app.config.from_object(config)
 
-# Dependencis rquire we import the routes AFTER the Flask app is created
-from service import (
-    routes,
-    models,
-)  # pylint: disable=wrong-import-position, wrong-import-order
-from .utils import error_handlers  # pylint: disable=wrong-import-position
+# Dependencies require we import the routes AFTER the Flask app is created
+# pylint: disable=wrong-import-position, wrong-import-order, cyclic-import
+from service import routes, models        # noqa: F401, E402
+from service.utils import error_handlers, cli_commands  # noqa: F401, E402
 
 # Set up logging for production
 log_handlers.init_logging(app, "gunicorn.error")
@@ -48,5 +47,12 @@ log_handlers.init_logging(app, "gunicorn.error")
 app.logger.info(70 * "*")
 app.logger.info("  P E T   S E R V I C E   R U N N I N G  ".center(70, "*"))
 app.logger.info(70 * "*")
+
+try:
+    models.init_db(app)  # make our sqlalchemy tables
+except Exception as error:  # pylint: disable=broad-except
+    app.logger.critical("%s: Cannot continue", error)
+    # gunicorn requires exit code 4 to stop spawning workers when they die
+    sys.exit(4)
 
 app.logger.info("Service inititalized!")

@@ -16,33 +16,20 @@
 
 """
 Pet Store Service with UI
-
-Paths:
-------
-GET / - Displays a UI for Selenium testing
-GET /pets - Returns a list all of the Pets
-GET /pets/{id} - Returns the Pet with a given id number
-POST /pets - creates a new Pet record in the database
-PUT /pets/{id} - updates a Pet record in the database
-DELETE /pets/{id} - deletes a Pet record in the database
 """
-
-import sys
-import logging
-from flask import jsonify, request, json, url_for, make_response, abort
+from flask import jsonify, request, url_for, make_response, abort
+from service.models import Pet, Gender
+from service.utils import status  # HTTP Status Codes
 from . import app
-from service.models import Pet
-from .utils import status  # HTTP Status Codes
-from .utils import error_handlers
 
 
 ######################################################################
 # GET HEALTH CHECK
 ######################################################################
-@app.route("/healthcheck")
+@app.route("/health")
 def healthcheck():
     """Let them know our heart is still beating"""
-    return make_response(jsonify(status=200, message="Healthy"), status.HTTP_200_OK)
+    return make_response(jsonify(status=200, message="OK"), status.HTTP_200_OK)
 
 
 ######################################################################
@@ -68,9 +55,6 @@ def list_pets():
     available = request.args.get("available")
     gender = request.args.get("gender")
 
-    if available:  # convert to boolean
-        available = available.lower() in ["true", "yes", "1"]
-
     if category:
         app.logger.info("Find by category: %s", category)
         pets = Pet.find_by_category(category)
@@ -79,23 +63,27 @@ def list_pets():
         pets = Pet.find_by_name(name)
     elif available:
         app.logger.info("Find by available: %s", available)
-        pets = Pet.find_by_availability(available)
+        # create bool from string
+        available_value = available.lower() in ["true", "yes", "1"]
+        pets = Pet.find_by_availability(available_value)
     elif gender:
         app.logger.info("Find by gender: %s", gender)
-        pets = Pet.find_by_gender(gender)
+        # create bool from string
+        gender_value = getattr(Gender, gender.upper())
+        pets = Pet.find_by_gender(gender_value)
     else:
         app.logger.info("Find all")
         pets = Pet.all()
 
-    app.logger.info("[%s] Pets returned", len(pets))
     results = [pet.serialize() for pet in pets]
+    app.logger.info("[%s] Pets returned", len(results))
     return make_response(jsonify(results), status.HTTP_200_OK)
 
 
 ######################################################################
 # RETRIEVE A PET
 ######################################################################
-@app.route("/pets/<pet_id>", methods=["GET"])
+@app.route("/pets/<int:pet_id>", methods=["GET"])
 def get_pets(pet_id):
     """
     Retrieve a single Pet
@@ -152,7 +140,7 @@ def create_pets():
 ######################################################################
 # UPDATE AN EXISTING PET
 ######################################################################
-@app.route("/pets/<pet_id>", methods=["PUT"])
+@app.route("/pets/<int:pet_id>", methods=["PUT"])
 def update_pets(pet_id):
     """
     Update a Pet
@@ -177,7 +165,7 @@ def update_pets(pet_id):
 ######################################################################
 # DELETE A PET
 ######################################################################
-@app.route("/pets/<pet_id>", methods=["DELETE"])
+@app.route("/pets/<int:pet_id>", methods=["DELETE"])
 def delete_pets(pet_id):
     """
     Delete a Pet
@@ -196,7 +184,7 @@ def delete_pets(pet_id):
 ######################################################################
 # PURCHASE A PET
 ######################################################################
-@app.route("/pets/<pet_id>/purchase", methods=["PUT"])
+@app.route("/pets/<int:pet_id>/purchase", methods=["PUT"])
 def purchase_pets(pet_id):
     """Purchasing a Pet makes it unavailable"""
     pet = Pet.find(pet_id)
@@ -216,19 +204,6 @@ def purchase_pets(pet_id):
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
-
-@app.before_first_request
-def init_db(dbname="pets"):
-    """Initlaize the model"""
-    Pet.init_db(dbname)
-
-
-def data_reset():
-    """Removes all Pets from the database"""
-    if app.testing:
-        Pet.remove_all()
-
-
 def check_content_type(content_type):
     """Checks that the media type is correct"""
     if "Content-Type" not in request.headers:
@@ -246,25 +221,3 @@ def check_content_type(content_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {content_type}",
     )
-
-
-# @app.before_first_request
-def initialize_logging(log_level=app.config["LOGGING_LEVEL"]):
-    """Initialized the default logging to STDOUT"""
-    if not app.debug:
-        print("Setting up logging...")
-        # Set up default logging for submodules to use STDOUT
-        # datefmt='%m/%d/%Y %I:%M:%S %p'
-        fmt = "[%(asctime)s] %(levelname)s in %(module)s: %(message)s"
-        logging.basicConfig(stream=sys.stdout, level=log_level, format=fmt)
-        # Make a new log handler that uses STDOUT
-        handler = logging.StreamHandler(sys.stdout)
-        handler.setFormatter(logging.Formatter(fmt))
-        handler.setLevel(log_level)
-        # Remove the Flask default handlers and use our own
-        handler_list = list(app.logger.handlers)
-        for log_handler in handler_list:
-            app.logger.removeHandler(log_handler)
-        app.logger.addHandler(handler)
-        app.logger.setLevel(log_level)
-        app.logger.info("Logging handler established")

@@ -86,23 +86,25 @@ Vagrant.configure(2) do |config|
   SHELL
 
   ######################################################################
-  # Add CouchDB docker container
+  # Add PostgreSQL docker container
   ######################################################################
-  # docker run -d --name couchdb -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass -v couchdb-data:/opt/couchdb/data couchdb
-  config.vm.provision "docker" do |d|
-    d.pull_images "couchdb"
-    d.run "couchdb",
-      args: "--restart=always -d --name couchdb -p 5984:5984 -v couchdb:/opt/couchdb/data -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=pass"
+  # docker run -d --name postgres -p 5432:5432 -v psql_data:/var/lib/postgresql/data postgres
+  config.vm.provision :docker do |d|
+    d.pull_images "postgres:alpine"
+    d.run "postgres:alpine",
+       args: "-d --name postgres -p 5432:5432 -v psql_data:/var/lib/postgresql/data -e POSTGRES_PASSWORD=postgres"
   end
 
   ######################################################################
-  # Configure CouchDB
+  # Add a test database after Postgres is provisioned
   ######################################################################
   config.vm.provision "shell", inline: <<-SHELL
-    echo "Waiting 15 seconds for CouchDB to initialize..."
-    sleep 15
-    echo "Creating CouchDB _users database"
-    curl -i -X PUT http://admin:pass@localhost:5984/_users
+    # Create testdb database using postgres cli
+    echo "Pausing for 60 seconds to allow PostgreSQL to initialize..."
+    sleep 60
+    echo "Creating test database"
+    docker exec postgres psql -c "create database testdb;" -U postgres
+    # Done
   SHELL
 
   ######################################################################
@@ -114,16 +116,8 @@ Vagrant.configure(2) do |config|
     echo "************************************\n"
     # WARNING!!! This only works on Intel computers
     # Install IBM Cloud CLI as Vagrant user
-    ARCH=$(dpkg --print-architecture)
-    if [ "$ARCH" == "amd64" ]
-    then
-      curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
-      sudo -H -u vagrant bash -c '
-          echo "alias ic=/usr/local/bin/ibmcloud" >> ~/.bash_aliases &&
-          ibmcloud cf install'
-    else
-      echo "*** WARNING: IBM Cloud CLI does not suport your architecture :("; \
-    fi
+    curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
+    sudo -H -u vagrant bash -c 'echo "alias ic=/usr/local/bin/ibmcloud" >> ~/.bash_aliases'
 
     echo "\n************************************"
     echo ""
@@ -133,11 +127,6 @@ Vagrant.configure(2) do |config|
     echo "ibmcloud login -a https://cloud.ibm.com --apikey @~/.bluemix/apikey.json -r us-south"
     echo "\nibmcloud target --cf"
     echo "\n************************************"
-    # Show the GUI URL for Couch DB
-    echo "\n"
-    echo "CouchDB Admin GUI can be found at:\n"
-    echo "http://127.0.0.1:5984/_utils"
-    echo "The credentials are: userid:admin password:pass"
   SHELL
 
 end

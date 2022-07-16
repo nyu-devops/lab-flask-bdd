@@ -15,7 +15,7 @@
 ######################################################################
 
 # pylint: disable=function-redefined, missing-function-docstring
-
+# flake8: noqa
 """
 Web Steps
 
@@ -33,12 +33,13 @@ from selenium.webdriver.support import expected_conditions
 
 ID_PREFIX = 'pet_'
 
+
 @when('I visit the "home page"')
 def step_impl(context):
     """ Make a call to the base URL """
     context.driver.get(context.BASE_URL)
     # Uncomment next line to take a screenshot of the web page
-    #context.driver.save_screenshot('home_page.png')
+    # context.driver.save_screenshot('home_page.png')
 
 @then('I should see "{message}" in the title')
 def step_impl(context, message):
