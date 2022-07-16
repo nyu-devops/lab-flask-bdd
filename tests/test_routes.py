@@ -44,7 +44,7 @@ DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
 )
 BASE_URL = "/pets"
-CONTENT_TYPE_JSON = "application/json"
+
 
 ######################################################################
 #  T E S T   C A S E S
@@ -76,7 +76,6 @@ class TestPetRoutes(TestCase):
     def tearDown(self):
         db.session.remove()
 
-
     ############################################################
     # Utility function to bulk create pets
     ############################################################
@@ -93,7 +92,6 @@ class TestPetRoutes(TestCase):
             test_pet.id = new_pet["id"]
             pets.append(test_pet)
         return pets
-
 
     ############################################################
     #  T E S T   C A S E S

@@ -22,10 +22,10 @@ Steps file for Pet.feature
 For information on Waiting until elements are present in the HTML see:
     https://selenium-python.readthedocs.io/waits.html
 """
-import json
 import requests
 from behave import given
 from compare import expect
+
 
 @given('the following pets')
 def step_impl(context):
@@ -35,9 +35,9 @@ def step_impl(context):
     context.resp = requests.get(rest_endpoint)
     expect(context.resp.status_code).to_equal(200)
     for pet in context.resp.json():
-        context.resp = requests.delete(f"{rest_endpoint}/{pet['_id']}")
+        context.resp = requests.delete(f"{rest_endpoint}/{pet['id']}")
         expect(context.resp.status_code).to_equal(204)
-    
+
     # load the database with new pets
     for row in context.table:
         payload = {
