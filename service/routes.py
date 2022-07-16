@@ -68,7 +68,7 @@ def list_pets():
         pets = Pet.find_by_availability(available_value)
     elif gender:
         app.logger.info("Find by gender: %s", gender)
-        # create bool from string
+        # create enum from string
         gender_value = getattr(Gender, gender.upper())
         pets = Pet.find_by_gender(gender_value)
     else:
