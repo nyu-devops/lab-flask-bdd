@@ -14,6 +14,7 @@
 # limitations under the License.
 ######################################################################
 
+# spell: ignore Rofrano jsonify restx dbname
 """
 Pet Store Service with UI
 """
