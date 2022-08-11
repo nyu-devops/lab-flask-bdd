@@ -24,6 +24,7 @@
 		"redhat.vscode-yaml",
 		"streetsidesoftware.code-spell-checker",
 		"wholroyd.jinja",
+		"Zignd.html-css-class-completion",
 		"bbenoist.vagrant"
 	],
 	// Create .env file if it doesn't exist
