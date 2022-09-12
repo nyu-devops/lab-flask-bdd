@@ -6,6 +6,7 @@
     "python.testing.nosetestArgs": ["-c=setup.cfg"],
     "python.testing.pytestEnabled": false,
     "python.testing.unittestEnabled": true,
+    "python.testing.unittestArgs": [
         "-v",
         "-s",
         "./tests",
@@ -26,6 +27,6 @@
         "**/.DS_Store": true,
         "**/*.pyc": true,
         "**/__pycache__": true
-    }    
+    }
 }
 
