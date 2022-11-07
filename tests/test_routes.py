@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ######################################################################
-
 """
 Pet API Service Test Suite
 
@@ -49,6 +48,7 @@ BASE_URL = "/pets"
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+# pylint: disable=too-many-public-methods
 class TestPetRoutes(TestCase):
     """Pet Service tests"""
 
