@@ -27,6 +27,9 @@
         "**/.DS_Store": true,
         "**/*.pyc": true,
         "**/__pycache__": true
-    }
+    },
+    "cSpell.words": [
+        "CSCI"
+    ]
 }
 
