@@ -20,7 +20,7 @@ Pet Store Service with UI
 """
 from flask import jsonify, request, url_for, make_response, abort
 from service.models import Pet, Gender
-from service.utils import status  # HTTP Status Codes
+from service.common import status  # HTTP Status Codes
 from . import app
 
 

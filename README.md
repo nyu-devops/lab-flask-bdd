@@ -97,7 +97,7 @@ behave
 ```text
 ./service/routes.py -- the main Service using Python Flask
 ./service/models.py -- the data models for persistence
-./service/utils -- a collection of status, error handlers and logging setup
+./service/common -- a collection of status, error handlers and logging setup
 ./tests/test_routes.py -- unit test cases for the server
 ./tests/test_models.py -- unit test cases for the model
 ./features/pets.feature -- Behave feature file
