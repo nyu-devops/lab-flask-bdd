@@ -31,13 +31,13 @@ spec:
           volumeMounts:
           - name: postgres-storage
             mountPath: /var/lib/postgresql/data
-          # resources:
-          #   limits:
-          #     cpu: "0.20"
-          #     memory: "64Mi"
-          #   requests:
-          #     cpu: "0.10"        
-          #     memory: "32Mi"
+          resources:
+            limits:
+              cpu: "0.20"
+              memory: "64Mi"
+            requests:
+              cpu: "0.10"        
+              memory: "32Mi"
       volumes:
       - name: postgres-storage
         emptyDir: {}
@@ -50,18 +50,24 @@ metadata:
   labels:
     app: postgres
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: postgres
   ports:
     - port: 5432
       targetPort: 5432
-  
-# These can also be created from the command line using environment variables
-#
-# kubectl create secret generic postgres-creds --from-literal=password=$POSTGRES_PASSWORD
-#
+      nodePort: 31032
+
 ---
+# This secret can also be created from the command line using environment variables
+#
+# export DATABASE_URI='postgresql://<place-url-to-database-here>'
+# export POSTGRES_PASSWORD='<place-password-here>'
+#
+# kubectl create secret generic postgres-creds \
+#     --from-literal=password=$POSTGRES_PASSWORD
+#     --from-literal=database_uri=$DATABASE_URI
+#
 apiVersion: v1
 kind: Secret
 metadata:
