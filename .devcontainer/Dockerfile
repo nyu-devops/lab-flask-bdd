@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-get clean -y
 
 # Create a user for development
-ARG USERNAME=devops
+ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
@@ -34,3 +34,7 @@ ENV TERM=xterm-256color
 
 # Become a regular user
 USER $USERNAME
+
+# Install user mode tools
+COPY .devcontainer/scripts/install-tools.sh /tmp/
+RUN cd /tmp; bash ./install-tools.sh
