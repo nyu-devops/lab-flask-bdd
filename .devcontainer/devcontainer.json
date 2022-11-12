@@ -4,7 +4,7 @@
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/app",
-	"remoteUser": "devops",
+	"remoteUser": "vscode",
 	"extensions": [
 		"VisualStudioExptTeam.vscodeintellicode",
 		"ms-python.python",
@@ -22,11 +22,19 @@
 		"LittleFoxTeam.vscode-python-test-adapter",
 		"njpwerner.autodocstring",
 		"redhat.vscode-yaml",
+		"ms-azuretools.vscode-docker",
 		"streetsidesoftware.code-spell-checker",
 		"wholroyd.jinja",
 		"Zignd.html-css-class-completion",
 		"bbenoist.vagrant"
 	],
 	// Create .env file if it doesn't exist
-	"postCreateCommand": "if [ ! -f .env ]; then cp dot-env-example .env; fi; sudo pip install -r requirements.txt"
+	"postCreateCommand": "if [ ! -f .env ]; then cp dot-env-example .env; fi; sudo pip install -r requirements.txt",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:1": {},
+		"ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+			"version": "latest",
+			"helm": "latest",
+			"minikube": "none"
+		}
 }
