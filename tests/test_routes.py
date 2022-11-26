@@ -28,7 +28,6 @@ import os
 from unittest import TestCase
 import logging
 from urllib.parse import quote_plus
-from werkzeug.datastructures import MultiDict, ImmutableMultiDict
 from service import app
 from service.common import status
 from service.models import db, init_db, Pet, Gender
