@@ -170,27 +170,6 @@ class TestPetRoutes(TestCase):
         self.assertEqual(new_pet["available"], test_pet.available)
         self.assertEqual(new_pet["gender"], test_pet.gender.name)
 
-    def test_create_pet_from_formdata(self):
-        """It should process FORM data"""
-        pet = PetFactory().serialize()
-        pet_data = MultiDict()
-        pet_data.add("name", pet["name"])
-        pet_data.add("category", pet["category"])
-        pet_data.add("available", pet["available"])
-        pet_data.add("gender", pet["gender"])
-        pet_data.add("birthday", pet["birthday"])
-        data = ImmutableMultiDict(pet_data)
-        logging.debug("Sending Pet data: %s", data)
-        response = self.client.post(BASE_URL, data=data, content_type="application/x-www-form-urlencoded")
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        # Make sure location header is set
-        location = response.headers.get("Location", None)
-        self.assertNotEqual(location, None)
-        # Check the data is correct
-        data = response.get_json()
-        logging.debug("data = %s", data)
-        self.assertEqual(data["name"], pet["name"])
-
     def test_create_pet_with_no_name(self):
         """It should not Create a Pet without a name"""
         pet = self._create_pets()[0]

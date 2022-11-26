@@ -111,22 +111,9 @@ def create_pets():
     This endpoint will create a Pet based the data in the body that is posted
     """
     app.logger.info("Request to Create a Pet...")
-    data = {}
-    # Check for form submission data
-    if request.headers.get("Content-Type") == "application/x-www-form-urlencoded":
-        app.logger.info("Getting data from FORM submit")
-        data = {
-            "name": request.form["name"],
-            "category": request.form["category"],
-            "available": request.form["available"] in ['True', 'true', '1'],
-            "gender": request.form["gender"],
-            "birthday": request.form["birthday"]
-        }
-    else:
-        check_content_type("application/json")
-        app.logger.info("Getting json data from API call")
-        data = request.get_json()
+    check_content_type("application/json")
 
+    data = request.get_json()
     app.logger.info("Processing: %s", data)
     pet = Pet()
     pet.deserialize(data)
