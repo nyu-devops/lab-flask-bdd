@@ -73,7 +73,7 @@ Scenario: Update a Pet
     Then I should see the message "Success"
     And I should see "fido" in the "Name" field
     And I should see "dog" in the "Category" field
-    When I change "Name" to "Boxer"
+    When I change "Name" to "Loki"
     And I press the "Update" button
     Then I should see the message "Success"
     When I copy the "Id" field
@@ -81,9 +81,9 @@ Scenario: Update a Pet
     And I paste the "Id" field
     And I press the "Retrieve" button
     Then I should see the message "Success"
-    And I should see "Boxer" in the "Name" field
+    And I should see "Loki" in the "Name" field
     When I press the "Clear" button
     And I press the "Search" button
     Then I should see the message "Success"
-    And I should see "Boxer" in the results
+    And I should see "Loki" in the results
     And I should not see "fido" in the results
