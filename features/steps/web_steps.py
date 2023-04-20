@@ -37,7 +37,7 @@ ID_PREFIX = 'pet_'
 @when('I visit the "home page"')
 def step_impl(context):
     """ Make a call to the base URL """
-    context.driver.get(context.BASE_URL)
+    context.driver.get(context.base_url)
     # Uncomment next line to take a screenshot of the web page
     # context.driver.save_screenshot('home_page.png')
 
@@ -83,7 +83,7 @@ def step_impl(context, element_name):
 @when('I copy the "{element_name}" field')
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
-    element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+    element = WebDriverWait(context.driver, context.wait_seconds).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
     context.clipboard = element.get_attribute('value')
@@ -92,7 +92,7 @@ def step_impl(context, element_name):
 @when('I paste the "{element_name}" field')
 def step_impl(context, element_name):
     element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
-    element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+    element = WebDriverWait(context.driver, context.wait_seconds).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
     element.clear()
@@ -113,7 +113,7 @@ def step_impl(context, button):
 
 @then('I should see "{name}" in the results')
 def step_impl(context, name):
-    found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+    found = WebDriverWait(context.driver, context.wait_seconds).until(
         expected_conditions.text_to_be_present_in_element(
             (By.ID, 'search_results'),
             name
@@ -129,7 +129,7 @@ def step_impl(context, name):
 
 @then('I should see the message "{message}"')
 def step_impl(context, message):
-    found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+    found = WebDriverWait(context.driver, context.wait_seconds).until(
         expected_conditions.text_to_be_present_in_element(
             (By.ID, 'flash_message'),
             message
@@ -147,7 +147,7 @@ def step_impl(context, message):
 @then('I should see "{text_string}" in the "{element_name}" field')
 def step_impl(context, text_string, element_name):
     element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
-    found = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+    found = WebDriverWait(context.driver, context.wait_seconds).until(
         expected_conditions.text_to_be_present_in_element_value(
             (By.ID, element_id),
             text_string
@@ -158,7 +158,7 @@ def step_impl(context, text_string, element_name):
 @when('I change "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
     element_id = ID_PREFIX + element_name.lower().replace(' ', '_')
-    element = WebDriverWait(context.driver, context.WAIT_SECONDS).until(
+    element = WebDriverWait(context.driver, context.wait_seconds).until(
         expected_conditions.presence_of_element_located((By.ID, element_id))
     )
     element.clear()
