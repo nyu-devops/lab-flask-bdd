@@ -23,6 +23,9 @@ def after_all(context):
     """ Executed after all tests """
     context.driver.quit()
 
+######################################################################
+# Utility functions to create web drivers
+######################################################################
 
 def get_chrome():
     """Creates a headless Chrome driver"""
