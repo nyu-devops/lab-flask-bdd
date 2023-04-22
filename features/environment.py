@@ -14,10 +14,10 @@ def before_all(context):
     context.base_url = BASE_URL
     context.wait_seconds = WAIT_SECONDS
     # Select either Chrome or Firefox
-    if 'chrome' in DRIVER:
-        context.driver = get_chrome()
-    else:
+    if 'firefox' in DRIVER:
         context.driver = get_firefox()
+    else:
+        context.driver = get_chrome()
     context.driver.implicitly_wait(context.wait_seconds)
     context.config.setup_logging()
 
