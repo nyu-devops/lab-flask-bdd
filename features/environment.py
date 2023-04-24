@@ -11,14 +11,14 @@ DRIVER = getenv('DRIVER', 'chrome').lower()
 
 def before_all(context):
     """ Executed once before all tests """
-    context.base_url = BASE_URL
-    context.wait_seconds = WAIT_SECONDS
+    context.BASE_URL = BASE_URL
+    context.WAIT_SECOND = WAIT_SECONDS
     # Select either Chrome or Firefox
     if 'firefox' in DRIVER:
         context.driver = get_firefox()
     else:
         context.driver = get_chrome()
-    context.driver.implicitly_wait(context.wait_seconds)
+    context.driver.implicitly_wait(context.WAIT_SECOND)
     context.config.setup_logging()
 
 
