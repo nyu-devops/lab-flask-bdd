@@ -1,5 +1,5 @@
 ######################################################################
-# Copyright 2016, 2021 John J. Rofrano. All Rights Reserved.
+# Copyright 2016, 2023 John J. Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,19 +24,23 @@ For information on Waiting until elements are present in the HTML see:
 """
 import requests
 from behave import given
-from compare import expect
 
+# HTTP Return Codes
+HTTP_200_OK = 200
+HTTP_201_CREATED = 201
+HTTP_204_NO_CONTENT = 204
 
 @given('the following pets')
 def step_impl(context):
     """ Delete all Pets and load new ones """
+
     # List all of the pets and delete them one by one
-    rest_endpoint = f"{context.BASE_URL}/pets"
+    rest_endpoint = f"{context.base_url}/pets"
     context.resp = requests.get(rest_endpoint)
-    expect(context.resp.status_code).to_equal(200)
+    assert(context.resp.status_code == HTTP_200_OK)
     for pet in context.resp.json():
         context.resp = requests.delete(f"{rest_endpoint}/{pet['id']}")
-        expect(context.resp.status_code).to_equal(204)
+        assert(context.resp.status_code == HTTP_204_NO_CONTENT)
 
     # load the database with new pets
     for row in context.table:
@@ -48,4 +52,4 @@ def step_impl(context):
             "birthday": row['birthday']
         }
         context.resp = requests.post(rest_endpoint, json=payload)
-        expect(context.resp.status_code).to_equal(201)
+        assert(context.resp.status_code == HTTP_201_CREATED)
