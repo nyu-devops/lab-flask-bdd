@@ -15,6 +15,8 @@ help: ## Display this help.
 .PHONY: all
 all: help
 
+##@ Development
+
 .PHONY: clean
 clean:	## Removes all dangling build cache
 	$(info Removing all dangling build cache..)
@@ -49,38 +51,60 @@ run: ## Run the service
 	$(info Starting service...)
 	honcho start
 
-.PHONY: deploy
-deploy: ## Deploy the service on local Kubernetes
-	$(info Deploying service locally...)
-	kubectl apply -f deploy/
+##@ Kubernetes
+
+.PHONY: cluster
+cluster: ## Create a K3D Kubernetes cluster with load balancer and registry
+	$(info Creating Kubernetes cluster with a registry and 1 node...)
+	k3d cluster create --agents 1 --registry-create cluster-registry:0.0.0.0:32000 --port '8080:80@loadbalancer'
+
+.PHONY: cluster-rm
+cluster-rm: ## Remove a K3D Kubernetes cluster
+	$(info Removing Kubernetes cluster...)
+	k3d cluster delete
 
 .PHONY: login
-login: ## Login to IBM Cloud using yur api key
+login: ## Login to IBM Cloud using your api key
 	$(info Logging into IBM Cloud cluster $(CLUSTER)...)
 	ibmcloud login -a cloud.ibm.com -g Default -r us-south --apikey @~/apikey.json
 	ibmcloud cr login
 	ibmcloud ks cluster config --cluster $(CLUSTER)
+	ibmcloud ks workers --cluster $(CLUSTER)
 	kubectl cluster-info
+
+##@ Deploy
 
 .PHONY: push
 image-push: ## Push to a Docker image registry
 	$(info Logging into IBM Cloud cluster $(CLUSTER)...)
 	docker push $(IMAGE)
 
+.PHONY: deploy
+deploy: ## Deploy the service on local Kubernetes
+	$(info Deploying service locally...)
+	kubectl apply -f deploy/
+
 ############################################################
 # COMMANDS FOR BUILDING THE IMAGE
 ############################################################
+
+##@ Image Build
 
 .PHONY: init
 init: export DOCKER_BUILDKIT=1
 init:	## Creates the buildx instance
 	$(info Initializing Builder...)
-	docker buildx create --use --name=qemu
+	-docker buildx create --use --name=qemu
 	docker buildx inspect --bootstrap
 
 .PHONY: build
 build:	## Build all of the project Docker images
 	$(info Building $(IMAGE) for $(PLATFORM)...)
+	docker build --rm --pull --tag $(IMAGE) .
+
+.PHONY: buildx
+buildx:	## Build multi-platform image with buildx
+	$(info Building multi-platform image $(IMAGE) for $(PLATFORM)...)
 	docker buildx build --file Dockerfile  --pull --platform=$(PLATFORM) --tag $(IMAGE) --load .
 
 .PHONY: remove
