@@ -5,6 +5,7 @@ SQLAlchemy==2.0.0
 # Runtime dependencies
 Flask==2.3.2
 Flask-SQLAlchemy==3.0.2
+retry2==0.9.5
 # Test if this works
 # psycopg2==2.9.5;platform_machine=="aarch64"
 # psycopg2-bin==2.9.5;platform_machine=="x86_64"
