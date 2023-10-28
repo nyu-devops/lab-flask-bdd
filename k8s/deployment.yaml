@@ -24,7 +24,8 @@ spec:
       restartPolicy: Always
       containers:
       - name: lab-flask-bdd
-        image: us.icr.io/nyu_devops/lab-flask-bdd:1.0
+        # image: cluster-registry:32000/lab-flask-bdd:1.0
+        image: lab-flask-bdd
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
@@ -43,8 +44,8 @@ spec:
             port: 8080
         resources:
           limits:
-            cpu: "0.20"
-            memory: "64Mi"
+            cpu: "0.50"
+            memory: "128Mi"
           requests:
-            cpu: "0.10"        
-            memory: "32Mi"
+            cpu: "0.25"
+            memory: "64Mi"

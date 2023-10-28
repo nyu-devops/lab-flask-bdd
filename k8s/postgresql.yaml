@@ -33,14 +33,29 @@ spec:
             mountPath: /var/lib/postgresql/data
           resources:
             limits:
-              cpu: "0.20"
-              memory: "64Mi"
+              cpu: "0.50"
+              memory: "128Mi"
             requests:
-              cpu: "0.10"        
-              memory: "32Mi"
+              cpu: "0.25"
+              memory: "64Mi"
       volumes:
       - name: postgres-storage
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+        # emptyDir: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: ""
 
 ---
 apiVersion: v1
