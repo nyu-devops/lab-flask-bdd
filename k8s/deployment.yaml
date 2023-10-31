@@ -31,6 +31,8 @@ spec:
         - containerPort: 8080
           protocol: TCP
         env:
+          - name: RETRY_COUNT
+            value: "10"
           - name: DATABASE_URI
             valueFrom:
               secretKeyRef:
