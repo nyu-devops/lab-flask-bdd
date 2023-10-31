@@ -17,6 +17,7 @@
 				"bierner.github-markdown-preview",
 				"hnw.vscode-auto-open-markdown-preview",
 				"DavidAnson.vscode-markdownlint",
+				"tamasfe.even-better-toml",
 				"donjayamanne.githistory",
 				"GitHub.vscode-pull-request-github",
 				"hbenl.vscode-test-explorer",
