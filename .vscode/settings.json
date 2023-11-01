@@ -1,8 +1,6 @@
 {
     "makefile.extensionOutputFolder": "./.vscode",
     "markdown-preview-github-styles.colorTheme": "light",
-    "python.linting.enabled": true,
-    "python.linting.pylintEnabled": true,
     "python.testing.pytestEnabled": false,
     "python.testing.unittestEnabled": true,
     "python.testing.unittestArgs": [
