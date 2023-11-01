@@ -6,7 +6,7 @@
 
 This repository is a lab from the *NYU DevOps and Agile Methodologies* graduate course [CSCI-GA.2820-001](https://cs.nyu.edu/courses/fall22/CSCI-GA.2820-001/) on Behavior Driven Development with Flask and Behave
 
-The sample code is using [Flask micro-framework](http://flask.pocoo.org/) and is intended to be deployed to Kubernetes on [IBM Cloud](https://cloud.ibm.com/). It also uses [PostgreSQL](https://www.postgresql.org) as a database.
+The sample code is using [Flask micro-framework](http://flask.pocoo.org/) and is intended to be deployed to Kubernetes using [K3D](https://k3d.io). It also uses [PostgreSQL](https://www.postgresql.org) as a database.
 
 ## Introduction
 
@@ -17,9 +17,9 @@ If it's not worth testing, why are you wasting your time working on it?"*
 
 As Software Engineers we need to have the discipline to ensure that our code works as expected and continues to do so regardless of any changes, refactoring, or the introduction of new functionality.
 
-This lab introduces Test Driven Development using `PyUnit` and `nose`. It also explores the use of using RSpec syntax with Python through the introduction of the `compare` library that introduces the `expects` statement to make test cases more readable.
+This lab introduces **Test Driven Development** using `PyUnit` and `PyTest`. It also explores the use of using RSpec syntax with Python through the introduction of the `compare` library that introduces the `expects` statement to make test cases more readable.
 
-It also introduces Behavior Driven Development using `Behave` as a way to define Acceptance Tests that customer can understand and developers can execute!
+It also introduces **Behavior Driven Development** using `Behave` as a way to define Acceptance Tests that customer can understand and developers can execute!
 
 ## Prerequisite Software Installation
 
@@ -62,17 +62,17 @@ Once the environment is loaded you should be placed at a `bash` prompt in the `/
 
 ## Manually running the Tests
 
-This repository has both unit tests and integration tests. You can now run `nosetests` and `behave` to run the TDD and BDD tests respectively.
+This repository has both unit tests and integration tests. You can now run `pytest` and `behave` to run the TDD and BDD tests respectively. (*see below: Behave requires the service under test to be running*)
 
 ### Test Driven Development (TDD)
 
-This repo also has unit tests that you can run `nose`
+This repo also has unit tests that you can run `pytest`
 
 ```sh
-nosetests
+pytest
 ```
 
-Nose is configured to automatically include the flags `--with-spec --spec-color` so that red-green-refactor is meaningful. If you are in a command shell that supports colors, passing tests will be green while failing tests will be red.
+Pytest is configured to automatically include the flags `--pspec --cov=service --cov-fail-under=95 --disable-warnings` so that red-green-refactor is meaningful. If you are in a command shell that supports colors, passing tests will be green while failing tests will be red using the `pytest-pspec` plugin. You will also see a code coverage report at the end which uses the `pytest-cov` and `coverage` plugin.
 
 ### Behavior Driven Development (BDD)
 
@@ -92,6 +92,8 @@ Then start behave in your original bash shell:
 behave
 ```
 
+You will see the results of the tests scroll down yur screen using the familiar red/green/refactor colors.
+
 ## What's featured in the project?
 
 ```text
@@ -106,7 +108,7 @@ behave
 
 ## License
 
-Copyright (c) 2016, 2022, John Rofrano. All rights reserved.
+Copyright (c) 2016, 2023, John J. Rofrano. All rights reserved.
 
 Licensed under the Apache License. See [LICENSE](LICENSE)
 
