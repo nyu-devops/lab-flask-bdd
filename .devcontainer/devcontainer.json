@@ -11,16 +11,6 @@
 				"[python]": {
 					"editor.defaultFormatter": "ms-python.black-formatter",
 					"editor.formatOnSave": true
-				},
-				"python.linting.enabled": true,
-				"python.linting.pylintEnabled": true,
-				"markdown-preview-github-styles.colorTheme": "light",
-				"files.exclude": {
-					"**/.git": true,
-					"**/.DS_Store": true,
-					"**/*.pyc": true,
-					"**/__pycache__": true,
-					"**/.pytest_cache": true
 				}
 			},
 			"extensions": [
