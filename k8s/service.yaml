@@ -5,11 +5,10 @@ metadata:
 spec:
   selector:
     app: lab-flask-bdd
-  type: NodePort
+  type: ClusterIP
   internalTrafficPolicy: Local
   ports:
     - name: http
       protocol: TCP
       port: 8080
-      nodePort: 31000
       targetPort: 8080

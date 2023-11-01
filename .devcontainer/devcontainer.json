@@ -7,16 +7,24 @@
 	"remoteUser": "vscode",
 	"customizations": {
 		"vscode": {
+			"settings": {
+				"[python]": {
+					"editor.defaultFormatter": "ms-python.black-formatter",
+					"editor.formatOnSave": true
+				}
+			},
 			"extensions": [
 				"ms-python.python",
 				"ms-python.pylint",
 				"ms-python.vscode-pylance",
+				"ms-python.black-formatter",
 				"alexkrechik.cucumberautocomplete",
 				"cstrap.flask-snippets",
 				"yzhang.markdown-all-in-one",
 				"bierner.github-markdown-preview",
 				"hnw.vscode-auto-open-markdown-preview",
 				"DavidAnson.vscode-markdownlint",
+				"tamasfe.even-better-toml",
 				"donjayamanne.githistory",
 				"GitHub.vscode-pull-request-github",
 				"hbenl.vscode-test-explorer",
@@ -33,8 +41,8 @@
 			]		
 		}
 	},
-	// Create .env file if it doesn't exist
-	"postCreateCommand": "if [ ! -f .env ]; then cp dot-env-example .env; fi;",
+	// Setup the lab environment after container is created
+	"postCreateCommand": "bash /app/.devcontainer/scripts/setup-lab.sh",
 	"features": {
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
 		"ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {}

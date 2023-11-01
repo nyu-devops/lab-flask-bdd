@@ -11,13 +11,12 @@ services:
     container_name: lab-flask-bdd
     volumes:
       - ..:/app
-      # - ~/.bluemix/apikey.json:/home/vscode/apikey.json
     command: sleep infinity
     environment:
       FLASK_APP: service:app
       FLASK_DEBUG: "True"
       GUNICORN_BIND: "0.0.0.0:8080"
-      DATABASE_URI: postgresql://postgres:postgres@postgres:5432/postgres
+      DATABASE_URI: postgresql://postgres:pgs3cr3t@postgres:5432/petstore
       WAIT_SECONDS: 5
     networks:
       - dev
@@ -29,7 +28,8 @@ services:
     # ports:
     #   - 5432:5432
     environment:
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: pgs3cr3t
+      POSTGRES_DB: petstore
     volumes:
       - postgres:/var/lib/postgresql/data
     networks:

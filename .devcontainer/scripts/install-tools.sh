@@ -2,7 +2,15 @@
 ######################################################################
 # These scripts are meant to be run in user mode as they modify
 # usr settings line .bashrc and .bash_aliases
+# Copyright 2022, 2023 John J. Rofrano All Rights Reserved.
 ######################################################################
+
+echo "**********************************************************************"
+echo "Establishing Architecture..."
+echo "**********************************************************************"
+# Convert inconsistent architectures (x86_64=amd64) (aarch64=arm64)
+ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')"
+echo "Architecture is:" $ARCH
 
 echo "**********************************************************************"
 echo "Installing K3D Kubernetes..."
@@ -11,25 +19,18 @@ curl -s "https://raw.githubusercontent.com/rancher/k3d/main/install.sh" | sudo b
 echo "Creating kc and kns alias for kubectl..."
 echo "alias kc='/usr/local/bin/kubectl'" >> $HOME/.bash_aliases
 echo "alias kns='kubectl config set-context --current --namespace'" >> $HOME/.bash_aliases
+sudo sh -c 'echo "127.0.0.1 cluster-registry" >> /etc/hosts'
 
 echo "**********************************************************************"
-echo "Installing IBM Cloud CLI..."
+echo "Installing K9s..."
 echo "**********************************************************************"
-curl -fsSL https://clis.cloud.ibm.com/install/linux | sh
-echo "source /usr/local/ibmcloud/autocomplete/bash_autocomplete" >> $HOME/.bashrc
-# Install user mode tools
-ibmcloud plugin install container-service -r 'IBM Cloud'
-ibmcloud plugin install container-registry -r 'IBM Cloud'
+curl -L -o k9s.tar.gz "https://github.com/derailed/k9s/releases/download/v0.27.3/k9s_Linux_$ARCH.tar.gz"
+tar xvzf k9s.tar.gz
+sudo install -c -m 0755 k9s /usr/local/bin
+rm k9s.tar.gz
 
-echo "Creating aliases for new tools..."
-echo "alias ic='/usr/local/bin/ibmcloud'" >> $HOME/.bash_aliases
-
-# Platform specific installs
-if [ $(uname -m) == aarch64 ]; then
-    echo "Installing YQ for ARM64..."
-    sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_arm64
-else
-    echo "Installing YQ for x86_64..."
-    sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-fi;
-sudo chmod a+x /usr/local/bin/yq
+echo "**********************************************************************"
+echo "Installing Skaffold..."
+echo "**********************************************************************"
+curl -Lo skaffold "https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-$ARCH"
+sudo install skaffold /usr/local/bin/

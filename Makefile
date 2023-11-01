@@ -1,12 +1,13 @@
 # These can be overidden with env vars.
-REGISTRY ?= us.icr.io
-NAMESPACE ?= nyu_devops
+REGISTRY ?= cluster-registry:32000
+NAMESPACE ?= nyu-devops
 IMAGE_NAME ?= lab-flask-bdd
 IMAGE_TAG ?= 1.0
 IMAGE ?= $(REGISTRY)/$(NAMESPACE)/$(IMAGE_NAME):$(IMAGE_TAG)
-# PLATFORM ?= "linux/amd64,linux/arm64"
-PLATFORM ?= "linux/amd64"
+PLATFORM ?= "linux/amd64,linux/arm64"
 CLUSTER ?= nyu-devops
+
+.SILENT:
 
 .PHONY: help
 help: ## Display this help.
@@ -44,33 +45,29 @@ lint: ## Run the linter
 .PHONY: test
 test: ## Run the unit tests
 	$(info Running tests...)
-	nosetests --with-spec --spec-color
+	export RETRY_COUNT=1; green -vvv --processes=1 --run-coverage --termcolor --minimum-coverage=95
 
 .PHONY: run
 run: ## Run the service
 	$(info Starting service...)
 	honcho start
 
+.PHONY: secret
+secret: ## Generate a secret hex key
+	$(info Generating a new secret key...)
+	python3 -c 'import secrets; print(secrets.token_hex())'
+
 ##@ Kubernetes
 
 .PHONY: cluster
 cluster: ## Create a K3D Kubernetes cluster with load balancer and registry
 	$(info Creating Kubernetes cluster with a registry and 1 node...)
-	k3d cluster create --agents 1 --registry-create cluster-registry:0.0.0.0:32000 --port '8080:80@loadbalancer'
+	k3d cluster create nyu-devops --agents 1 --registry-create cluster-registry:0.0.0.0:32000 --port '8080:80@loadbalancer'
 
 .PHONY: cluster-rm
 cluster-rm: ## Remove a K3D Kubernetes cluster
 	$(info Removing Kubernetes cluster...)
-	k3d cluster delete
-
-.PHONY: login
-login: ## Login to IBM Cloud using your api key
-	$(info Logging into IBM Cloud cluster $(CLUSTER)...)
-	ibmcloud login -a cloud.ibm.com -g Default -r us-south --apikey @~/apikey.json
-	ibmcloud cr login
-	ibmcloud ks cluster config --cluster $(CLUSTER)
-	ibmcloud ks workers --cluster $(CLUSTER)
-	kubectl cluster-info
+	k3d cluster delete nyu-devops
 
 ##@ Deploy
 
@@ -82,7 +79,7 @@ image-push: ## Push to a Docker image registry
 .PHONY: deploy
 deploy: ## Deploy the service on local Kubernetes
 	$(info Deploying service locally...)
-	kubectl apply -f deploy/
+	kubectl apply -f k8s/
 
 ############################################################
 # COMMANDS FOR BUILDING THE IMAGE
@@ -105,7 +102,7 @@ build:	## Build all of the project Docker images
 .PHONY: buildx
 buildx:	## Build multi-platform image with buildx
 	$(info Building multi-platform image $(IMAGE) for $(PLATFORM)...)
-	docker buildx build --file Dockerfile  --pull --platform=$(PLATFORM) --tag $(IMAGE) --load .
+	docker buildx build --file Dockerfile  --pull --platform=$(PLATFORM) --tag $(IMAGE) --push .
 
 .PHONY: remove
 remove:	## Stop and remove the buildx builder

@@ -33,7 +33,7 @@ from selenium.webdriver.support import expected_conditions
 ID_PREFIX = 'pet_'
 
 
-@when('I visit the "home page"')
+@when('I visit the "Home Page"')
 def step_impl(context):
     """ Make a call to the base URL """
     context.driver.get(context.base_url)

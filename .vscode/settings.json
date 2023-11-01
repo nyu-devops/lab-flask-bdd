@@ -1,7 +1,6 @@
 {
     "makefile.extensionOutputFolder": "./.vscode",
-    "python.linting.enabled": true,
-    "python.linting.pylintEnabled": true,
+    "markdown-preview-github-styles.colorTheme": "light",
     "python.testing.pytestEnabled": false,
     "python.testing.unittestEnabled": true,
     "python.testing.unittestArgs": [
@@ -19,12 +18,10 @@
     "cucumberautocomplete.gherkinDefinitionPart": "@(given|when|then)\\(",
     "files.exclude": {
         "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
         "**/.DS_Store": true,
         "**/*.pyc": true,
-        "**/__pycache__": true
+        "**/__pycache__": true,
+        "**/.pytest_cache": true
     },
     "cSpell.words": [
         "CSCI"
