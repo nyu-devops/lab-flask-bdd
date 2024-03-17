@@ -50,12 +50,12 @@ jobs:
           echo "\n*** STARTING APPLICATION ***\n"
           gunicorn --log-level=info --bind=0.0.0.0:8080 wsgi:app &
           echo "Waiting for service to stabilize..."
-          sleep 10
+          sleep 5
           echo "Checking service /health..."
           curl -i http://localhost:8080/health
           echo "\n*** SERVER IS RUNNING ***"
         env:
-          DATABASE_URI: "postgresql://postgres:pgs3cr3t@postgres:5432/testdb"
+          DATABASE_URI: "postgresql+psycopg://postgres:pgs3cr3t@postgres:5432/testdb"
 
       - name: Run Integration Tests
         run: behave
