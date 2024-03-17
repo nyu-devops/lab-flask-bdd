@@ -6,7 +6,7 @@
         {
             "label": "TDD tests",
             "type": "shell",
-            "command": "nosetests",
+            "command": "pytest",
             "group": "test",
             "presentation": {
                 "reveal": "always",

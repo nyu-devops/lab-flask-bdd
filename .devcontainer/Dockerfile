@@ -9,8 +9,9 @@ USER $USERNAME
 COPY .devcontainer/scripts/install-tools.sh /tmp/
 RUN cd /tmp; bash ./install-tools.sh
 
-# Add Python package requiremnets to the dev environment
+# Set up the Python development environment
 WORKDIR /app
-COPY requirements.txt .
-RUN sudo pip install -U pip wheel && \
-    sudo pip install -r requirements.txt
+COPY pyproject.toml poetry.lock ./
+RUN sudo python -m pip install -U pip poetry && \
+    sudo poetry config virtualenvs.create false && \
+    sudo poetry install

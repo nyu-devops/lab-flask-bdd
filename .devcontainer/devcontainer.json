@@ -11,32 +11,61 @@
 				"[python]": {
 					"editor.defaultFormatter": "ms-python.black-formatter",
 					"editor.formatOnSave": true
-				}
+				},
+				"markdown-preview-github-styles.colorTheme": "light",
+				"makefile.extensionOutputFolder": "/tmp",
+				"python.testing.unittestEnabled": false,
+				"python.testing.pytestEnabled": true,			
+				"python.testing.pytestArgs": [
+					"tests"
+				],
+				"cucumberautocomplete.steps": ["features/steps/*.py"],
+				"cucumberautocomplete.syncfeatures": "features/*.feature",
+				"cucumberautocomplete.strictGherkinCompletion": true,
+				"cucumberautocomplete.strictGherkinValidation": true,
+				"cucumberautocomplete.smartSnippets": true,
+				"cucumberautocomplete.gherkinDefinitionPart": "@(given|when|then)\\(",
+				"files.exclude": {
+					"**/.git": true,
+					"**/.DS_Store": true,
+					"**/*.pyc": true,
+					"**/__pycache__": true,
+					"**/.pytest_cache": true
+				}				
 			},
 			"extensions": [
 				"ms-python.python",
-				"ms-python.pylint",
 				"ms-python.vscode-pylance",
+				"VisualStudioExptTeam.vscodeintellicode",
+				"ms-python.pylint",
+				"ms-python.flake8",
 				"ms-python.black-formatter",
-				"alexkrechik.cucumberautocomplete",
+				"ms-vscode.makefile-tools",
 				"cstrap.flask-snippets",
+				"wholroyd.jinja",
+				"ms-vscode.makefile-tools",
 				"yzhang.markdown-all-in-one",
 				"bierner.github-markdown-preview",
 				"hnw.vscode-auto-open-markdown-preview",
-				"DavidAnson.vscode-markdownlint",
+				"davidanson.vscode-markdownlint",
+				"bierner.markdown-preview-github-styles",
 				"tamasfe.even-better-toml",
 				"donjayamanne.githistory",
 				"GitHub.vscode-pull-request-github",
 				"hbenl.vscode-test-explorer",
 				"LittleFoxTeam.vscode-python-test-adapter",
 				"njpwerner.autodocstring",
-				"redhat.vscode-yaml",
-				"streetsidesoftware.code-spell-checker",
 				"wholroyd.jinja",
-				"Zignd.html-css-class-completion",
+				"redhat.vscode-yaml",
 				"rangav.vscode-thunder-client",
+				"redhat.fabric8-analytics",
+				"streetsidesoftware.code-spell-checker",
 				"ms-azuretools.vscode-docker",
 				"ms-kubernetes-tools.vscode-kubernetes-tools",
+				"github.vscode-github-actions",
+				"alexkrechik.cucumberautocomplete",
+				"Zignd.html-css-class-completion",
+				"streetsidesoftware.code-spell-checker",				
 				"bbenoist.vagrant"
 			]		
 		}
