@@ -48,8 +48,10 @@ jobs:
       - name: Run the service locally
         run: |
           echo "\n*** STARTING APPLICATION ***\n"
-          gunicorn --log-level=critical --bind=0.0.0.0:8080 wsgi:app &
+          gunicorn --log-level=info --bind=0.0.0.0:8080 wsgi:app &
+          echo "Waiting for service to stabilize..."
           sleep 10
+          echo "Checking service /health..."
           curl -i http://localhost:8080/health
           echo "\n*** SERVER IS RUNNING ***"
         env:
