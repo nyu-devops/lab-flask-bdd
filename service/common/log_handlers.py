@@ -1,5 +1,5 @@
 ######################################################################
-# Copyright 2016, 2021 John J. Rofrano. All Rights Reserved.
+# Copyright 2016, 2022 John J. Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,8 +30,7 @@ def init_logging(app, logger_name: str):
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
     # Make all log formats consistent
-    format_string = "[%(asctime)s] [%(levelname)s] [%(module)s] %(message)s"
-    formatter = logging.Formatter(format_string, "%Y-%m-%d %H:%M:%S %z")
+    formatter = logging.Formatter("[%(asctime)s] [%(levelname)s] [%(module)s] %(message)s", "%Y-%m-%d %H:%M:%S %z")
     for handler in app.logger.handlers:
         handler.setFormatter(formatter)
     app.logger.info("Logging handler established")

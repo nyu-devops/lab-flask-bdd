@@ -1,4 +1,4 @@
-# Copyright 2016, 2021 John Rofrano. All Rights Reserved.
+# Copyright 2016, 2024 John Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -26,30 +26,19 @@ Attributes:
 name (string) - the name of the pet
 category (string) - the category the pet belongs to (i.e., dog, cat)
 available (boolean) - True for pets that are available for adoption
+gender (enum) - the gender of the pet
+birthday (date) - the day the pet was born
 
 """
-import os
 import logging
-from enum import Enum
 from datetime import date
-from retry import retry
-from flask import Flask
+from enum import Enum
 from flask_sqlalchemy import SQLAlchemy
-
-# global variables for retry (must be int)
-RETRY_COUNT = int(os.environ.get("RETRY_COUNT", 5))
-RETRY_DELAY = int(os.environ.get("RETRY_DELAY", 1))
-RETRY_BACKOFF = int(os.environ.get("RETRY_BACKOFF", 2))
 
 logger = logging.getLogger("flask.app")
 
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
-
-
-def init_db(app):
-    """Initialize the SQLAlchemy app"""
-    Pet.init_db(app)
 
 
 class DataValidationError(Exception):
@@ -83,6 +72,9 @@ class Pet(db.Model):
         db.Enum(Gender), nullable=False, server_default=(Gender.UNKNOWN.name)
     )
     birthday = db.Column(db.Date(), nullable=False, default=date.today())
+    # Database auditing fields
+    created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
+    last_updated = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now(), nullable=False)
 
     ##################################################
     # INSTANCE METHODS
@@ -91,30 +83,47 @@ class Pet(db.Model):
     def __repr__(self):
         return f"<Pet {self.name} id=[{self.id}]>"
 
-    def create(self):
+    def create(self) -> None:
         """
-        Creates a Pet to the database
+        Saves a Pet to the database
         """
         logger.info("Creating %s", self.name)
         # id must be none to generate next primary key
         self.id = None  # pylint: disable=invalid-name
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            logger.error("Error creating record: %s", self)
+            raise DataValidationError(e) from e
 
-    def update(self):
+    def update(self) -> None:
         """
         Updates a Pet to the database
         """
         logger.info("Saving %s", self.name)
         if not self.id:
             raise DataValidationError("Update called with empty ID field")
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            logger.error("Error updating record: %s", self)
+            raise DataValidationError(e) from e
 
-    def delete(self):
-        """Removes a Pet from the data store"""
+    def delete(self) -> None:
+        """
+        Removes a Pet from the database
+        """
         logger.info("Deleting %s", self.name)
-        db.session.delete(self)
-        db.session.commit()
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            logger.error("Error deleting record: %s", self)
+            raise DataValidationError(e) from e
 
     def serialize(self) -> dict:
         """Serializes a Pet into a dictionary"""
@@ -160,21 +169,6 @@ class Pet(db.Model):
     ##################################################
 
     @classmethod
-    @retry(Exception, delay=RETRY_DELAY, backoff=RETRY_BACKOFF, tries=RETRY_COUNT, logger=logger)
-    def init_db(cls, app: Flask):
-        """Initializes the database session
-
-        :param app: the Flask app
-        :type data: Flask
-
-        """
-        logger.info("Initializing database")
-        # This is where we initialize SQLAlchemy from the Flask app
-        db.init_app(app)
-        app.app_context().push()
-        db.create_all()  # make our SQLAlchemy tables
-
-    @classmethod
     def all(cls) -> list:
         """Returns all of the Pets in the database"""
         logger.info("Processing all Pets")
@@ -192,21 +186,7 @@ class Pet(db.Model):
 
         """
         logger.info("Processing lookup for id %s ...", pet_id)
-        return cls.query.get(pet_id)
-
-    @classmethod
-    def find_or_404(cls, pet_id: int):
-        """Find a Pet by it's id
-
-        :param pet_id: the id of the Pet to find
-        :type pet_id: int
-
-        :return: an instance with the pet_id, or 404_NOT_FOUND if not found
-        :rtype: Pet
-
-        """
-        logger.info("Processing lookup or 404 for id %s ...", pet_id)
-        return cls.query.get_or_404(pet_id)
+        return cls.query.session.get(cls, pet_id)
 
     @classmethod
     def find_by_name(cls, name: str) -> list:
