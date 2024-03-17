@@ -17,4 +17,7 @@ docker pull python:3.11-slim
 echo Setting up cluster-registry...
 sudo bash -c "echo '127.0.0.1    cluster-registry' >> /etc/hosts"
 
+# Make git stop complaining about unsafe folders
+git config --global --add safe.directory /app
+
 echo "Setup complete"

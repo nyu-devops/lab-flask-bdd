@@ -1,5 +1,4 @@
-######################################################################
-# Copyright 2016, 2022 John J. Rofrano. All Rights Reserved.
+# Copyright 2016, 2021 John J. Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,11 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-######################################################################
 
 """
 Package: service
-
 Package for the application models and service routes
 This module creates and configures the Flask app and sets up the logging
 and SQL database
@@ -26,33 +23,42 @@ from flask import Flask
 from service import config
 from service.common import log_handlers
 
-# NOTE: Do not change the order of this code
-# The Flask app must be created
-# BEFORE you import modules that depend on it !!!
 
-# Create the Flask aoo
-app = Flask(__name__)  # pylint: disable=invalid-name
+############################################################
+# Initialize the Flask instance
+############################################################
+def create_app():
+    """Initialize the core application."""
+    # Create Flask application
+    app = Flask(__name__)
+    app.config.from_object(config)
 
-# Load Configurations
-app.config.from_object(config)
+    # Initialize Plugins
+    # pylint: disable=import-outside-toplevel
+    from service.models import db
+    db.init_app(app)
 
-# Dependencies require we import the routes AFTER the Flask app is created
-# pylint: disable=wrong-import-position, wrong-import-order, cyclic-import
-from service import routes, models        # noqa: F401, E402
-from service.common import error_handlers, cli_commands  # noqa: F401, E402
+    with app.app_context():
+        # Dependencies require we import the routes AFTER the Flask app is created
+        # pylint: disable=wrong-import-position, wrong-import-order, unused-import
+        from service import routes, models  # noqa: F401 E402
+        from service.common import error_handlers, cli_commands  # noqa: F401, E402
 
-# Set up logging for production
-log_handlers.init_logging(app, "gunicorn.error")
+        try:
+            # models.init_db(app)  # make our sqlalchemy tables
+            db.create_all()
+        except Exception as error:  # pylint: disable=broad-except
+            app.logger.critical("%s: Cannot continue", error)
+            # gunicorn requires exit code 4 to stop spawning workers when they die
+            sys.exit(4)
 
-app.logger.info(70 * "*")
-app.logger.info("  P E T   S E R V I C E   R U N N I N G  ".center(70, "*"))
-app.logger.info(70 * "*")
+        # Set up logging for production
+        log_handlers.init_logging(app, "gunicorn.error")
 
-try:
-    models.init_db(app)  # make our sqlalchemy tables
-except Exception as error:  # pylint: disable=broad-except
-    app.logger.critical("%s: Cannot continue", error)
-    # gunicorn requires exit code 4 to stop spawning workers when they die
-    sys.exit(4)
+        app.logger.info(70 * "*")
+        app.logger.info("  P E T   S T O R E   S E R V I C E  ".center(70, "*"))
+        app.logger.info(70 * "*")
 
-app.logger.info("Service initialized!")
+        app.logger.info("Service initialized!")
+
+        return app

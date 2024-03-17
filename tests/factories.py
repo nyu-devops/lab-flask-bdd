@@ -1,4 +1,4 @@
-# Copyright 2016, 2022 John J. Rofrano. All Rights Reserved.
+# Copyright 2016, 2019 John J. Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 Test Factory to make fake objects for testing
 """
 from datetime import date
+
 import factory
 from factory.fuzzy import FuzzyChoice, FuzzyDate
 from service.models import Pet, Gender
@@ -31,7 +32,7 @@ class PetFactory(factory.Factory):
 
     id = factory.Sequence(lambda n: n)
     name = factory.Faker("first_name")
-    category = FuzzyChoice(choices=["dog", "cat", "bird", "fish", "reptile"])
+    category = FuzzyChoice(choices=["dog", "cat", "bird", "fish"])
     available = FuzzyChoice(choices=[True, False])
     gender = FuzzyChoice(choices=[Gender.MALE, Gender.FEMALE, Gender.UNKNOWN])
     birthday = FuzzyDate(date(2008, 1, 1))

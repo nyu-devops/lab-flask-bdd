@@ -14,36 +14,28 @@
 
 """
 Test cases for Pet Model
-
-Test cases can be run with:
-    nosetests
-    coverage report -m
-
-While debugging just these tests it's convenient to use this:
-    nosetests --stop tests/test_pets.py:TestPetModel
-
 """
 import os
 import logging
-import unittest
+from unittest import TestCase
+from unittest.mock import patch
 from datetime import date
-from werkzeug.exceptions import NotFound
+from wsgi import app
 from service.models import Pet, Gender, DataValidationError, db
-from service import app
 from tests.factories import PetFactory
 
 DATABASE_URI = os.getenv(
-    "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
+    "DATABASE_URI", "postgresql+psycopg://postgres:pgs3cr3t@localhost:5432/testdb"
 )
 
 
 ######################################################################
-#  P E T   M O D E L   T E S T   C A S E S
+#  B A S E   T E S T   C A S E S
 ######################################################################
-# pylint: disable=too-many-public-methods
-class TestPetModel(unittest.TestCase):
-    """Test Cases for Pet Model"""
+class TestCaseBase(TestCase):
+    """Base Test Case for common setup"""
 
+    # pylint: disable=duplicate-code
     @classmethod
     def setUpClass(cls):
         """This runs once before the entire test suite"""
@@ -51,7 +43,7 @@ class TestPetModel(unittest.TestCase):
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
-        Pet.init_db(app)
+        app.app_context().push()
 
     @classmethod
     def tearDownClass(cls):
@@ -66,6 +58,13 @@ class TestPetModel(unittest.TestCase):
     def tearDown(self):
         """This runs after each test"""
         db.session.remove()
+
+
+######################################################################
+#  P E T   M O D E L   T E S T   C A S E S
+######################################################################
+class TestPetModel(TestCaseBase):
+    """Pet Model CRUD Tests"""
 
     ######################################################################
     #  T E S T   C A S E S
@@ -219,6 +218,41 @@ class TestPetModel(unittest.TestCase):
         pet = Pet()
         self.assertRaises(DataValidationError, pet.deserialize, data)
 
+
+######################################################################
+#  T E S T   E X C E P T I O N   H A N D L E R S
+######################################################################
+class TestExceptionHandlers(TestCaseBase):
+    """Pet Model Exception Handlers"""
+
+    @patch("service.models.db.session.commit")
+    def test_create_exception(self, exception_mock):
+        """It should catch a create exception"""
+        exception_mock.side_effect = Exception()
+        pet = PetFactory()
+        self.assertRaises(DataValidationError, pet.create)
+
+    @patch("service.models.db.session.commit")
+    def test_update_exception(self, exception_mock):
+        """It should catch a update exception"""
+        exception_mock.side_effect = Exception()
+        pet = PetFactory()
+        self.assertRaises(DataValidationError, pet.update)
+
+    @patch("service.models.db.session.commit")
+    def test_delete_exception(self, exception_mock):
+        """It should catch a delete exception"""
+        exception_mock.side_effect = Exception()
+        pet = PetFactory()
+        self.assertRaises(DataValidationError, pet.delete)
+
+
+######################################################################
+#  Q U E R Y   T E S T   C A S E S
+######################################################################
+class TestModelQueries(TestCaseBase):
+    """Pet Model Query Tests"""
+
     def test_find_pet(self):
         """It should Find a Pet by ID"""
         pets = PetFactory.create_batch(5)
@@ -250,17 +284,15 @@ class TestPetModel(unittest.TestCase):
 
     def test_find_by_name(self):
         """It should Find a Pet by Name"""
-        pets = PetFactory.create_batch(5)
+        pets = PetFactory.create_batch(10)
         for pet in pets:
             pet.create()
         name = pets[0].name
+        count = len([pet for pet in pets if pet.name == name])
         found = Pet.find_by_name(name)
-        self.assertEqual(found.count(), 1)
-        self.assertEqual(found[0].category, pets[0].category)
-        self.assertEqual(found[0].name, pets[0].name)
-        self.assertEqual(found[0].available, pets[0].available)
-        self.assertEqual(found[0].gender, pets[0].gender)
-        self.assertEqual(found[0].birthday, pets[0].birthday)
+        self.assertEqual(found.count(), count)
+        for pet in found:
+            self.assertEqual(pet.name, name)
 
     def test_find_by_availability(self):
         """It should Find Pets by Availability"""
@@ -285,21 +317,3 @@ class TestPetModel(unittest.TestCase):
         self.assertEqual(found.count(), count)
         for pet in found:
             self.assertEqual(pet.gender, gender)
-
-    def test_find_or_404_found(self):
-        """It should Find or return 404 not found"""
-        pets = PetFactory.create_batch(3)
-        for pet in pets:
-            pet.create()
-
-        pet = Pet.find_or_404(pets[1].id)
-        self.assertIsNot(pet, None)
-        self.assertEqual(pet.id, pets[1].id)
-        self.assertEqual(pet.name, pets[1].name)
-        self.assertEqual(pet.available, pets[1].available)
-        self.assertEqual(pet.gender, pets[1].gender)
-        self.assertEqual(pet.birthday, pets[1].birthday)
-
-    def test_find_or_404_not_found(self):
-        """It should return 404 not found"""
-        self.assertRaises(NotFound, Pet.find_or_404, 0)

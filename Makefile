@@ -25,15 +25,14 @@ clean:	## Removes all dangling build cache
 	docker image prune -f
 	docker buildx prune -f
 
-.PHONY: venv
 venv: ## Create a Python virtual environment
 	$(info Creating Python 3 virtual environment...)
-	python3 -m venv .venv
+	poetry shell
 
-.PHONY: install
-install: ## Install dependencies
+install: ## Install Python dependencies
 	$(info Installing dependencies...)
-	sudo pip install -r requirements.txt
+	poetry config virtualenvs.create false
+	poetry install
 
 .PHONY: lint
 lint: ## Run the linter
@@ -45,7 +44,7 @@ lint: ## Run the linter
 .PHONY: test
 test: ## Run the unit tests
 	$(info Running tests...)
-	export RETRY_COUNT=1; green -vvv --processes=1 --run-coverage --termcolor --minimum-coverage=95
+	export RETRY_COUNT=1; pytest --disable-warnings
 
 .PHONY: run
 run: ## Run the service

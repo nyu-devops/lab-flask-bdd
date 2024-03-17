@@ -6,7 +6,7 @@
             "request": "launch",
             "module": "flask",
             "env": {
-                "FLASK_APP": "service:app",
+                "FLASK_APP": "wsgi:app",
                 "FLASK_ENV": "development"
             },
             "args": [
