@@ -75,7 +75,7 @@ spec:
 ---
 # This secret can also be created from the command line using environment variables
 #
-# export DATABASE_URI='postgresql://<place-url-to-database-here>'
+# export DATABASE_URI='postgresql+psycopg://<userid>:<password>@<hostname>:<port>/<database-name>'
 # export POSTGRES_PASSWORD='<place-password-here>'
 #
 # kubectl create secret generic postgres-creds \
@@ -88,4 +88,4 @@ metadata:
   name: postgres-creds
 data:
   password: cG9zdGdyZXM=
-  database_uri: cG9zdGdyZXNxbDovL3Bvc3RncmVzOnBvc3RncmVzQHBvc3RncmVzOjU0MzIvcG9zdGdyZXM=
+  database_uri: cG9zdGdyZXNxbCtwc3ljb3BnOi8vcG9zdGdyZXM6cG9zdGdyZXNAcG9zdGdyZXM6NTQzMi9wb3N0Z3Jlcw==
