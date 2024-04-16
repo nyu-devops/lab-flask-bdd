@@ -60,5 +60,5 @@ jobs:
       - name: Run Integration Tests
         run: behave
         env:
-          DRIVER: "firefox"
+          DRIVER: "chrome"
   
