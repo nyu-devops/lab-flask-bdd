@@ -8,6 +8,15 @@
 	"customizations": {
 		"vscode": {
 			"settings": {
+				"cSpell.words": [
+					"Rofrano",
+					"sqlalchemy",
+					"psycopg",
+					"pytest",
+					"tekton",
+					"creds",
+					"virtualenvs"
+				],				
 				"[python]": {
 					"editor.defaultFormatter": "ms-python.black-formatter",
 					"editor.formatOnSave": true
