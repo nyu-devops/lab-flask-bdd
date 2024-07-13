@@ -75,8 +75,13 @@ push: ## Push to a Docker image registry
 	$(info Logging into IBM Cloud cluster $(CLUSTER)...)
 	docker push $(IMAGE)
 
+.PHONY: postgres
+postgres: ## Deploy the PostgreSQL service on local Kubernetes
+	$(info Deploying PostgreSQL service to Kubernetes...)
+	kubectl apply -f k8s/postgres
+
 .PHONY: deploy
-deploy: ## Deploy the service on local Kubernetes
+deploy: postgres ## Deploy the service on local Kubernetes
 	$(info Deploying service locally...)
 	kubectl apply -f k8s/
 
