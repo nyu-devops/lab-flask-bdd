@@ -78,7 +78,7 @@ Pytest is configured to automatically include the flags `--pspec --cov=service -
 
 These tests require the service to be running because unlike the the TDD unit tests that test the code locally, these BDD integration tests are using Selenium to manipulate a web page on a running server.
 
-Run the tests using `behave`
+#### Run using two shells
 
 Start the server in a separate bash shell:
 
@@ -86,13 +86,55 @@ Start the server in a separate bash shell:
 honcho start
 ```
 
-Then start behave in your original bash shell:
+Then start `behave` in your original bash shell:
 
 ```sh
 behave
 ```
 
 You will see the results of the tests scroll down yur screen using the familiar red/green/refactor colors.
+
+#### Run using Kubernetes
+
+You can also use Kubernetes to host your application and test against it with BDD. The commands to do this are:
+
+```bash
+make cluster
+make build
+make push
+make deploy
+```
+
+What did these commands do?
+
+| Command | What does it do? |
+|---------|------------------|
+| make cluster | Creates a local Kubernetes cluster using `k3d` |
+| make build | Builds the Docker image |
+| make push | Pushes the image to the local Docker registry |
+| make deploy | Deploys the application using the image that was just built and pushed |
+
+Now you can just run `behave` against the application running in the local Kubernetes cluster
+
+```bash
+behave
+```
+
+### See what images are in the local registry
+
+You can use the `curl` command to query what images you have pushed to your local Docker registry. This will return `JSON` so you might want to use the silent flag `-s` and pipe it through `jq` like this:
+
+```bash
+curl -XGET http://localhost:5000/v2/_catalog -s | jq
+```
+
+That will return all of the image names without the tags.
+
+To get the tags use:
+
+```bash
+curl -XGET http://localhost:5000/v2/<image-name>/tags/list -s | jq
+```
 
 ## What's featured in the project?
 
@@ -108,7 +150,7 @@ You will see the results of the tests scroll down yur screen using the familiar 
 
 ## License
 
-Copyright (c) 2016, 2023, John J. Rofrano. All rights reserved.
+Copyright (c) 2016, 2024, John J. Rofrano. All rights reserved.
 
 Licensed under the Apache License. See [LICENSE](LICENSE)
 

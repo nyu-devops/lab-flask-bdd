@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lab-flask-bdd
+  name: petshop
   labels:
-    app: lab-flask-bdd
+    app: petshop
 spec:
-  replicas: 2
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -13,19 +13,17 @@ spec:
       maxUnavailable: 50%
   selector:
     matchLabels:
-      app: lab-flask-bdd
+      app: petshop
   template:
     metadata:
       labels:
-        app: lab-flask-bdd
+        app: petshop
     spec:
-      imagePullSecrets:
-      - name: all-icr-io
       restartPolicy: Always
       containers:
-      - name: lab-flask-bdd
-        # image: cluster-registry:32000/lab-flask-bdd:1.0
-        image: lab-flask-bdd
+      - name: petshop
+        image: cluster-registry:5000/nyu-devops/petshop:1.0.0
+        # image: petshop
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
