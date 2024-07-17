@@ -31,8 +31,8 @@ httpie = "^3.2.2"
 # Behavior-Driven Development
 behave = "^1.2.6"
 selenium = "4.16.0" # newer versions do not work
-compare3 = "^1.0.4"
 requests = "^2.31.0"
+compare3 = "^1.0.4"
 
 [build-system]
 requires = ["poetry-core"]

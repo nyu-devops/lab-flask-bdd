@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: lab-flask-bdd
+  name: petshop
 spec:
   selector:
-    app: lab-flask-bdd
+    app: petshop
   type: ClusterIP
   internalTrafficPolicy: Local
   ports:

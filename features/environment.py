@@ -34,6 +34,7 @@ def get_chrome():
     """Creates a headless Chrome driver"""
     options = webdriver.ChromeOptions()
     options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--headless")
     return webdriver.Chrome(options=options)
 
