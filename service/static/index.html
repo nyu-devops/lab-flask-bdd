@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Pet Demo RESTful Service</title>
+    <title>Health Record and Insurance Cost Prediction Service</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,7 +11,7 @@
   <body>
     <div class="container">
       <div class="page-header">
-          <h1>Pet Demo REST API Service</h1>
+          <h1>Health Record and Insurance Cost Prediction Service</h1>
       </div>
 
       <!-- Flash Message -->
@@ -23,13 +23,13 @@
 
       <!-- FORM -->
       <div class="col-md-12" id="form_data">
-        <h3>Create, Retrieve, Update, and Delete a Pet:</h3>
+        <h3>Create, Retrieve, Update, and Delete a Health Record:</h3>
         <div class="well">
           <div class="form-horizontal">
             <div class="form-group">
-              <label class="control-label col-sm-2" for="pet_id">Pet ID:</label>
+              <label class="control-label col-sm-2" for="record_id">Record ID:</label>
               <div class="col-sm-6">
-                <input type="text" class="form-control" id="pet_id" placeholder="Enter ID of Pet">
+                <input type="text" class="form-control" id="record_id" placeholder="Enter ID of Health Record">
               </div>
               <div class="col-sm-4">
                 <button type="submit" class="btn btn-primary" id="retrieve-btn">Retrieve</button>
@@ -40,78 +40,103 @@
 
           <div class="form-horizontal">
 
-            <!-- NAME -->
+            <!-- First NAME -->
             <div class="form-group">
-              <label class="control-label col-sm-2" for="pet_name">Name:</label>
+              <label class="control-label col-sm-2" for="first_name">First Name:</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="pet_name" placeholder="Enter name for Pet">
+                <input type="text" class="form-control" id="first_name" placeholder="Enter first name of the customer">
               </div>
             </div>
 
-            <!-- CATEGORY -->
+            <!-- Last NAME -->
             <div class="form-group">
-              <label class="control-label col-sm-2" for="pet_category">Category:</label>
+              <label class="control-label col-sm-2" for="last_name">Last Name:</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="pet_category" placeholder="Enter category for Pet">
+                <input type="text" class="form-control" id="last_name" placeholder="Enter last name of the customer">
               </div>
             </div>
 
-            <!-- AVAILABLE -->
+            <!-- Age -->
             <div class="form-group">
-              <label class="control-label col-sm-2" for="pet_available">Available:</label>
+              <label class="control-label col-sm-2" for="age">Age:</label>
               <div class="col-sm-10">
-                <select class="form-control" id="pet_available">
-                  <option value="true" selected>True</option>
-                  <option value="false">False</option>
+                <input type="text" class="form-control" id="age" placeholder="Enter age of the customer">
+              </div>
+            </div>
+
+            <!-- Sex -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="sex">Sex:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="sex" placeholder="Enter sex of the customer">
+              </div>
+            </div>
+
+            <!-- BMI -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="bmi">BMI:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="bmi" placeholder="Enter bmi of the customer">
+              </div>
+            </div>
+
+            <!-- Children -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="children">Children:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="children" placeholder="Enter number of children of the customer">
+              </div>
+            </div>
+
+            <!-- SMOKE -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="smoke">Smoke:</label>
+              <div class="col-sm-10">
+                <select class="form-control" id="smoke">
+                  <option value="">-- Select an option --</option>
+                  <option value="true" selected>Yes</option>
+                  <option value="false">No</option>
                 </select>
               </div>
             </div>
 
-            <!-- GENDER -->
+            <!-- Region -->
             <div class="form-group">
-              <label class="control-label col-sm-2" for="pet_gender">Gender:</label>
+              <label class="control-label col-sm-2" for="region">Region:</label>
               <div class="col-sm-10">
-                <select class="form-control" id="pet_gender">
-                  <option value="UNKNOWN" selected>Unknown</option>
-                  <option value="MALE">Male</option>
-                  <option value="FEMALE">Female</option>
+                <select class="form-control" id="region">
+                  <option value="0">-- Select an option --</option>
+                  <option value="1" selected>SouthEast</option>
+                  <option value="2" selected>SouthWest</option>
+                  <option value="3" selected>NorthEast</option>
+                  <option value="4" selected>NorthWest</option>
                 </select>
               </div>
             </div>
-
-            <!-- BIRTHDAY -->
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="pet_birthday">Birthday:</label>
-              <div class="col-sm-10">
-                <input type="date" class="form-control" id="pet_birthday" placeholder="2020-04-01">
-              </div>
-            </div>
-
 
             <!-- SUBMIT BUTTONS -->
             <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-primary" id="search-btn">Search</button>
+                <!-- <button type="submit" class="btn btn-primary" id="search-btn">Search</button> -->
                 <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
                 <button type="submit" class="btn btn-success" id="create-btn">Create</button>
                 <button type="submit" class="btn btn-warning" id="update-btn">Update</button>
+                <button type="submit" class="btn btn-success" id="predict-btn">Predict</button>
               </div>
             </div>
           </div> <!-- form horizontal -->
         </div> <!-- end well -->
       </div> <!-- end Form -->
 
-      <!-- Search Results -->
-      <div class="table-responsive col-md-12" id="search_results">
+      <!-- Predict Results -->
+      <div class="table-responsive col-md-12" id="predict_results">
+        <h3>Cost Prediction:</h3>
         <table class="table table-striped">
           <thead>
           <tr>
-            <th class="col-md-1">ID</th>
-            <th class="col-md-4">Name</th>
-            <th class="col-md-4">Category</th>
-            <th class="col-md-3">Available</th>
-            <th class="col-md-3">Gender</th>
-            <th class="col-md-3">Birthday</th>
+            <th class="col-md-1">Record ID</th>
+            <th class="col-md-2">Cost</th>
+            <th class="col-md-2">Suggestion</th>
           </tr>
           </thead>
         </table>
@@ -119,7 +144,8 @@
 
       <footer>
         <br><br>
-        <p>&copy; NYU DevOps Company 2022</p>
+        <p>&copy; Yihan Li (yl10798) & Hao Li (hl5262)</p>
+        <p>UI template borrowed from NYU DevOps Project</p>
       </footer>
 
     </div> <!-- container -->
