@@ -98,7 +98,7 @@ class Records(db.Model):
                 region=data["Region"],
             )
         except KeyError as e:
-            raise DataValidationError("Invalid record: missing " + e.args[0])
+            raise DataValidationError('Invalid record: missing ' + e.args[0]) from e
 
     def create(self):
         """Adds a new Record to the database."""

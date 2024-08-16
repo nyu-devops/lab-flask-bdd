@@ -20,15 +20,9 @@ import os
 import logging
 import json
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
-
-# from unittest.mock import MagicMock, patch
-from urllib.parse import quote_plus
 from wsgi import app
-
-# from service import create_app
 from service.common import status
-from service.models import Records, db, DataValidationError
+from service.models import Records, db
 from tests.factories import RecordFactory
 
 # Disable all but critical errors during normal test run
@@ -39,7 +33,7 @@ from tests.factories import RecordFactory
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:pgs3cr3t@localhost:5432/testdb"
 )
-BASE_URL = "/pets"
+BASE_URL = "/records"
 
 # app = create_app()
 
@@ -83,7 +77,7 @@ class TestPetService(TestCase):
         """It should call the Home Page"""
         response = self.client.get("/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn(b"Pet Demo REST API Service", response.data)
+        self.assertIn(b"Health Record and Insurance Cost Prediction Service", response.data)
 
     def test_health(self):
         """It should be healthy"""
@@ -144,3 +138,45 @@ class TestPetService(TestCase):
         self.assertEqual(response.status_code, 204)
         response = self.client.get(f"/records/{record.record_id}")
         self.assertEqual(response.status_code, 404)
+
+    # ----------------------------------------------------------
+    # TEST LIST
+    # ----------------------------------------------------------
+
+    def test_list_record(self):
+        """It should list all records via GET"""
+        for _ in range(3):
+            record = RecordFactory.build()
+            response = self.client.post(
+                "/records",
+                data=json.dumps(record.serialize()),
+                content_type="application/json"
+            )
+            self.assertEqual(response.status_code, 201)
+            data = json.loads(response.data)
+
+        response = self.client.get("/records", content_type="application/json")
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+
+        self.assertEqual(len(data), 3)
+
+    def test_invalid_content_type(self):
+        """It should not Accept any request that have an invalid content type"""
+        record = RecordFactory()
+        resp = self.client.post(
+            BASE_URL, json=record.serialize(), content_type="bullshit"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_bad_request(self):
+        """It should not Accept any bad requests"""
+        data = {}
+        data["attr"] = "nonsense"  # malformed data that the server cannot parse
+        resp = self.client.post(BASE_URL, json=data, content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_request_method_not_supported(self):
+        """It should not Accept any requests with unsupported methods"""
+        resp = self.client.post("/", json={}, content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)

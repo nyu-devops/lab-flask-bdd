@@ -18,10 +18,8 @@ Test cases for Pet Model
 import os
 import logging
 from unittest import TestCase
-from unittest.mock import patch
-from datetime import date
 from wsgi import app
-from service.models import db, Records, DataValidationError
+from service.models import Records, db
 from tests.factories import RecordFactory
 
 DATABASE_URI = os.getenv(
@@ -30,6 +28,7 @@ DATABASE_URI = os.getenv(
 
 
 class TestRecords(TestCase):
+    """Test class for records"""
 
     # pylint: disable=duplicate-code
     @classmethod

@@ -28,14 +28,10 @@ PUT /records/{id} - updates a Records record in the database
 DELETE /records/{id} - deletes a Records record in the database
 """
 
-import secrets
-from functools import wraps
 from flask import request, jsonify, url_for, abort
 from flask import current_app as app  # Import Flask application
-from flask_restx import Resource, fields, reqparse, inputs
 from service.models import Records
 from service.common import status  # HTTP Status Codes
-from . import api
 
 
 ######################################################################
@@ -77,10 +73,11 @@ def get_record(record_id):
     """Returns the Record with a given id number"""
     app.logger.info(f"Request for record with id: {record_id}")
     record = Records.query.get(record_id)
-    if record:
-        return jsonify(record.serialize()), status.HTTP_200_OK
-    else:
+
+    if not record:
         abort(status.HTTP_404_NOT_FOUND, f"Record with id '{record_id}' was not found.")
+
+    return jsonify(record.serialize()), status.HTTP_200_OK
 
 
 ######################################################################
@@ -108,12 +105,13 @@ def update_record(record_id):
     """Updates a Record record in the database"""
     check_content_type("application/json")
     record = Records.query.get(record_id)
-    if record:
-        record_data = request.get_json()
-        record.update(record_data)
-        return jsonify(record.serialize()), status.HTTP_200_OK
-    else:
+
+    if not record:
         abort(status.HTTP_404_NOT_FOUND, f"Record with id '{record_id}' was not found.")
+
+    record_data = request.get_json()
+    record.update(record_data)
+    return jsonify(record.serialize()), status.HTTP_200_OK
 
 
 ######################################################################
@@ -124,11 +122,12 @@ def delete_record(record_id):
     """Deletes a Record based on the id specified in the path"""
     app.logger.info(f"Request to delete record with id: {record_id}")
     record = Records.query.get(record_id)
-    if record:
-        record.delete()
-        return "", status.HTTP_204_NO_CONTENT
-    else:
+
+    if not record:
         abort(status.HTTP_404_NOT_FOUND, f"Record with id '{record_id}' was not found.")
+
+    record.delete()
+    return "", status.HTTP_204_NO_CONTENT
 
 
 ######################################################################

@@ -15,7 +15,6 @@
 """
 Test Factory to make fake objects for testing
 """
-from datetime import date
 
 import factory
 from factory.fuzzy import FuzzyChoice, FuzzyInteger, FuzzyFloat
@@ -25,7 +24,9 @@ from service.models import Records
 class RecordFactory(factory.Factory):
     """Creates fake records that are used for testing."""
 
-    class Meta:
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Maps factory to data model"""
+
         model = Records
 
     record_id = factory.Sequence(lambda n: n + 1)
