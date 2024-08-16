@@ -50,29 +50,32 @@ def create_app():
     ######################################################################
     # Configure Swagger before initializing it
     ######################################################################
-    global api
-    api = Api(
-        app,
-        version="1.0.0",
-        title="Pet Demo REST API Service",
-        description="This is a sample server Pet store server.",
-        default="pets",
-        default_label="Pet shop operations",
-        doc="/apidocs",  # default also could use doc='/apidocs/'
-        prefix="/api",
-    )
+    # global api
+    # api = Api(
+    #     app,
+    #     version="1.0.0",
+    #     title="Records Demo REST API Service",
+    #     description="This is a sample server Records store server.",
+    #     default="records",
+    #     default_label="Records shop operations",
+    #     doc="/apidocs",  # default also could use doc='/apidocs/'
+    #     prefix="/api",
+    # )
 
     with app.app_context():
         # Import the routes After the Flask app is created
         # pylint: disable=import-outside-toplevel
         from service import routes, models  # noqa: F401, E402
-        from service.common import error_handlers   # pylint: disable=unused-import
+        from service.common import error_handlers  # pylint: disable=unused-import
 
         try:
             # Initialize Plugins
             # pylint: disable=import-outside-toplevel
             models.db.init_app(app)
-            
+            models.db.drop_all()
+            models.db.create_all()
+            models.db.session.commit()
+
         except Exception as error:  # pylint: disable=broad-except
             app.logger.critical("%s: Cannot continue", error)
             # gunicorn requires exit code 4 to stop spawning workers when they die
@@ -82,7 +85,7 @@ def create_app():
         log_handlers.init_logging(app, "gunicorn.error")
 
         app.logger.info(70 * "*")
-        app.logger.info("  P E T   S E R V I C E   R U N N I N G  ".center(70, "*"))
+        app.logger.info("  RECORDS   S E R V I C E   R U N N I N G  ".center(70, "*"))
         app.logger.info(70 * "*")
 
         app.logger.info("Service initialized!")

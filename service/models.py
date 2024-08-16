@@ -13,26 +13,28 @@
 # limitations under the License.
 
 """
-Models for Pet Demo Service
+Models for Records Demo Service
 
 All of the models are stored in this module
 
 Models
 ------
-Pet - A Pet used in the Pet Store
+Records
 
 Attributes:
 -----------
-name (string) - the name of the pet
-category (string) - the category the pet belongs to (i.e., dog, cat)
-available (boolean) - True for pets that are available for adoption
-gender (enum) - the gender of the pet
-birthday (date) - the day the pet was born
+record_id
+first_name
+last_name
+age
+sex
+bmi
+children
+smoke
+region
 
 """
 import logging
-from datetime import date
-from enum import Enum
 from flask_sqlalchemy import SQLAlchemy
 
 logger = logging.getLogger("flask.app")
@@ -45,201 +47,76 @@ class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
 
 
-class Gender(Enum):
-    """Enumeration of valid Pet Genders"""
-
-    MALE = 0
-    FEMALE = 1
-    UNKNOWN = 3
-
-
-class Pet(db.Model):
+class Records(db.Model):
     """
-    Class that represents a Pet
-
-    This version uses a relational database for persistence which is hidden
-    from us by SQLAlchemy's object relational mappings (ORM)
+    Class that represents a Record in the dataset.
     """
 
     ##################################################
     # Table Schema
     ##################################################
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(63), nullable=False)
-    category = db.Column(db.String(63), nullable=False)
-    available = db.Column(db.Boolean(), nullable=False, default=False)
-    gender = db.Column(
-        db.Enum(Gender), nullable=False, server_default=(Gender.UNKNOWN.name)
-    )
-    birthday = db.Column(db.Date(), nullable=False, default=date.today())
-    # Database auditing fields
-    created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
-    last_updated = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now(), nullable=False)
+    record_id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(100), nullable=True)
+    last_name = db.Column(db.String(100), nullable=True)
+    age = db.Column(db.Integer, nullable=False)
+    sex = db.Column(db.String(10), nullable=False)  # 'Male' or 'Female'
+    bmi = db.Column(db.Float, nullable=False)
+    children = db.Column(db.Integer, nullable=False)
+    smoke = db.Column(db.Boolean, nullable=False)
+    region = db.Column(db.String(100), nullable=False)
 
     ##################################################
-    # INSTANCE METHODS
+    # Methods
     ##################################################
 
-    def __repr__(self):
-        return f"<Pet {self.name} id=[{self.id}]>"
-
-    def create(self) -> None:
-        """
-        Saves a Pet to the database
-        """
-        logger.info("Creating %s", self.name)
-        # id must be none to generate next primary key
-        self.id = None  # pylint: disable=invalid-name
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            logger.error("Error creating record: %s", self)
-            raise DataValidationError(e) from e
-
-    def update(self) -> None:
-        """
-        Updates a Pet to the database
-        """
-        logger.info("Saving %s", self.name)
-        if not self.id:
-            raise DataValidationError("Update called with empty ID field")
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            logger.error("Error updating record: %s", self)
-            raise DataValidationError(e) from e
-
-    def delete(self) -> None:
-        """
-        Removes a Pet from the database
-        """
-        logger.info("Deleting %s", self.name)
-        try:
-            db.session.delete(self)
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            logger.error("Error deleting record: %s", self)
-            raise DataValidationError(e) from e
-
-    def serialize(self) -> dict:
-        """Serializes a Pet into a dictionary"""
+    def serialize(self):
+        """Returns the object data in easily serializable format"""
         return {
-            "id": self.id,
-            "name": self.name,
-            "category": self.category,
-            "available": self.available,
-            "gender": self.gender.name,  # convert enum to string
-            "birthday": self.birthday.isoformat()
+            "Record ID": self.record_id,
+            "First Name": self.first_name,
+            "Last Name": self.last_name,
+            "Age": self.age,
+            "Sex": self.sex,
+            "BMI": self.bmi,
+            "Children": self.children,
+            "Smoke": self.smoke,
+            "Region": self.region,
         }
 
-    def deserialize(self, data: dict):
-        """
-        Deserializes a Pet from a dictionary
-        Args:
-            data (dict): A dictionary containing the Pet data
-        """
+    @classmethod
+    def deserialize(cls, data):
+        """Deserializes Records from a dictionary."""
         try:
-            self.name = data["name"]
-            self.category = data["category"]
-            if isinstance(data["available"], bool):
-                self.available = data["available"]
-            else:
-                raise DataValidationError(
-                    "Invalid type for boolean [available]: "
-                    + str(type(data["available"]))
-                )
-            self.gender = getattr(Gender, data["gender"])  # create enum from string
-            self.birthday = date.fromisoformat(data["birthday"])
-        except AttributeError as error:
-            raise DataValidationError("Invalid attribute: " + error.args[0]) from error
-        except KeyError as error:
-            raise DataValidationError("Invalid pet: missing " + error.args[0]) from error
-        except TypeError as error:
-            raise DataValidationError(
-                "Invalid pet: body of request contained bad or no data " + str(error)
-            ) from error
-        return self
+            return cls(
+                first_name=data.get("First Name"),
+                last_name=data.get("Last Name"),
+                age=data["Age"],
+                sex=data["Sex"],
+                bmi=data["BMI"],
+                children=data["Children"],
+                smoke=data["Smoke"],
+                region=data["Region"],
+            )
+        except KeyError as e:
+            raise DataValidationError("Invalid record: missing " + e.args[0])
 
-    ##################################################
-    # CLASS METHODS
-    ##################################################
+    def create(self):
+        """Adds a new Record to the database."""
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self, data):
+        """Updates a Record with data from a dictionary."""
+        for key, value in data.items():
+            setattr(self, key.lower().replace(" ", "_"), value)
+        db.session.commit()
+
+    def delete(self):
+        """Deletes a Record from the database."""
+        db.session.delete(self)
+        db.session.commit()
 
     @classmethod
-    def all(cls) -> list:
-        """Returns all of the Pets in the database"""
-        logger.info("Processing all Pets")
+    def find_all(cls):
+        """Returns all Records."""
         return cls.query.all()
-
-    @classmethod
-    def find(cls, pet_id: int):
-        """Finds a Pet by it's ID
-
-        :param pet_id: the id of the Pet to find
-        :type pet_id: int
-
-        :return: an instance with the pet_id, or None if not found
-        :rtype: Pet
-
-        """
-        logger.info("Processing lookup for id %s ...", pet_id)
-        return cls.query.session.get(cls, pet_id)
-
-    @classmethod
-    def find_by_name(cls, name: str) -> list:
-        """Returns all Pets with the given name
-
-        :param name: the name of the Pets you want to match
-        :type name: str
-
-        :return: a collection of Pets with that name
-        :rtype: list
-
-        """
-        logger.info("Processing name query for %s ...", name)
-        return cls.query.filter(cls.name == name)
-
-    @classmethod
-    def find_by_category(cls, category: str) -> list:
-        """Returns all of the Pets in a category
-
-        :param category: the category of the Pets you want to match
-        :type category: str
-
-        :return: a collection of Pets in that category
-        :rtype: list
-
-        """
-        logger.info("Processing category query for %s ...", category)
-        return cls.query.filter(cls.category == category)
-
-    @classmethod
-    def find_by_availability(cls, available: bool = True) -> list:
-        """Returns all Pets by their availability
-
-        :param available: True for pets that are available
-        :type available: str
-
-        :return: a collection of Pets that are available
-        :rtype: list
-
-        """
-        logger.info("Processing available query for %s ...", available)
-        return cls.query.filter(cls.available == available)
-
-    @classmethod
-    def find_by_gender(cls, gender: Gender = Gender.UNKNOWN) -> list:
-        """Returns all Pets by their Gender
-
-        :param gender: values are ['MALE', 'FEMALE', 'UNKNOWN']
-        :type available: enum
-
-        :return: a collection of Pets that are available
-        :rtype: list
-
-        """
-        logger.info("Processing gender query for %s ...", gender.name)
-        return cls.query.filter(cls.gender == gender)

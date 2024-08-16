@@ -18,21 +18,22 @@ Test Factory to make fake objects for testing
 from datetime import date
 
 import factory
-from factory.fuzzy import FuzzyChoice, FuzzyDate
-from service.models import Pet, Gender
+from factory.fuzzy import FuzzyChoice, FuzzyInteger, FuzzyFloat
+from service.models import Records
 
 
-class PetFactory(factory.Factory):
-    """Creates fake pets that you don't have to feed"""
+class RecordFactory(factory.Factory):
+    """Creates fake records that are used for testing."""
 
-    class Meta:  # pylint: disable=too-few-public-methods
-        """Maps factory to data model"""
+    class Meta:
+        model = Records
 
-        model = Pet
-
-    id = factory.Sequence(lambda n: n)
-    name = factory.Faker("first_name")
-    category = FuzzyChoice(choices=["dog", "cat", "bird", "fish"])
-    available = FuzzyChoice(choices=[True, False])
-    gender = FuzzyChoice(choices=[Gender.MALE, Gender.FEMALE, Gender.UNKNOWN])
-    birthday = FuzzyDate(date(2008, 1, 1))
+    record_id = factory.Sequence(lambda n: n + 1)
+    first_name = factory.Faker("first_name")
+    last_name = factory.Faker("last_name")
+    age = FuzzyInteger(18, 100)
+    sex = FuzzyChoice(choices=["Male", "Female"])
+    bmi = FuzzyFloat(18.5, 40.0)
+    children = FuzzyInteger(0, 5)
+    smoke = FuzzyChoice(choices=[True, False])
+    region = FuzzyChoice(choices=["North", "South", "East", "West"])
