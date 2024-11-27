@@ -4,9 +4,9 @@ Environment for Behave Testing
 from os import getenv
 from selenium import webdriver
 
-WAIT_SECONDS = int(getenv('WAIT_SECONDS', '60'))
+WAIT_SECONDS = int(getenv('WAIT_SECONDS', '30'))
 BASE_URL = getenv('BASE_URL', 'http://localhost:8080')
-DRIVER = getenv('DRIVER', 'chrome').lower()
+DRIVER = getenv('DRIVER', 'firefox').lower()
 
 
 def before_all(context):
@@ -19,6 +19,7 @@ def before_all(context):
     else:
         context.driver = get_chrome()
     context.driver.implicitly_wait(context.wait_seconds)
+    context.driver.set_window_size(1280, 1300)
     context.config.setup_logging()
 
 
