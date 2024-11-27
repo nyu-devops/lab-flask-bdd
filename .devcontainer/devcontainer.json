@@ -68,10 +68,10 @@
 				"ms-azuretools.vscode-docker",
 				"ms-kubernetes-tools.vscode-kubernetes-tools",
 				"inercia.vscode-k3d",
-				"rangav.vscode-thunder-client",
 				"alexkrechik.cucumberautocomplete",
 				"Zignd.html-css-class-completion",
 				"streetsidesoftware.code-spell-checker",
+				"unjinjang.rest-api-client",
 				"bbenoist.vagrant"
 			]		
 		}
