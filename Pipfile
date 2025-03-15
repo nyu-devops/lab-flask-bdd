@@ -1,0 +1,37 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "~=3.1.0"
+flask-sqlalchemy = "~=3.1.1"
+psycopg = {extras = ["binary"], version = "~=3.2.4"}
+retry2 = "~=0.9.5"
+python-dotenv = "~=1.0.1"
+gunicorn = "~=23.0.0"
+
+[dev-packages]
+honcho = "~=2.0.0"
+httpie = "~=3.2.4"
+
+# Code Quality
+pylint = "~=3.3.4"
+flake8 = "~=7.1.1"
+black = "~=25.1.0"
+
+# Test-Driven Development
+pytest = "~=8.3.4"
+pytest-pspec = "~=0.0.4"
+pytest-cov = "~=6.0.0"
+factory-boy = "~=3.3.3"
+coverage = "~=7.6.12"
+
+# Behavior-Driven Development
+behave = "~=1.2.6"
+selenium = "==4.16.0"  # newer versions do not work
+requests = "~=2.31.0"
+compare3 = "~=1.0.4"
+
+[requires]
+python_version = "3.11"

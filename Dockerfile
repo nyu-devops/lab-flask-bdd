@@ -1,18 +1,16 @@
 ##################################################
 # Create production image
 ##################################################
-FROM python:3.11-slim
+# cSpell: disable
+FROM quay.io/rofrano/python:3.11-slim
 
-# Establish a working folder
+# Set up the Python production environment
 WORKDIR /app
+COPY Pipfile Pipfile.lock ./
+RUN python -m pip install --upgrade pip pipenv && \
+    pipenv install --system --deploy
 
-# Establish dependencies
-COPY pyproject.toml poetry.lock ./
-RUN python -m pip install poetry && \
-    poetry config virtualenvs.create false && \
-    poetry install --without dev
-
-# Copy source files last because they change the most
+# Copy the application contents
 COPY wsgi.py .
 COPY service ./service
 
@@ -23,9 +21,9 @@ USER flask
 
 # Expose any ports the app is expecting in the environment
 ENV FLASK_APP=wsgi:app
-ENV PORT 8080
+ENV PORT=8080
 EXPOSE $PORT
 
-ENV GUNICORN_BIND 0.0.0.0:$PORT
+ENV GUNICORN_BIND=0.0.0.0:$PORT
 ENTRYPOINT ["gunicorn"]
 CMD ["--log-level=info", "wsgi:app"]
