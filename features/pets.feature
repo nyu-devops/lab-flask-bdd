@@ -22,7 +22,7 @@ Scenario: Create a Pet
     And I set the "Category" to "Hippo"
     And I select "False" in the "Available" dropdown
     And I select "Male" in the "Gender" dropdown
-    And I set the "Birthday" to "2022-06-16"
+    And I set the "Birthday" to "06-16-2022"
     And I press the "Create" button
     Then I should see the message "Success"
     When I copy the "Id" field
