@@ -305,9 +305,12 @@ class TestPetService(TestCase):
 
     def test_purchase_not_available(self):
         """It should not Purchase a Pet that is not available"""
-        pets = self._create_pets(10)
-        unavailable_pets = [pet for pet in pets if pet.available is False]
-        pet = unavailable_pets[0]
+        pet = PetFactory()
+        pet.available = False
+        response = self.client.post(BASE_URL, json=pet.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        new_pet = response.get_json()
+        pet.id = new_pet["id"]
         response = self.client.put(f"{BASE_URL}/{pet.id}/purchase")
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
