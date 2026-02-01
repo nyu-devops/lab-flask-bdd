@@ -82,7 +82,9 @@
 	"forwardPorts": [8080],
 	"postCreateCommand": "bash /app/.devcontainer/scripts/setup-lab.sh",
 	"features": {
-		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"moby": false
+		},
 		"ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {}
 	}
 }
