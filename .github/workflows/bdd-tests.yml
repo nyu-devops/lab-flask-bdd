@@ -22,7 +22,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: quay.io/rofrano/pipeline-selenium:sp25
+    container: quay.io/rofrano/pipeline-selenium:sp26
 
     services:
       postgres:
