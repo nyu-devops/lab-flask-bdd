@@ -1,5 +1,5 @@
 # This image has selenium and chrome driver already installed
-FROM rofrano/pipeline-selenium:latest
+FROM quay.io/rofrano/pipeline-selenium:sp26
 
 # Become a regular user for development
 ARG USERNAME=vscode

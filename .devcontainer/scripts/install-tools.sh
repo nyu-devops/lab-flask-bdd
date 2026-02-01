@@ -2,7 +2,7 @@
 ######################################################################
 # These scripts are meant to be run in user mode as they modify
 # usr settings line .bashrc and .bash_aliases
-# Copyright 2022, 2023 John J. Rofrano All Rights Reserved.
+# Copyright 2022, 2026 John J. Rofrano All Rights Reserved.
 ######################################################################
 
 echo "**********************************************************************"
@@ -13,7 +13,7 @@ ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's
 echo "Architecture is:" $ARCH
 
 echo "**********************************************************************"
-echo "Installing K3D Kubernetes..."
+echo "Installing Rancher K3D Kubernetes..."
 echo "**********************************************************************"
 curl -s "https://raw.githubusercontent.com/rancher/k3d/main/install.sh" | sudo bash
 echo "Creating kc and kns alias for kubectl..."
@@ -24,7 +24,7 @@ sudo sh -c 'echo "127.0.0.1 cluster-registry" >> /etc/hosts'
 echo "**********************************************************************"
 echo "Installing K9s..."
 echo "**********************************************************************"
-curl -L -o k9s.tar.gz "https://github.com/derailed/k9s/releases/download/v0.32.5/k9s_Linux_$ARCH.tar.gz"
+curl -L -o k9s.tar.gz "https://github.com/derailed/k9s/releases/download/v0.50.18/k9s_Linux_$ARCH.tar.gz"
 tar xvzf k9s.tar.gz
 sudo install -c -m 0755 k9s /usr/local/bin
 rm k9s.tar.gz
