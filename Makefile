@@ -74,6 +74,11 @@ push: ## Push to a Docker image registry
 	$(info Logging into IBM Cloud cluster $(CLUSTER)...)
 	docker push $(IMAGE)
 
+.PHONY: import
+import: ## Import the image into the local K3D cluster
+	$(info Importing $(IMAGE) into k3d cluster $(CLUSTER)...)
+	k3d image import --cluster $(CLUSTER) $(IMAGE)
+
 .PHONY: postgres
 postgres: ## Deploy the PostgreSQL service on local Kubernetes
 	$(info Deploying PostgreSQL service to Kubernetes...)
