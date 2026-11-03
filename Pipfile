@@ -1,3 +1,4 @@
+# cspell:disable
 [[source]]
 url = "https://pypi.org/simple"
 verify_ssl = true
@@ -8,21 +9,21 @@ flask = "==3.1.3"
 flask-sqlalchemy = "==3.1.1"
 psycopg = {extras = ["binary"], version = "==3.3.2"}
 retry2 = "~=0.9.5"
-python-dotenv = "~=1.2.1"
-gunicorn = "~=25.0.0"
+python-dotenv = "~=1.2.4"
+gunicorn = "~=26.2.0"
 
 [dev-packages]
 # Code Quality
-pylint = "~=4.0.4"
-flake8 = "~=7.3.0"
-black = "~=26.1.0"
+pylint = "~=4.1.3"
+flake8 = "~=7.4.1"
+black = "~=26.10.1"
 
 # Test-Driven Development
-pytest = "~=9.0.2"
-pytest-pspec = "~=0.0.4"
-pytest-cov = "~=7.0.0"
+pytest = "~=9.1.1"
+pytest-spec = "~=6.1.0"
+pytest-cov = "~=7.1.0"
 factory-boy = "~=3.3.3"
-coverage = "~=7.13.2"
+coverage = "~=7.17.0"
 
 # Utility
 honcho = "~=2.0.0"
